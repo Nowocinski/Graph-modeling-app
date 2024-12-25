@@ -89,6 +89,24 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('lathe')) {
+    // Create a default profile shape for the lathe
+    const points = [];
+    for (let i = 0; i < 10; i++) {
+      const t = i / 9;
+      const x = 0.5 + Math.sin(t * Math.PI) * 0.25; // Creates a curved profile
+      const y = t - 0.5;
+      points.push(new THREE.Vector2(x, y));
+    }
+
+    return new THREE.LatheGeometry(
+      points,
+      geometryNode.data.segments,
+      geometryNode.data.phiStart,
+      geometryNode.data.phiLength
+    );
+  }
+
   if (nodeType.includes('extrude')) {
     // Create a default shape (heart shape) for extrusion
     const shape = new THREE.Shape();
