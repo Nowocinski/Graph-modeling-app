@@ -17,6 +17,7 @@ const selectorStyles = {
 };
 
 const buttonStyles = {
+  cursor: 'pointer',
   background: '#2563eb',
   color: 'white',
   border: 'none',
@@ -38,6 +39,7 @@ const buttonStyles = {
 };
 
 const dropdownStyles = {
+  padding: '8px',
   position: 'fixed' as const,
   top: 'calc(20px + 45px)',
   left: '20px',
@@ -144,6 +146,9 @@ const nodes = {
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
     { type: 'group', label: 'Group', icon: '▢' },
+  ],
+  'CSG Operations': [
+    { type: 'subtract', label: 'Subtract Operation', icon: '⊖' },
   ]
 };
 
