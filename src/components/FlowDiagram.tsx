@@ -347,27 +347,29 @@ const FlowDiagramInner = () => {
     const sourceNode = nodes.find(node => node.id === params.source);
     const targetNode = nodes.find(node => node.id === params.target);
 
-    // Sprawdź czy połączenie jest dozwolone
-    const isValidConnection = () => {
-      // Scene może przyjmować połączenia od Mesh, Group i Subtract
+    // Funkcja sprawdzająca czy połączenie jest dozwolone
+    const isValidConnection = (connection: Connection) => {
+      const sourceNode = nodes.find(node => node.id === connection.source);
+      const targetNode = nodes.find(node => node.id === connection.target);
+
+      // Scene może przyjmować połączenia tylko od Mesh i operacji CSG
       if (targetNode?.type === 'scene') {
         return sourceNode?.type === 'mesh' || 
-               sourceNode?.type === 'group' || 
-               sourceNode?.type === 'subtract';
-      }
-      
-      // Mesh może przyjmować połączenia od geometry i material
-      if (targetNode?.type === 'mesh') {
-        const isGeometry = sourceNode?.type?.toLowerCase().includes('geometry');
-        const isMaterial = sourceNode?.type?.toLowerCase().includes('material');
-        return isGeometry || isMaterial;
+               sourceNode?.type === 'subtract' || 
+               sourceNode?.type === 'intersect';
       }
 
-      // Group może przyjmować połączenia od Mesh, Group i Subtract
+      // Group może przyjmować połączenia tylko od Mesh i operacji CSG
       if (targetNode?.type === 'group') {
         return sourceNode?.type === 'mesh' || 
-               sourceNode?.type === 'group' || 
-               sourceNode?.type === 'subtract';
+               sourceNode?.type === 'subtract' || 
+               sourceNode?.type === 'intersect';
+      }
+
+      // Mesh może przyjmować połączenia tylko od Geometry
+      if (targetNode?.type === 'mesh') {
+        return sourceNode?.type === 'boxGeometry' || 
+               sourceNode?.type === 'sphereGeometry';
       }
 
       // Subtract może przyjmować połączenia tylko od Mesh
@@ -394,7 +396,7 @@ const FlowDiagramInner = () => {
       return outgoingEdges.some(edge => wouldCreateCycle(sourceId, edge.target, visited));
     };
 
-    if (isValidConnection() && params.source && params.target) {
+    if (isValidConnection(params) && params.source && params.target) {
       // Sprawdź czy nie tworzymy cyklu
       if (sourceNode?.type === 'group' && targetNode?.type === 'group') {
         if (wouldCreateCycle(params.source, params.target)) {
