@@ -98,6 +98,7 @@ const nodes = {
   ],
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
+    { type: 'group', label: 'Group', icon: '▢' },
   ]
 };
 
