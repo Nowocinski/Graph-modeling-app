@@ -1,5 +1,8 @@
+'use client';
+
 import DiagramWrapper from '../components/DiagramWrapper';
 import ThreeWrapper from '../components/ThreeWrapper';
+import { SceneProvider } from '../context/SceneContext';
 
 const styles = {
   container: {
@@ -19,13 +22,15 @@ const styles = {
 
 export default function Home() {
   return (
-    <main style={styles.container}>
-      <section style={styles.section}>
-        <DiagramWrapper />
-      </section>
-      <section style={styles.section}>
-        <ThreeWrapper />
-      </section>
-    </main>
+    <SceneProvider>
+      <main style={styles.container}>
+        <section style={styles.section}>
+          <DiagramWrapper />
+        </section>
+        <section style={styles.section}>
+          <ThreeWrapper />
+        </section>
+      </main>
+    </SceneProvider>
   );
 }

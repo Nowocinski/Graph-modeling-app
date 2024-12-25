@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ReactFlow, { 
   Node, 
   Edge, 
@@ -18,6 +18,7 @@ import BoxGeometryNode from './nodes/BoxGeometryNode';
 import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
+import { useScene } from '../context/SceneContext';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
@@ -91,8 +92,15 @@ const customStyles = `
 `;
 
 export default function FlowDiagram() {
+  const { updateNodes, updateEdges } = useScene();
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+  // Aktualizuj kontekst przy każdej zmianie nodes lub edges
+  useEffect(() => {
+    updateNodes(nodes);
+    updateEdges(edges);
+  }, [nodes, edges, updateNodes, updateEdges]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
