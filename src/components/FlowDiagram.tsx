@@ -12,10 +12,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/BoxGeometryNode';
+import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
-  boxGeometry: BoxGeometryNode
+  boxGeometry: BoxGeometryNode,
+  meshNormalMaterial: MeshNormalMaterialNode,
+  input: undefined,
+  output: undefined
 };
 
 const initialNodes: Node[] = [
@@ -44,6 +48,16 @@ const initialNodes: Node[] = [
       width: 2,
       height: 2,
       depth: 2
+    }
+  },
+  {
+    id: '5',
+    type: 'meshNormalMaterial',
+    position: { x: 900, y: 100 },
+    data: {
+      wireframe: false,
+      transparent: false,
+      opacity: 1
     }
   }
 ];
