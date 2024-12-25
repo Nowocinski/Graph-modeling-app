@@ -28,6 +28,7 @@ import IcosahedronGeometryNode from './nodes/geometry/IcosahedronGeometryNode';
 import LatheGeometryNode from './nodes/geometry/LatheGeometryNode';
 import OctahedronGeometryNode from './nodes/geometry/OctahedronGeometryNode';
 import PlaneGeometryNode from './nodes/geometry/PlaneGeometryNode';
+import RingGeometryNode from './nodes/geometry/RingGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -51,6 +52,7 @@ const nodeTypes: NodeTypes = {
   latheGeometry: LatheGeometryNode,
   octahedronGeometry: OctahedronGeometryNode,
   planeGeometry: PlaneGeometryNode,
+  ringGeometry: RingGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -126,6 +128,14 @@ const defaultNodeData = {
     height: 1,
     widthSegments: 1,
     heightSegments: 1
+  },
+  ringGeometry: {
+    innerRadius: 0.5,
+    outerRadius: 1,
+    thetaSegments: 32,
+    phiSegments: 1,
+    thetaStart: 0,
+    thetaLength: Math.PI * 2
   },
   meshNormalMaterial: {
     wireframe: false,

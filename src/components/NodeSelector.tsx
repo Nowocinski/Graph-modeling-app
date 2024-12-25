@@ -99,6 +99,7 @@ const nodes = {
     { type: 'latheGeometry', label: 'Lathe Geometry', icon: '◎' },
     { type: 'octahedronGeometry', label: 'Octahedron Geometry', icon: '◈' },
     { type: 'planeGeometry', label: 'Plane Geometry', icon: '▭' },
+    { type: 'ringGeometry', label: 'Ring Geometry', icon: '◍' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },

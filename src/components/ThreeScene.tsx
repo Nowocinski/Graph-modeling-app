@@ -105,6 +105,17 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('ring')) {
+    return new THREE.RingGeometry(
+      geometryNode.data.innerRadius,
+      geometryNode.data.outerRadius,
+      geometryNode.data.thetaSegments,
+      geometryNode.data.phiSegments,
+      geometryNode.data.thetaStart,
+      geometryNode.data.thetaLength
+    );
+  }
+
   if (nodeType.includes('lathe')) {
     // Create a default profile shape for the lathe
     const points = [];
