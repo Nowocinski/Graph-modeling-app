@@ -202,10 +202,14 @@ export default function FlowDiagram() {
     if (isValidConnection()) {
       // Jeśli tworzymy nowe połączenie
       if (params.source && params.target) {
-        // Znajdź i usuń stare połączenie do tego samego handlera
-        const updatedEdges = edges.filter(edge => 
-          !(edge.target === params.target && edge.targetHandle === params.targetHandle)
-        );
+        let updatedEdges = [...edges];
+        
+        // Usuń stare połączenie tylko dla Mesh i Group (nie dla Scene)
+        if (targetNode?.type !== 'scene') {
+          updatedEdges = edges.filter(edge => 
+            !(edge.target === params.target && edge.targetHandle === params.targetHandle)
+          );
+        }
         
         // Dodaj nowe połączenie
         const newEdges = addEdge(params, updatedEdges);
