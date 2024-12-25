@@ -67,6 +67,23 @@ const createMaterial = (materialNode: any): THREE.Material => {
             ? THREE.BackSide 
             : THREE.DoubleSide
       });
+    case 'meshPhongMaterial':
+      return new THREE.MeshPhongMaterial({
+        color: materialNode.data.color,
+        emissive: materialNode.data.emissive,
+        specular: materialNode.data.specular,
+        shininess: materialNode.data.shininess,
+        wireframe: materialNode.data.wireframe,
+        transparent: materialNode.data.transparent,
+        opacity: materialNode.data.opacity,
+        visible: materialNode.data.visible,
+        side: materialNode.data.side === 'front' 
+          ? THREE.FrontSide 
+          : materialNode.data.side === 'back' 
+            ? THREE.BackSide 
+            : THREE.DoubleSide,
+        flatShading: materialNode.data.flatShading
+      });
     default:
       console.warn('Unknown material type:', materialNode.type);
       return new THREE.MeshNormalMaterial();
