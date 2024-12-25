@@ -3,6 +3,17 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+const sceneStyles = {
+  width: '100vw',
+  height: '100vh',
+  margin: 0,
+  padding: 0,
+  overflow: 'hidden',
+  position: 'fixed' as const,
+  top: 0,
+  left: 0
+};
+
 export default function ThreeScene() {
   const mountRef = useRef<HTMLDivElement>(null);
   
@@ -12,9 +23,24 @@ export default function ThreeScene() {
     // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true,
+      alpha: true 
+    });
     
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    // Set initial size
+    const updateSize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+    };
+
+    updateSize();
     mountRef.current.appendChild(renderer.domElement);
 
     // Add a simple cube
@@ -46,13 +72,7 @@ export default function ThreeScene() {
 
     // Handle window resize
     const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-
-      renderer.setSize(width, height);
+      updateSize();
     };
 
     window.addEventListener('resize', handleResize);
@@ -63,10 +83,14 @@ export default function ThreeScene() {
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
-      mountRef.current?.removeChild(renderer.domElement);
+      if (mountRef.current?.contains(renderer.domElement)) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      geometry.dispose();
+      material.dispose();
       renderer.dispose();
     };
   }, []);
 
-  return <div ref={mountRef} style={{ width: '100vw', height: '100vh' }} />;
+  return <div ref={mountRef} style={sceneStyles} />;
 }
