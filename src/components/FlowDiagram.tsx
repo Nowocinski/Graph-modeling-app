@@ -372,10 +372,11 @@ const FlowDiagramInner = () => {
                sourceNode?.type === 'union';
       }
 
-      // Mesh może przyjmować połączenia tylko od Geometry
+      // Mesh może przyjmować połączenia od Geometry i Material
       if (targetNode?.type === 'mesh') {
-        return sourceNode?.type === 'boxGeometry' || 
-               sourceNode?.type === 'sphereGeometry';
+        const isGeometry = sourceNode?.type?.toLowerCase().includes('geometry');
+        const isMaterial = sourceNode?.type?.toLowerCase().includes('material');
+        return isGeometry || isMaterial;
       }
 
       // Subtract może przyjmować połączenia tylko od Mesh
