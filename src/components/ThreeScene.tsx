@@ -123,6 +123,16 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('torus')) {
+    return new THREE.TorusGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.tube,
+      geometryNode.data.radialSegments,
+      geometryNode.data.tubularSegments,
+      geometryNode.data.arc
+    );
+  }
+
   if (nodeType.includes('lathe')) {
     // Create a default profile shape for the lathe
     const points = [];

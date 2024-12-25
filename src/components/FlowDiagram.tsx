@@ -30,6 +30,7 @@ import OctahedronGeometryNode from './nodes/geometry/OctahedronGeometryNode';
 import PlaneGeometryNode from './nodes/geometry/PlaneGeometryNode';
 import RingGeometryNode from './nodes/geometry/RingGeometryNode';
 import TetrahedronGeometryNode from './nodes/geometry/TetrahedronGeometryNode';
+import TorusGeometryNode from './nodes/geometry/TorusGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -55,6 +56,7 @@ const nodeTypes: NodeTypes = {
   planeGeometry: PlaneGeometryNode,
   ringGeometry: RingGeometryNode,
   tetrahedronGeometry: TetrahedronGeometryNode,
+  torusGeometry: TorusGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -142,6 +144,13 @@ const defaultNodeData = {
   tetrahedronGeometry: {
     radius: 1,
     detail: 0
+  },
+  torusGeometry: {
+    radius: 1,
+    tube: 0.4,
+    radialSegments: 8,
+    tubularSegments: 24,
+    arc: Math.PI * 2
   },
   meshNormalMaterial: {
     wireframe: false,
