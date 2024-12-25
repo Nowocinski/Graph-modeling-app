@@ -617,6 +617,14 @@ export default function ThreeScene() {
     }
 
     try {
+      // Hide input meshes
+      if (meshA.parent) {
+        meshA.parent.remove(meshA);
+      }
+      if (meshB.parent) {
+        meshB.parent.remove(meshB);
+      }
+
       // Update world matrices
       meshA.updateMatrixWorld(true);
       meshB.updateMatrixWorld(true);
@@ -719,6 +727,14 @@ export default function ThreeScene() {
           scene.add(resultMesh);
           console.log('Added result to scene');
         }
+      }
+
+      // Remove input meshes from objectsRef
+      if (meshAEdge) {
+        delete objectsRef[meshAEdge.source];
+      }
+      if (meshBEdge) {
+        delete objectsRef[meshBEdge.source];
       }
 
       // Ensure the result mesh is visible
