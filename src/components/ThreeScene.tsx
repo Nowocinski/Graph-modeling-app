@@ -82,6 +82,13 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('icosahedron')) {
+    return new THREE.IcosahedronGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.detail
+    );
+  }
+
   if (nodeType.includes('extrude')) {
     // Create a default shape (heart shape) for extrusion
     const shape = new THREE.Shape();

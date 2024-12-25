@@ -24,6 +24,7 @@ import CircleGeometryNode from './nodes/geometry/CircleGeometryNode';
 import ConeGeometryNode from './nodes/geometry/ConeGeometryNode';
 import DodecahedronGeometryNode from './nodes/geometry/DodecahedronGeometryNode';
 import ExtrudeGeometryNode from './nodes/geometry/ExtrudeGeometryNode';
+import IcosahedronGeometryNode from './nodes/geometry/IcosahedronGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -43,6 +44,7 @@ const nodeTypes: NodeTypes = {
   coneGeometry: ConeGeometryNode,
   dodecahedronGeometry: DodecahedronGeometryNode,
   extrudeGeometry: ExtrudeGeometryNode,
+  icosahedronGeometry: IcosahedronGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -99,6 +101,10 @@ const defaultNodeData = {
     bevelSize: 0.1,
     bevelSegments: 3,
     steps: 1
+  },
+  icosahedronGeometry: {
+    radius: 1,
+    detail: 0
   },
   meshNormalMaterial: {
     wireframe: false,

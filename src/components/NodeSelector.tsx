@@ -95,6 +95,7 @@ const nodes = {
     { type: 'coneGeometry', label: 'Cone Geometry', icon: '▼' },
     { type: 'dodecahedronGeometry', label: 'Dodecahedron Geometry', icon: '⬢' },
     { type: 'extrudeGeometry', label: 'Extrude Geometry', icon: '⬗' },
+    { type: 'icosahedronGeometry', label: 'Icosahedron Geometry', icon: '⬡' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },
