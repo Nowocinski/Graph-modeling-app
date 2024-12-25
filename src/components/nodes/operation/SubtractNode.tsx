@@ -51,35 +51,33 @@ const SubtractNode = ({ data, id }: { data: SubtractNodeData; id: string }) => {
       />
       <Handle 
         type="target" 
-        position={Position.Left}
+        position={Position.Left} 
         id="meshB"
         style={{ top: '60%', background: '#64748b' }}
       />
-      <Handle type="source" position={Position.Right} />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="output"
+        style={{ background: '#64748b' }}
+      />
       
-      <div style={{ marginBottom: '12px', fontWeight: 'bold' }}>Subtract Operation</div>
-      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
-        Subtracts Mesh B from Mesh A
+      <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#1e293b' }}>
+        Subtract Operation
       </div>
-      
       <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
-        Mesh A (top input)
+        Base Mesh (A)
       </div>
-      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
-        Mesh B (bottom input)
+      <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
+        Subtract Mesh (B)
+      </div>
+      <div style={{ fontSize: '12px', color: '#64748b' }}>
+        Result: A - B
       </div>
 
       <button 
         onClick={handleDelete} 
         style={deleteButtonStyles}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = '#ef4444';
-          e.currentTarget.style.background = '#fee2e2';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = '#666';
-          e.currentTarget.style.background = 'transparent';
-        }}
       >
         🗑️
       </button>
