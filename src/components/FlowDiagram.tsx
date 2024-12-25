@@ -18,6 +18,7 @@ import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
 import SphereGeometryNode from './nodes/geometry/SphereGeometryNode';
 import CylinderGeometryNode from './nodes/geometry/CylinderGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
+import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
 import NodeSelector from './NodeSelector';
@@ -29,6 +30,7 @@ const nodeTypes: NodeTypes = {
   sphereGeometry: SphereGeometryNode,
   cylinderGeometry: CylinderGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
+  meshBasicMaterial: MeshBasicMaterialNode,
   mesh: MeshNode,
   scene: SceneNode
 };
@@ -57,6 +59,14 @@ const defaultNodeData = {
     wireframe: false,
     transparent: false,
     opacity: 1
+  },
+  meshBasicMaterial: {
+    color: '#ffffff',
+    wireframe: false,
+    transparent: false,
+    opacity: 1,
+    visible: true,
+    side: 'front'
   },
   mesh: {
     name: 'Mesh',

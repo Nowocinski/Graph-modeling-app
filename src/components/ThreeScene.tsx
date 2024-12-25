@@ -46,6 +46,33 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
   }
 };
 
+const createMaterial = (materialNode: any): THREE.Material => {
+  switch (materialNode.type) {
+    case 'meshNormalMaterial':
+      return new THREE.MeshNormalMaterial({
+        wireframe: materialNode.data.wireframe,
+        transparent: materialNode.data.transparent,
+        opacity: materialNode.data.opacity
+      });
+    case 'meshBasicMaterial':
+      return new THREE.MeshBasicMaterial({
+        color: materialNode.data.color,
+        wireframe: materialNode.data.wireframe,
+        transparent: materialNode.data.transparent,
+        opacity: materialNode.data.opacity,
+        visible: materialNode.data.visible,
+        side: materialNode.data.side === 'front' 
+          ? THREE.FrontSide 
+          : materialNode.data.side === 'back' 
+            ? THREE.BackSide 
+            : THREE.DoubleSide
+      });
+    default:
+      console.warn('Unknown material type:', materialNode.type);
+      return new THREE.MeshNormalMaterial();
+  }
+};
+
 export default function ThreeScene() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -174,11 +201,7 @@ export default function ThreeScene() {
           if (!mesh) {
             // Create new mesh
             const geometry = createGeometry(geometryNode);
-            const material = new THREE.MeshNormalMaterial({
-              wireframe: materialNode.data.wireframe,
-              transparent: materialNode.data.transparent,
-              opacity: materialNode.data.opacity
-            });
+            const material = createMaterial(materialNode);
 
             mesh = new THREE.Mesh(geometry, material);
             objectsRef.current[meshNode.id] = mesh;
@@ -189,11 +212,9 @@ export default function ThreeScene() {
             mesh.geometry = createGeometry(geometryNode);
             oldGeometry.dispose();
 
-            const material = mesh.material as THREE.MeshNormalMaterial;
-            material.wireframe = materialNode.data.wireframe;
-            material.transparent = materialNode.data.transparent;
-            material.opacity = materialNode.data.opacity;
-            material.needsUpdate = true;
+            const oldMaterial = mesh.material as THREE.Material;
+            mesh.material = createMaterial(materialNode);
+            oldMaterial.dispose();
           }
 
           // Update transform
