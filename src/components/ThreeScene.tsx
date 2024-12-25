@@ -487,7 +487,9 @@ export default function ThreeScene() {
     Object.entries(objectsRef.current).forEach(([id, object]) => {
       const node = nodes.find(node => node.id === id);
       if (!node || !isConnectedToScene(id)) {
-        scene.remove(object);
+        if (object.parent) {
+          object.parent.remove(object);
+        }
         delete objectsRef.current[id];
       }
     });
@@ -498,7 +500,10 @@ export default function ThreeScene() {
       // Sprawdź czy grupa jest połączona ze sceną
       if (!isConnectedToScene(groupNode.id)) {
         if (objectsRef.current[groupNode.id]) {
-          scene.remove(objectsRef.current[groupNode.id]);
+          const group = objectsRef.current[groupNode.id];
+          if (group.parent) {
+            group.parent.remove(group);
+          }
           delete objectsRef.current[groupNode.id];
         }
         return;
@@ -540,9 +545,8 @@ export default function ThreeScene() {
       if (!isConnectedToScene(meshNode.id)) {
         if (objectsRef.current[meshNode.id]) {
           const mesh = objectsRef.current[meshNode.id];
-          const parent = mesh.parent;
-          if (parent) {
-            parent.remove(mesh);
+          if (mesh.parent) {
+            mesh.parent.remove(mesh);
           }
           delete objectsRef.current[meshNode.id];
         }
@@ -587,13 +591,13 @@ export default function ThreeScene() {
         
         if (parentNode?.type === 'group') {
           const parentGroup = objectsRef.current[parentNode.id] as THREE.Group;
-          if (mesh.parent !== parentGroup) {
+          if (parentGroup && mesh.parent !== parentGroup) {
             if (mesh.parent) {
               mesh.parent.remove(mesh);
             }
             parentGroup.add(mesh);
           }
-        } else {
+        } else if (scene) {
           if (mesh.parent !== scene) {
             if (mesh.parent) {
               mesh.parent.remove(mesh);
