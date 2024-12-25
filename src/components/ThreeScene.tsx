@@ -17,6 +17,35 @@ const sceneStyles = {
   alignItems: 'center'
 };
 
+const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
+  switch (geometryNode.type) {
+    case 'boxGeometry':
+      return new THREE.BoxGeometry(
+        geometryNode.data.width,
+        geometryNode.data.height,
+        geometryNode.data.depth
+      );
+    case 'sphereGeometry':
+      return new THREE.SphereGeometry(
+        geometryNode.data.radius,
+        geometryNode.data.widthSegments,
+        geometryNode.data.heightSegments
+      );
+    case 'cylinderGeometry':
+      return new THREE.CylinderGeometry(
+        geometryNode.data.radiusTop,
+        geometryNode.data.radiusBottom,
+        geometryNode.data.height,
+        geometryNode.data.radialSegments,
+        geometryNode.data.heightSegments,
+        geometryNode.data.openEnded
+      );
+    default:
+      console.warn('Unknown geometry type:', geometryNode.type);
+      return new THREE.BoxGeometry(1, 1, 1);
+  }
+};
+
 export default function ThreeScene() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -116,6 +145,20 @@ export default function ThreeScene() {
       scene.add(pointLight);
     }
 
+    // Clean up removed meshes
+    Object.entries(objectsRef.current).forEach(([id, object]) => {
+      if (!meshNodes.find(node => node.id === id)) {
+        scene.remove(object);
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          if (object.material instanceof THREE.Material) {
+            object.material.dispose();
+          }
+        }
+        delete objectsRef.current[id];
+      }
+    });
+
     // Update meshes
     meshNodes.forEach(meshNode => {
       const geometryConnection = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
@@ -129,12 +172,8 @@ export default function ThreeScene() {
           let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
 
           if (!mesh) {
-            const geometry = new THREE.BoxGeometry(
-              geometryNode.data.width,
-              geometryNode.data.height,
-              geometryNode.data.depth
-            );
-
+            // Create new mesh
+            const geometry = createGeometry(geometryNode);
             const material = new THREE.MeshNormalMaterial({
               wireframe: materialNode.data.wireframe,
               transparent: materialNode.data.transparent,
@@ -146,18 +185,15 @@ export default function ThreeScene() {
             scene.add(mesh);
           } else {
             // Update existing mesh
-            const geometry = mesh.geometry as THREE.BoxGeometry;
-            geometry.dispose();
-            mesh.geometry = new THREE.BoxGeometry(
-              geometryNode.data.width,
-              geometryNode.data.height,
-              geometryNode.data.depth
-            );
+            const oldGeometry = mesh.geometry;
+            mesh.geometry = createGeometry(geometryNode);
+            oldGeometry.dispose();
 
             const material = mesh.material as THREE.MeshNormalMaterial;
             material.wireframe = materialNode.data.wireframe;
             material.transparent = materialNode.data.transparent;
             material.opacity = materialNode.data.opacity;
+            material.needsUpdate = true;
           }
 
           // Update transform
