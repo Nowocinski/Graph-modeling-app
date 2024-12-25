@@ -118,7 +118,7 @@ const customStyles = `
 `;
 
 export default function FlowDiagram() {
-  const { updateNodes, updateEdges } = useScene();
+  const { updateNodes, updateEdges, updateSceneState } = useScene();
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
 
@@ -138,10 +138,21 @@ export default function FlowDiagram() {
     []
   );
 
-  const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
-    []
-  );
+  const onConnect = useCallback((params: Connection) => {
+    // Jeśli tworzymy nowe połączenie do mesh'a
+    if (params.target && params.targetHandle) {
+      // Znajdź i usuń stare połączenie do tego samego handlera
+      const updatedEdges = edges.filter(edge => 
+        !(edge.target === params.target && edge.targetHandle === params.targetHandle)
+      );
+      
+      // Dodaj nowe połączenie
+      setEdges(addEdge(params, updatedEdges));
+      
+      // Aktualizuj kontekst sceny
+      updateSceneState(nodes, [...updatedEdges, params]);
+    }
+  }, [edges, nodes, updateSceneState]);
 
   const handleNodeUpdate = useCallback((nodeId: string, newData: any) => {
     setNodes((nds) =>

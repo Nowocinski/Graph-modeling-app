@@ -8,6 +8,7 @@ interface SceneContextType {
   edges: Edge[];
   updateNodes: (nodes: Node[]) => void;
   updateEdges: (edges: Edge[]) => void;
+  updateSceneState: (nodes: Node[], edges: Edge[]) => void;
 }
 
 const SceneContext = createContext<SceneContextType | undefined>(undefined);
@@ -24,8 +25,19 @@ export function SceneProvider({ children }: { children: React.ReactNode }) {
     setEdges(newEdges);
   };
 
+  const updateSceneState = (newNodes: Node[], newEdges: Edge[]) => {
+    setNodes(newNodes);
+    setEdges(newEdges);
+  };
+
   return (
-    <SceneContext.Provider value={{ nodes, edges, updateNodes, updateEdges }}>
+    <SceneContext.Provider value={{ 
+      nodes, 
+      edges, 
+      updateNodes, 
+      updateEdges,
+      updateSceneState 
+    }}>
       {children}
     </SceneContext.Provider>
   );
