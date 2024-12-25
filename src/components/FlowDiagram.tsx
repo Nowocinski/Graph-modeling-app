@@ -223,7 +223,7 @@ const defaultNodeData = {
 const defaultSceneNode: Node = {
   id: 'scene',
   type: 'scene',
-  position: { x: 500, y: 200 },
+  position: { x: 800, y: 200 },
   data: {
     backgroundColor: '#f0f0f0',
     ambientLightIntensity: 0.5,
@@ -233,23 +233,23 @@ const defaultSceneNode: Node = {
 };
 
 const initialNodes: Node[] = [
-  defaultSceneNode,
+  defaultSceneNode, // Scene node w prawej części
   {
     id: 'boxGeometry_1',
     type: 'boxGeometry',
-    position: { x: 100, y: 100 },
+    position: { x: 100, y: 200 }, // Przesunięty w lewo
     data: defaultNodeData.boxGeometry
   },
   {
     id: 'meshNormalMaterial_1',
     type: 'meshNormalMaterial',
-    position: { x: 100, y: 250 },
+    position: { x: 100, y: 600 }, // Przesunięty w dół
     data: defaultNodeData.meshNormalMaterial
   },
   {
     id: 'mesh_1',
     type: 'mesh',
-    position: { x: 400, y: 175 },
+    position: { x: 500, y: 400 }, // Przesunięty na środek
     data: defaultNodeData.mesh
   }
 ];
