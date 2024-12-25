@@ -11,7 +11,9 @@ import ReactFlow, {
   NodeChange,
   addEdge,
   Connection,
-  Edge as FlowEdge
+  Edge as FlowEdge,
+  applyEdgeChanges,
+  EdgeChange
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
@@ -166,7 +168,7 @@ export default function FlowDiagram() {
   );
 
   const onEdgesChange = useCallback(
-    (changes: NodeChange[]) => setEdges((eds) => applyNodeChanges(changes, eds)),
+    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
@@ -221,6 +223,10 @@ export default function FlowDiagram() {
     ));
   }, []);
 
+  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+  }, []);
+
   return (
     <div style={flowStyles}>
       <style>{customStyles}</style>
@@ -239,6 +245,7 @@ export default function FlowDiagram() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onEdgeClick={onEdgeClick}
         fitView
         style={flowStyles}
       >
