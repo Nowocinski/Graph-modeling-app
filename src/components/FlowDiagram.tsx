@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import ReactFlow, { 
   Node, 
   Edge, 
@@ -13,7 +13,10 @@ import ReactFlow, {
   Connection,
   Edge as FlowEdge,
   applyEdgeChanges,
-  EdgeChange
+  EdgeChange,
+  ReactFlowProvider,
+  ReactFlowInstance,
+  useReactFlow
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
@@ -261,10 +264,11 @@ const customStyles = `
   }
 `;
 
-export default function FlowDiagram() {
+const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const { project, getViewport } = useReactFlow();
 
   // Aktualizuj kontekst przy każdej zmianie nodes lub edges
   useEffect(() => {
@@ -369,15 +373,24 @@ export default function FlowDiagram() {
   }, []);
 
   const handleAddNode = useCallback((type: string) => {
+    const { x: viewX, y: viewY, zoom } = getViewport();
+    
+    // Pobierz środek widoku
+    const centerX = window.innerWidth / 4;
+    const centerY = window.innerHeight / 2;
+    
+    // Przekonwertuj pozycję ekranu na pozycję flow
+    const position = project({ x: centerX, y: centerY });
+
     const newNode: Node = {
       id: `${type}_${Date.now()}`,
       type,
-      position: { x: 100, y: 100 },
+      position: position,
       data: defaultNodeData[type as keyof typeof defaultNodeData] || {}
     };
 
     setNodes((nds) => [...nds, newNode]);
-  }, []);
+  }, [project]);
 
   const handleDeleteNode = useCallback((nodeId: string) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
@@ -416,5 +429,13 @@ export default function FlowDiagram() {
         <Controls />
       </ReactFlow>
     </div>
+  );
+};
+
+export default function FlowDiagram() {
+  return (
+    <ReactFlowProvider>
+      <FlowDiagramInner />
+    </ReactFlowProvider>
   );
 }
