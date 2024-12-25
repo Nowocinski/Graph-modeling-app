@@ -117,7 +117,7 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
       position: 'relative',
       width: '320px' 
     }}>
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Left} />
       <div style={{ marginBottom: '12px', fontWeight: 'bold' }}>Group: {data.name}</div>
       
       <Vector3Input
@@ -139,7 +139,7 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
       <button onClick={handleDelete} style={deleteButtonStyles}>
         🗑️
       </button>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Right} />
     </div>
   );
 };
