@@ -119,11 +119,6 @@ export default function ThreeScene() {
 
       // Update controls
       controls.update();
-
-      // Rotate cube
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-
       renderer.render(scene, camera);
     };
 
