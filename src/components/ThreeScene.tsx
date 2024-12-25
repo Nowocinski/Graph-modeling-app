@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const sceneStyles = {
   width: '100%',
@@ -57,6 +58,12 @@ export default function ThreeScene() {
     
     rendererRef.current = renderer;
     
+    // Add OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    
     // Set initial size
     const updateSize = () => {
       if (!mountRef.current) return;
@@ -109,6 +116,9 @@ export default function ThreeScene() {
     let animationFrameId: number;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+
+      // Update controls
+      controls.update();
 
       // Rotate cube
       cube.rotation.x += 0.01;
