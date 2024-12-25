@@ -144,18 +144,6 @@ const initialNodes: Node[] = [
     type: 'scene',
     position: { x: 700, y: 175 },
     data: defaultNodeData.scene
-  },
-  {
-    id: '5',
-    type: 'capsuleGeometry',
-    position: { x: 100, y: 400 },
-    data: defaultNodeData.capsuleGeometry
-  },
-  {
-    id: '6',
-    type: 'circleGeometry',
-    position: { x: 100, y: 550 },
-    data: defaultNodeData.circleGeometry
   }
 ];
 
