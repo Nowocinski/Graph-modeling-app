@@ -157,7 +157,7 @@ const initialNodes: Node[] = [
   {
     id: '4',
     type: 'scene',
-    position: { x: 700, y: 175 },
+    position: { x: 750, y: 175 },
     data: defaultNodeData.scene
   }
 ];
