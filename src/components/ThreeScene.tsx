@@ -496,6 +496,27 @@ export default function ThreeScene() {
 
     // Update or create groups
     const groupNodes = nodes.filter(node => node.type === 'group');
+    
+    // Funkcja do znalezienia rodzica grupy
+    const findGroupParent = (groupId: string): THREE.Object3D => {
+      const parentEdge = edges.find(edge => edge.source === groupId);
+      const parentNode = nodes.find(node => node.id === parentEdge?.target);
+
+      if (parentNode?.type === 'group') {
+        return objectsRef.current[parentNode.id] as THREE.Group || scene;
+      }
+      return scene;
+    };
+
+    // Najpierw stwórz wszystkie grupy
+    groupNodes.forEach(groupNode => {
+      if (!objectsRef.current[groupNode.id]) {
+        const group = new THREE.Group();
+        objectsRef.current[groupNode.id] = group;
+      }
+    });
+
+    // Następnie ustaw hierarchię i transformacje
     groupNodes.forEach(groupNode => {
       // Sprawdź czy grupa jest połączona ze sceną
       if (!isConnectedToScene(groupNode.id)) {
@@ -509,13 +530,15 @@ export default function ThreeScene() {
         return;
       }
 
-      let group = objectsRef.current[groupNode.id] as THREE.Group;
+      const group = objectsRef.current[groupNode.id] as THREE.Group;
+      const parent = findGroupParent(groupNode.id);
       
-      // Stwórz nową grupę jeśli nie istnieje
-      if (!group) {
-        group = new THREE.Group();
-        objectsRef.current[groupNode.id] = group;
-        scene.add(group);
+      // Zmień rodzica jeśli potrzeba
+      if (group.parent !== parent) {
+        if (group.parent) {
+          group.parent.remove(group);
+        }
+        parent.add(group);
       }
 
       // Aktualizuj transformacje grupy

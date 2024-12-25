@@ -355,51 +355,67 @@ const FlowDiagramInner = () => {
         return isGeometry || isMaterial;
       }
 
-      // Group może przyjmować połączenia od Mesh
+      // Group może przyjmować połączenia od Mesh i Group
       if (targetNode?.type === 'group') {
-        return sourceNode?.type === 'mesh';
+        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
       }
 
       return false;
     };
 
-    if (isValidConnection()) {
-      // Jeśli tworzymy nowe połączenie
-      if (params.source && params.target) {
-        let updatedEdges = [...edges];
-        
-        // Usuń stare połączenie tylko dla Mesh (nie dla Scene i Group)
-        if (targetNode?.type === 'mesh') {
-          updatedEdges = edges.filter(edge => 
-            !(edge.target === params.target && edge.targetHandle === params.targetHandle)
-          );
-        }
-        
-        // Dodaj nowe połączenie
-        const newEdges = addEdge(params, updatedEdges);
-        setEdges(newEdges);
-        
-        // Aktualizuj kontekst sceny
-        updateSceneState(nodes, newEdges);
+    // Sprawdź czy nie tworzymy cyklu w grafie
+    const wouldCreateCycle = (sourceId: string, targetId: string, visited = new Set<string>()): boolean => {
+      if (sourceId === targetId) return true;
+      if (visited.has(targetId)) return false;
+      
+      visited.add(targetId);
+      
+      const outgoingEdges = edges.filter(edge => edge.source === targetId);
+      return outgoingEdges.some(edge => wouldCreateCycle(sourceId, edge.target, visited));
+    };
 
-        // Dodaj node do GroupNode
-        if (targetNode?.type === 'group') {
-          const targetGroupNode = nodes.find(node => node.id === params.target);
-          if (targetGroupNode) {
-            const updatedNodes = nodes.map(node => {
-              if (node.id === targetGroupNode.id) {
-                return {
-                  ...node,
-                  data: {
-                    ...node.data,
-                    nodes: [...(node.data.nodes || []), params.source]
-                  }
-                };
-              }
-              return node;
-            });
-            setNodes(updatedNodes);
-          }
+    if (isValidConnection() && params.source && params.target) {
+      // Sprawdź czy nie tworzymy cyklu
+      if (sourceNode?.type === 'group' && targetNode?.type === 'group') {
+        if (wouldCreateCycle(params.source, params.target)) {
+          console.warn('Cannot create cyclic group dependencies');
+          return;
+        }
+      }
+
+      let updatedEdges = [...edges];
+      
+      // Usuń stare połączenie tylko dla Mesh (nie dla Scene i Group)
+      if (targetNode?.type === 'mesh') {
+        updatedEdges = edges.filter(edge => 
+          !(edge.target === params.target && edge.targetHandle === params.targetHandle)
+        );
+      }
+      
+      // Dodaj nowe połączenie
+      const newEdges = addEdge(params, updatedEdges);
+      setEdges(newEdges);
+      
+      // Aktualizuj kontekst sceny
+      updateSceneState(nodes, newEdges);
+
+      // Dodaj node do GroupNode
+      if (targetNode?.type === 'group') {
+        const targetGroupNode = nodes.find(node => node.id === params.target);
+        if (targetGroupNode) {
+          const updatedNodes = nodes.map(node => {
+            if (node.id === targetGroupNode.id) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  nodes: [...(node.data.nodes || []), params.source]
+                }
+              };
+            }
+            return node;
+          });
+          setNodes(updatedNodes);
         }
       }
     }
