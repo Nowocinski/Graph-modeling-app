@@ -23,6 +23,9 @@ const sceneStyles = {
 export default function ThreeScene() {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   
   // Update dimensions
@@ -42,20 +45,23 @@ export default function ThreeScene() {
 
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-  
+
+  // Initialize scene
   useEffect(() => {
     if (!mountRef.current) return;
 
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xe0e0e0);
+    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
+    cameraRef.current = camera;
+
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true,
       alpha: true 
     });
-    
     rendererRef.current = renderer;
     
     // Add OrbitControls
@@ -63,33 +69,8 @@ export default function ThreeScene() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
+    controlsRef.current = controls;
     
-    // Set initial size
-    const updateSize = () => {
-      if (!mountRef.current) return;
-      
-      // Update camera
-      camera.aspect = dimensions.width / dimensions.height;
-      camera.updateProjectionMatrix();
-      
-      // Update renderer
-      renderer.setSize(dimensions.width, dimensions.height, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    };
-
-    // Initialize renderer
-    updateSize();
-    renderer.setSize(dimensions.width, dimensions.height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    
-    // Ustaw viewport na środek
-    const viewportWidth = dimensions.width;
-    const viewportHeight = dimensions.height;
-    renderer.setViewport(0, 0, viewportWidth, viewportHeight);
-    
-    mountRef.current.appendChild(renderer.domElement);
-
     // Add a simple cube
     const geometry = new THREE.BoxGeometry(2, 2, 2);
     const material = new THREE.MeshPhongMaterial({ 
@@ -97,7 +78,7 @@ export default function ThreeScene() {
       shininess: 60,
     });
     const cube = new THREE.Mesh(geometry, material);
-    cube.position.set(0, 0, 0); // Ustawienie kostki w środku sceny
+    cube.position.set(0, 0, 0);
     scene.add(cube);
 
     // Add lights
@@ -110,33 +91,50 @@ export default function ThreeScene() {
 
     // Position camera
     camera.position.set(0, 0, 5);
-    camera.lookAt(0, 0, 0); // Skierowanie kamery na środek sceny
+    camera.lookAt(0, 0, 0);
+
+    mountRef.current.appendChild(renderer.domElement);
 
     // Animation
     let animationFrameId: number;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-
-      // Update controls
-      controls.update();
-      renderer.render(scene, camera);
+      if (controlsRef.current) {
+        controlsRef.current.update();
+      }
+      if (rendererRef.current && sceneRef.current && cameraRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      }
     };
 
-    // Start animation
     animate();
 
-    // Cleanup
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      if (mountRef.current?.contains(renderer.domElement)) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
       }
-      geometry.dispose();
-      material.dispose();
-      renderer.dispose();
-      rendererRef.current = null;
+      if (mountRef.current && rendererRef.current) {
+        mountRef.current.removeChild(rendererRef.current.domElement);
+      }
     };
-  }, [dimensions]); // Re-run effect when dimensions change
+  }, []); // Pusta tablica zależności - scena tworzona tylko raz
+
+  // Handle resize
+  useEffect(() => {
+    if (!rendererRef.current || !cameraRef.current || !mountRef.current) return;
+
+    const camera = cameraRef.current;
+    const renderer = rendererRef.current;
+
+    // Update camera
+    camera.aspect = dimensions.width / dimensions.height;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(dimensions.width, dimensions.height, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  }, [dimensions]); // Reaguj tylko na zmiany wymiarów
 
   return <div ref={mountRef} style={sceneStyles} />;
 }
