@@ -229,6 +229,36 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType === 'tubeGeometry') {
+    // Create a custom curve (helix)
+    class CustomCurve extends THREE.Curve<THREE.Vector3> {
+      private scale: number;
+      
+      constructor(scale = 1) {
+        super();
+        this.scale = scale;
+      }
+
+      getPoint(t: number): THREE.Vector3 {
+        const tx = Math.sin(2 * Math.PI * t);
+        const ty = t * 2 - 1; // Move up as we go around
+        const tz = Math.cos(2 * Math.PI * t);
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+      }
+    }
+
+    const path = new CustomCurve(geometryNode.data.radius);
+    
+    return new THREE.TubeGeometry(
+      path,
+      geometryNode.data.tubularSegments,
+      geometryNode.data.tubeRadius,
+      geometryNode.data.radialSegments,
+      geometryNode.data.closed
+    );
+  }
+
   if (nodeType === 'latheGeometry') {
     // Create a default profile shape for the lathe
     const points = [];
