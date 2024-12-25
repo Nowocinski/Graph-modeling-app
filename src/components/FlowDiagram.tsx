@@ -34,13 +34,19 @@ const initialEdges: Edge[] = [
   { id: 'e2-3', source: '2', target: '3' }
 ];
 
+const flowStyles = {
+  width: '100%',
+  height: '100vh',
+};
+
 export default function FlowDiagram() {
   return (
-    <div style={{ width: '100%', height: '500px' }}>
+    <div style={flowStyles}>
       <ReactFlow
         nodes={initialNodes}
         edges={initialEdges}
         fitView
+        style={flowStyles}
       >
         <Background />
         <Controls />
