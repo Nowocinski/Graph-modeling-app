@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface NodeSelectorProps {
   onSelect: (nodeType: string) => void;
@@ -149,16 +149,37 @@ const nodes = {
   ],
   'CSG Operations': [
     { type: 'subtract', label: 'Subtract Operation', icon: '⊖' },
+    { type: 'intersect', label: 'Intersect Operation', icon: '⊗' },
   ]
 };
 
-export default function NodeSelector({ onSelect }: NodeSelectorProps) {
+const NodeSelector = ({ onSelect }: NodeSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (nodeType: string) => {
     onSelect(nodeType);
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Funkcja dzieląca elementy na kolumny po 5
   const splitIntoColumns = (items: typeof nodes.Geometry) => {
@@ -171,8 +192,9 @@ export default function NodeSelector({ onSelect }: NodeSelectorProps) {
 
   return (
     <div style={selectorStyles}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)} 
+      <button
+        ref={buttonRef}
+        onClick={() => setIsOpen(!isOpen)}
         style={buttonStyles}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = '#1d4ed8';
@@ -190,7 +212,10 @@ export default function NodeSelector({ onSelect }: NodeSelectorProps) {
       </button>
 
       {isOpen && (
-        <div style={dropdownStyles}>
+        <div
+          ref={menuRef}
+          style={dropdownStyles}
+        >
           {Object.entries(nodes).map(([category, items]) => (
             <div key={category} style={sectionStyles}>
               <div style={categoryStyles}>{category}</div>
@@ -222,4 +247,6 @@ export default function NodeSelector({ onSelect }: NodeSelectorProps) {
       )}
     </div>
   );
-}
+};
+
+export default NodeSelector;
