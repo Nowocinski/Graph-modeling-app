@@ -4,9 +4,16 @@ import ReactFlow, {
   Node, 
   Edge, 
   Background,
-  Controls
+  Controls,
+  NodeTypes
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import BoxGeometryNode from './nodes/BoxGeometryNode';
+
+// Definicja typów node'ów
+const nodeTypes: NodeTypes = {
+  boxGeometry: BoxGeometryNode
+};
 
 const initialNodes: Node[] = [
   {
@@ -25,6 +32,16 @@ const initialNodes: Node[] = [
     position: { x: 500, y: 100 },
     data: { label: 'Node 3' },
     type: 'output'
+  },
+  {
+    id: '4',
+    type: 'boxGeometry',
+    position: { x: 700, y: 100 },
+    data: { 
+      width: 2,
+      height: 2,
+      depth: 2
+    }
   }
 ];
 
@@ -52,6 +69,7 @@ export default function FlowDiagram() {
       <ReactFlow
         nodes={initialNodes}
         edges={initialEdges}
+        nodeTypes={nodeTypes}
         fitView
         style={flowStyles}
       >
