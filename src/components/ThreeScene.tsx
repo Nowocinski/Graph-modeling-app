@@ -96,6 +96,15 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('plane')) {
+    return new THREE.PlaneGeometry(
+      geometryNode.data.width,
+      geometryNode.data.height,
+      geometryNode.data.widthSegments,
+      geometryNode.data.heightSegments
+    );
+  }
+
   if (nodeType.includes('lathe')) {
     // Create a default profile shape for the lathe
     const points = [];
