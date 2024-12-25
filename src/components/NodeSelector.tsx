@@ -102,6 +102,7 @@ const nodes = {
     { type: 'ringGeometry', label: 'Ring Geometry', icon: '◍' },
     { type: 'tetrahedronGeometry', label: 'Tetrahedron Geometry', icon: '△' },
     { type: 'torusGeometry', label: 'Torus Geometry', icon: '⊗' },
+    { type: 'torusKnotGeometry', label: 'Torus Knot Geometry', icon: '✾' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },

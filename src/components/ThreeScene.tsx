@@ -18,10 +18,21 @@ const sceneStyles = {
 };
 
 const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
-  const nodeType = geometryNode.type.toLowerCase();
-  console.log('Creating geometry for node:', { type: nodeType, data: geometryNode.data });
+  const nodeType = geometryNode.type;
+  console.log('Creating geometry for node type:', nodeType);
+  console.log('Node data:', geometryNode.data);
 
-  if (nodeType.includes('box')) {
+  if (!geometryNode.data) {
+    console.warn('No data for geometry node:', nodeType);
+    return new THREE.BoxGeometry(1, 1, 1);
+  }
+
+  if (nodeType === 'boxGeometry') {
+    console.log('Creating BoxGeometry with params:', {
+      width: geometryNode.data.width,
+      height: geometryNode.data.height,
+      depth: geometryNode.data.depth
+    });
     return new THREE.BoxGeometry(
       geometryNode.data.width,
       geometryNode.data.height,
@@ -29,8 +40,12 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   } 
   
-  if (nodeType.includes('sphere')) {
-    console.log('Creating sphere geometry with:', geometryNode.data);
+  if (nodeType === 'sphereGeometry') {
+    console.log('Creating SphereGeometry with params:', {
+      radius: geometryNode.data.radius,
+      widthSegments: geometryNode.data.widthSegments,
+      heightSegments: geometryNode.data.heightSegments
+    });
     return new THREE.SphereGeometry(
       geometryNode.data.radius,
       geometryNode.data.widthSegments,
@@ -38,7 +53,15 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
   
-  if (nodeType.includes('cylinder')) {
+  if (nodeType === 'cylinderGeometry') {
+    console.log('Creating CylinderGeometry with params:', {
+      radiusTop: geometryNode.data.radiusTop,
+      radiusBottom: geometryNode.data.radiusBottom,
+      height: geometryNode.data.height,
+      radialSegments: geometryNode.data.radialSegments,
+      heightSegments: geometryNode.data.heightSegments,
+      openEnded: geometryNode.data.openEnded
+    });
     return new THREE.CylinderGeometry(
       geometryNode.data.radiusTop,
       geometryNode.data.radiusBottom,
@@ -49,7 +72,13 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('capsule')) {
+  if (nodeType === 'capsuleGeometry') {
+    console.log('Creating CapsuleGeometry with params:', {
+      radius: geometryNode.data.radius,
+      length: geometryNode.data.length,
+      capSegments: geometryNode.data.capSegments,
+      radialSegments: geometryNode.data.radialSegments
+    });
     return new THREE.CapsuleGeometry(
       geometryNode.data.radius,
       geometryNode.data.length,
@@ -58,14 +87,25 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('circle')) {
+  if (nodeType === 'circleGeometry') {
+    console.log('Creating CircleGeometry with params:', {
+      radius: geometryNode.data.radius,
+      segments: geometryNode.data.segments
+    });
     return new THREE.CircleGeometry(
       geometryNode.data.radius,
       geometryNode.data.segments
     );
   }
 
-  if (nodeType.includes('cone')) {
+  if (nodeType === 'coneGeometry') {
+    console.log('Creating ConeGeometry with params:', {
+      radius: geometryNode.data.radius,
+      height: geometryNode.data.height,
+      radialSegments: geometryNode.data.radialSegments,
+      heightSegments: geometryNode.data.heightSegments,
+      openEnded: geometryNode.data.openEnded
+    });
     return new THREE.ConeGeometry(
       geometryNode.data.radius,
       geometryNode.data.height,
@@ -75,28 +115,46 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('dodecahedron')) {
+  if (nodeType === 'dodecahedronGeometry') {
+    console.log('Creating DodecahedronGeometry with params:', {
+      radius: geometryNode.data.radius,
+      detail: geometryNode.data.detail
+    });
     return new THREE.DodecahedronGeometry(
       geometryNode.data.radius,
       geometryNode.data.detail
     );
   }
 
-  if (nodeType.includes('icosahedron')) {
+  if (nodeType === 'icosahedronGeometry') {
+    console.log('Creating IcosahedronGeometry with params:', {
+      radius: geometryNode.data.radius,
+      detail: geometryNode.data.detail
+    });
     return new THREE.IcosahedronGeometry(
       geometryNode.data.radius,
       geometryNode.data.detail
     );
   }
 
-  if (nodeType.includes('octahedron')) {
+  if (nodeType === 'octahedronGeometry') {
+    console.log('Creating OctahedronGeometry with params:', {
+      radius: geometryNode.data.radius,
+      detail: geometryNode.data.detail
+    });
     return new THREE.OctahedronGeometry(
       geometryNode.data.radius,
       geometryNode.data.detail
     );
   }
 
-  if (nodeType.includes('plane')) {
+  if (nodeType === 'planeGeometry') {
+    console.log('Creating PlaneGeometry with params:', {
+      width: geometryNode.data.width,
+      height: geometryNode.data.height,
+      widthSegments: geometryNode.data.widthSegments,
+      heightSegments: geometryNode.data.heightSegments
+    });
     return new THREE.PlaneGeometry(
       geometryNode.data.width,
       geometryNode.data.height,
@@ -105,7 +163,15 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('ring')) {
+  if (nodeType === 'ringGeometry') {
+    console.log('Creating RingGeometry with params:', {
+      innerRadius: geometryNode.data.innerRadius,
+      outerRadius: geometryNode.data.outerRadius,
+      thetaSegments: geometryNode.data.thetaSegments,
+      phiSegments: geometryNode.data.phiSegments,
+      thetaStart: geometryNode.data.thetaStart,
+      thetaLength: geometryNode.data.thetaLength
+    });
     return new THREE.RingGeometry(
       geometryNode.data.innerRadius,
       geometryNode.data.outerRadius,
@@ -116,14 +182,44 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('tetrahedron')) {
+  if (nodeType === 'tetrahedronGeometry') {
+    console.log('Creating TetrahedronGeometry with params:', {
+      radius: geometryNode.data.radius,
+      detail: geometryNode.data.detail
+    });
     return new THREE.TetrahedronGeometry(
       geometryNode.data.radius,
       geometryNode.data.detail
     );
   }
 
-  if (nodeType.includes('torus')) {
+  if (nodeType === 'torusKnotGeometry') {
+    console.log('Creating TorusKnotGeometry with params:', {
+      radius: geometryNode.data.radius,
+      tube: geometryNode.data.tube,
+      tubularSegments: geometryNode.data.tubularSegments,
+      radialSegments: geometryNode.data.radialSegments,
+      p: geometryNode.data.p,
+      q: geometryNode.data.q
+    });
+    return new THREE.TorusKnotGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.tube,
+      geometryNode.data.tubularSegments,
+      geometryNode.data.radialSegments,
+      geometryNode.data.p,
+      geometryNode.data.q
+    );
+  }
+
+  if (nodeType === 'torusGeometry') {
+    console.log('Creating TorusGeometry with params:', {
+      radius: geometryNode.data.radius,
+      tube: geometryNode.data.tube,
+      radialSegments: geometryNode.data.radialSegments,
+      tubularSegments: geometryNode.data.tubularSegments,
+      arc: geometryNode.data.arc
+    });
     return new THREE.TorusGeometry(
       geometryNode.data.radius,
       geometryNode.data.tube,
@@ -133,7 +229,7 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('lathe')) {
+  if (nodeType === 'latheGeometry') {
     // Create a default profile shape for the lathe
     const points = [];
     for (let i = 0; i < 10; i++) {
@@ -143,6 +239,12 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
       points.push(new THREE.Vector2(x, y));
     }
 
+    console.log('Creating LatheGeometry with params:', {
+      points: points,
+      segments: geometryNode.data.segments,
+      phiStart: geometryNode.data.phiStart,
+      phiLength: geometryNode.data.phiLength
+    });
     return new THREE.LatheGeometry(
       points,
       geometryNode.data.segments,
@@ -151,7 +253,7 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
-  if (nodeType.includes('extrude')) {
+  if (nodeType === 'extrudeGeometry') {
     // Create a default shape (heart shape) for extrusion
     const shape = new THREE.Shape();
     shape.moveTo(0, 0);
@@ -171,6 +273,10 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
       steps: geometryNode.data.steps
     };
 
+    console.log('Creating ExtrudeGeometry with params:', {
+      shape: shape,
+      extrudeSettings: extrudeSettings
+    });
     return new THREE.ExtrudeGeometry(shape, extrudeSettings);
   }
 
