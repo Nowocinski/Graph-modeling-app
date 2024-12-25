@@ -58,6 +58,13 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('circle')) {
+    return new THREE.CircleGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.segments
+    );
+  }
+
   console.warn('Unknown geometry type:', geometryNode.type);
   return new THREE.BoxGeometry(1, 1, 1);
 };

@@ -20,6 +20,7 @@ import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
 import SphereGeometryNode from './nodes/geometry/SphereGeometryNode';
 import CylinderGeometryNode from './nodes/geometry/CylinderGeometryNode';
 import CapsuleGeometryNode from './nodes/geometry/CapsuleGeometryNode';
+import CircleGeometryNode from './nodes/geometry/CircleGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -35,6 +36,7 @@ const nodeTypes: NodeTypes = {
   sphereGeometry: SphereGeometryNode,
   cylinderGeometry: CylinderGeometryNode,
   capsuleGeometry: CapsuleGeometryNode,
+  circleGeometry: CircleGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -68,6 +70,10 @@ const defaultNodeData = {
     length: 2,
     capSegments: 4,
     radialSegments: 8
+  },
+  circleGeometry: {
+    radius: 1,
+    segments: 32
   },
   meshNormalMaterial: {
     wireframe: false,
@@ -144,6 +150,12 @@ const initialNodes: Node[] = [
     type: 'capsuleGeometry',
     position: { x: 100, y: 400 },
     data: defaultNodeData.capsuleGeometry
+  },
+  {
+    id: '6',
+    type: 'circleGeometry',
+    position: { x: 100, y: 550 },
+    data: defaultNodeData.circleGeometry
   }
 ];
 
