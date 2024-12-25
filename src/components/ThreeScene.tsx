@@ -663,38 +663,32 @@ export default function ThreeScene() {
 
       console.log('CSG operation completed');
 
-      // Calculate center position
-      const centerA = new THREE.Vector3();
-      const centerB = new THREE.Vector3();
+      // Use meshA's position for the result
+      const resultPosition = meshA.position.clone();
+      const resultRotation = meshA.rotation.clone();
+      const resultScale = meshA.scale.clone();
       
-      meshA.geometry.computeBoundingBox();
-      meshB.geometry.computeBoundingBox();
-      
-      meshA.geometry.boundingBox!.getCenter(centerA);
-      meshB.geometry.boundingBox!.getCenter(centerB);
-      
-      centerA.applyMatrix4(meshA.matrixWorld);
-      centerB.applyMatrix4(meshB.matrixWorld);
-      
-      const resultPosition = centerA.clone().add(centerB).multiplyScalar(0.5);
-      
-      console.log('Result position:', resultPosition);
+      console.log('Using meshA position:', resultPosition);
 
       // Create or update result mesh
       let resultMesh = objectsRef[meshNode.id] as THREE.Mesh;
       
       if (!resultMesh) {
         console.log('Creating new result mesh');
-        resultMesh = CSG.toMesh(bspResult, new THREE.Matrix4(), meshA.material);
+        resultMesh = CSG.toMesh(bspResult, meshA.matrix.clone(), meshA.material);
         resultMesh.position.copy(resultPosition);
+        resultMesh.rotation.copy(resultRotation);
+        resultMesh.scale.copy(resultScale);
         objectsRef[meshNode.id] = resultMesh;
       } else {
         console.log('Updating existing result mesh');
-        const newMesh = CSG.toMesh(bspResult, new THREE.Matrix4(), meshA.material);
+        const newMesh = CSG.toMesh(bspResult, meshA.matrix.clone(), meshA.material);
         resultMesh.geometry.dispose();
         resultMesh.geometry = newMesh.geometry;
         resultMesh.material = newMesh.material;
         resultMesh.position.copy(resultPosition);
+        resultMesh.rotation.copy(resultRotation);
+        resultMesh.scale.copy(resultScale);
       }
 
       // Force geometry update
@@ -813,7 +807,7 @@ export default function ThreeScene() {
         }
         parentGroup.add(mesh);
       }
-    } else if (scene) {
+    } else {
       if (mesh.parent !== scene) {
         if (mesh.parent) {
           mesh.parent.remove(mesh);
