@@ -154,6 +154,13 @@ export default function FlowDiagram() {
     setNodes((nds) => [...nds, newNode]);
   }, []);
 
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    setEdges((eds) => eds.filter((edge) => 
+      edge.source !== nodeId && edge.target !== nodeId
+    ));
+  }, []);
+
   return (
     <div style={flowStyles}>
       <style>{customStyles}</style>
@@ -163,7 +170,8 @@ export default function FlowDiagram() {
           ...node,
           data: {
             ...node.data,
-            onUpdate: handleNodeUpdate
+            onUpdate: handleNodeUpdate,
+            onDelete: node.type !== 'scene' ? handleDeleteNode : undefined
           }
         }))}
         edges={edges}

@@ -8,6 +8,7 @@ interface BoxGeometryData {
   height: number;
   depth: number;
   onUpdate?: (id: string, data: Partial<BoxGeometryData>) => void;
+  onDelete?: (id: string) => void;
 }
 
 const inputStyles = {
@@ -19,11 +20,37 @@ const inputStyles = {
   marginLeft: '8px'
 };
 
+const deleteButtonStyles = {
+  position: 'absolute' as const,
+  top: '8px',
+  right: '8px',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '4px',
+  borderRadius: '4px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '#666',
+  transition: 'all 0.2s ease',
+  ':hover': {
+    color: '#ef4444',
+    background: '#fee2e2'
+  }
+};
+
 const BoxGeometryNode = ({ data, id }: NodeProps<BoxGeometryData>) => {
   const handleChange = (field: keyof BoxGeometryData, value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && data.onUpdate) {
       data.onUpdate(id, { [field]: numValue });
+    }
+  };
+
+  const handleDelete = () => {
+    if (data.onDelete) {
+      data.onDelete(id);
     }
   };
 
@@ -35,12 +62,28 @@ const BoxGeometryNode = ({ data, id }: NodeProps<BoxGeometryData>) => {
       padding: '10px',
       minWidth: '150px',
       color: '#333',
+      position: 'relative'
     }}>
       <Handle type="target" position={Position.Left} />
       
       <div style={{ padding: '5px' }}>
         <h4 style={{ margin: '0 0 8px 0' }}>BoxGeometry</h4>
         
+        <button
+          onClick={handleDelete}
+          style={deleteButtonStyles}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#ef4444';
+            e.currentTarget.style.background = '#fee2e2';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#666';
+            e.currentTarget.style.background = 'transparent';
+          }}
+        >
+          🗑️
+        </button>
+
         <div style={{ fontSize: '12px' }}>
           <div style={{ marginBottom: '4px' }}>
             <label>Width:</label>
