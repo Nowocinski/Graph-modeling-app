@@ -98,7 +98,6 @@ const nodes = {
   ],
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
-    { type: 'scene', label: 'Scene', icon: '⬚' },
   ]
 };
 
