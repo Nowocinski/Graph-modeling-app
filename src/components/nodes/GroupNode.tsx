@@ -16,6 +16,7 @@ interface GroupData {
   scale: Vector3;
   onUpdate?: (id: string, data: Partial<GroupData>) => void;
   onDelete?: (id: string) => void;
+  nodes?: string[]; // Add nodes array to GroupData
 }
 
 const inputStyles = {

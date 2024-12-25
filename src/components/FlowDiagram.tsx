@@ -204,8 +204,8 @@ export default function FlowDiagram() {
       if (params.source && params.target) {
         let updatedEdges = [...edges];
         
-        // Usuń stare połączenie tylko dla Mesh i Group (nie dla Scene)
-        if (targetNode?.type !== 'scene') {
+        // Usuń stare połączenie tylko dla Mesh (nie dla Scene i Group)
+        if (targetNode?.type === 'mesh') {
           updatedEdges = edges.filter(edge => 
             !(edge.target === params.target && edge.targetHandle === params.targetHandle)
           );
@@ -217,6 +217,26 @@ export default function FlowDiagram() {
         
         // Aktualizuj kontekst sceny
         updateSceneState(nodes, newEdges);
+
+        // Dodaj node do GroupNode
+        if (targetNode?.type === 'group') {
+          const targetGroupNode = nodes.find(node => node.id === params.target);
+          if (targetGroupNode) {
+            const updatedNodes = nodes.map(node => {
+              if (node.id === targetGroupNode.id) {
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    nodes: [...(node.data.nodes || []), params.source]
+                  }
+                };
+              }
+              return node;
+            });
+            setNodes(updatedNodes);
+          }
+        }
       }
     }
   }, [edges, nodes, updateSceneState]);
