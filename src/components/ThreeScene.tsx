@@ -176,7 +176,27 @@ export default function ThreeScene() {
 
     const scene = sceneRef.current;
     const sceneNode = nodes.find(node => node.type === 'scene');
-    const meshNodes = nodes.filter(node => node.type === 'mesh');
+    
+    // Funkcja sprawdzająca, czy node jest połączony ze sceną
+    const isConnectedToScene = (nodeId: string, visited = new Set<string>()): boolean => {
+      if (visited.has(nodeId)) return false;
+      visited.add(nodeId);
+
+      // Znajdź wszystkie krawędzie wychodzące z tego node'a
+      const nodeEdges = edges.filter(edge => edge.source === nodeId);
+      
+      for (const edge of nodeEdges) {
+        const targetNode = nodes.find(node => node.id === edge.target);
+        if (targetNode?.type === 'scene') {
+          return true;
+        }
+        if (isConnectedToScene(edge.target, visited)) {
+          return true;
+        }
+      }
+      
+      return false;
+    };
 
     // Update scene settings
     if (sceneNode) {
@@ -196,72 +216,72 @@ export default function ThreeScene() {
       scene.add(pointLight);
     }
 
-    // Clean up removed meshes
+    // Clean up removed or disconnected meshes
     Object.entries(objectsRef.current).forEach(([id, object]) => {
-      if (!meshNodes.find(node => node.id === id)) {
+      const node = nodes.find(node => node.id === id);
+      if (!node || !isConnectedToScene(id)) {
         scene.remove(object);
-        if (object instanceof THREE.Mesh) {
-          object.geometry.dispose();
-          if (object.material instanceof THREE.Material) {
-            object.material.dispose();
-          }
-        }
         delete objectsRef.current[id];
       }
     });
 
-    // Update meshes
+    // Update or create meshes
+    const meshNodes = nodes.filter(node => node.type === 'mesh');
     meshNodes.forEach(meshNode => {
-      const geometryConnection = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
-      const materialConnection = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'material');
-
-      if (geometryConnection && materialConnection) {
-        const geometryNode = nodes.find(node => node.id === geometryConnection.source);
-        const materialNode = nodes.find(node => node.id === materialConnection.source);
-
-        if (geometryNode && materialNode) {
-          let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
-
-          if (!mesh) {
-            // Create new mesh
-            const geometry = createGeometry(geometryNode);
-            const material = createMaterial(materialNode);
-
-            mesh = new THREE.Mesh(geometry, material);
-            objectsRef.current[meshNode.id] = mesh;
-            scene.add(mesh);
-          } else {
-            // Update existing mesh
-            const oldGeometry = mesh.geometry;
-            mesh.geometry = createGeometry(geometryNode);
-            oldGeometry.dispose();
-
-            const oldMaterial = mesh.material as THREE.Material;
-            mesh.material = createMaterial(materialNode);
-            oldMaterial.dispose();
-          }
-
-          // Update transform
-          mesh.position.set(
-            meshNode.data.position.x,
-            meshNode.data.position.y,
-            meshNode.data.position.z
-          );
-          mesh.rotation.set(
-            meshNode.data.rotation.x,
-            meshNode.data.rotation.y,
-            meshNode.data.rotation.z
-          );
-          mesh.scale.set(
-            meshNode.data.scale.x,
-            meshNode.data.scale.y,
-            meshNode.data.scale.z
-          );
+      // Sprawdź czy mesh jest połączony ze sceną
+      if (!isConnectedToScene(meshNode.id)) {
+        // Jeśli nie jest połączony, usuń go ze sceny
+        if (objectsRef.current[meshNode.id]) {
+          scene.remove(objectsRef.current[meshNode.id]);
+          delete objectsRef.current[meshNode.id];
         }
+        return;
+      }
+
+      // Znajdź połączone geometry i material nodes
+      const geometryEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
+      const materialEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'material');
+
+      const geometryNode = nodes.find(node => node.id === geometryEdge?.source);
+      const materialNode = nodes.find(node => node.id === materialEdge?.source);
+
+      if (geometryNode && materialNode) {
+        let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
+
+        if (!mesh) {
+          const geometry = createGeometry(geometryNode);
+          const material = createMaterial(materialNode);
+          mesh = new THREE.Mesh(geometry, material);
+          objectsRef.current[meshNode.id] = mesh;
+          scene.add(mesh);
+        }
+
+        // Update position
+        mesh.position.set(
+          meshNode.data.position.x,
+          meshNode.data.position.y,
+          meshNode.data.position.z
+        );
+
+        // Update rotation
+        mesh.rotation.set(
+          meshNode.data.rotation.x,
+          meshNode.data.rotation.y,
+          meshNode.data.rotation.z
+        );
+
+        // Update scale
+        mesh.scale.set(
+          meshNode.data.scale.x,
+          meshNode.data.scale.y,
+          meshNode.data.scale.z
+        );
       }
     });
+  }, [nodes, edges]);
 
-    // Animation
+  // Animation
+  useEffect(() => {
     const animate = () => {
       const animationFrameId = requestAnimationFrame(animate);
 
@@ -279,7 +299,7 @@ export default function ThreeScene() {
     };
 
     animate();
-  }, [nodes, edges]);
+  }, []);
 
   return <div ref={mountRef} style={sceneStyles} />;
 }
