@@ -18,32 +18,39 @@ const sceneStyles = {
 };
 
 const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
-  switch (geometryNode.type) {
-    case 'boxGeometry':
-      return new THREE.BoxGeometry(
-        geometryNode.data.width,
-        geometryNode.data.height,
-        geometryNode.data.depth
-      );
-    case 'sphereGeometry':
-      return new THREE.SphereGeometry(
-        geometryNode.data.radius,
-        geometryNode.data.widthSegments,
-        geometryNode.data.heightSegments
-      );
-    case 'cylinderGeometry':
-      return new THREE.CylinderGeometry(
-        geometryNode.data.radiusTop,
-        geometryNode.data.radiusBottom,
-        geometryNode.data.height,
-        geometryNode.data.radialSegments,
-        geometryNode.data.heightSegments,
-        geometryNode.data.openEnded
-      );
-    default:
-      console.warn('Unknown geometry type:', geometryNode.type);
-      return new THREE.BoxGeometry(1, 1, 1);
+  const nodeType = geometryNode.type.toLowerCase();
+  console.log('Creating geometry for node:', { type: nodeType, data: geometryNode.data });
+
+  if (nodeType.includes('box')) {
+    return new THREE.BoxGeometry(
+      geometryNode.data.width,
+      geometryNode.data.height,
+      geometryNode.data.depth
+    );
+  } 
+  
+  if (nodeType.includes('sphere')) {
+    console.log('Creating sphere geometry with:', geometryNode.data);
+    return new THREE.SphereGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.widthSegments,
+      geometryNode.data.heightSegments
+    );
   }
+  
+  if (nodeType.includes('cylinder')) {
+    return new THREE.CylinderGeometry(
+      geometryNode.data.radiusTop,
+      geometryNode.data.radiusBottom,
+      geometryNode.data.height,
+      geometryNode.data.radialSegments,
+      geometryNode.data.heightSegments,
+      geometryNode.data.openEnded
+    );
+  }
+
+  console.warn('Unknown geometry type:', geometryNode.type);
+  return new THREE.BoxGeometry(1, 1, 1);
 };
 
 const createMaterial = (materialNode: any): THREE.Material => {
