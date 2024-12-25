@@ -90,6 +90,7 @@ const nodes = {
     { type: 'boxGeometry', label: 'Box Geometry', icon: '□' },
     { type: 'sphereGeometry', label: 'Sphere Geometry', icon: '○' },
     { type: 'cylinderGeometry', label: 'Cylinder Geometry', icon: '⬤' },
+    { type: 'capsuleGeometry', label: 'Capsule Geometry', icon: '⧫' }, // Added CapsuleGeometry
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },

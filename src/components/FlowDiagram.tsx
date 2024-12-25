@@ -19,6 +19,7 @@ import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
 import SphereGeometryNode from './nodes/geometry/SphereGeometryNode';
 import CylinderGeometryNode from './nodes/geometry/CylinderGeometryNode';
+import CapsuleGeometryNode from './nodes/geometry/CapsuleGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -33,6 +34,7 @@ const nodeTypes: NodeTypes = {
   boxGeometry: BoxGeometryNode,
   sphereGeometry: SphereGeometryNode,
   cylinderGeometry: CylinderGeometryNode,
+  capsuleGeometry: CapsuleGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -60,6 +62,12 @@ const defaultNodeData = {
     radialSegments: 32,
     heightSegments: 1,
     openEnded: false
+  },
+  capsuleGeometry: {
+    radius: 1,
+    length: 2,
+    capSegments: 4,
+    radialSegments: 8
   },
   meshNormalMaterial: {
     wireframe: false,
@@ -130,6 +138,12 @@ const initialNodes: Node[] = [
     type: 'scene',
     position: { x: 700, y: 175 },
     data: defaultNodeData.scene
+  },
+  {
+    id: '5',
+    type: 'capsuleGeometry',
+    position: { x: 100, y: 400 },
+    data: defaultNodeData.capsuleGeometry
   }
 ];
 
