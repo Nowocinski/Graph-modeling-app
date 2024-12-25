@@ -49,6 +49,15 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('capsule')) {
+    return new THREE.CapsuleGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.length,
+      geometryNode.data.capSegments,
+      geometryNode.data.radialSegments
+    );
+  }
+
   console.warn('Unknown geometry type:', geometryNode.type);
   return new THREE.BoxGeometry(1, 1, 1);
 };
