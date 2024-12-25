@@ -38,9 +38,17 @@ const flowStyles = {
   height: '100vh',
 };
 
+// Style do ukrycia linku reactflow.dev
+const customStyles = `
+  .react-flow__attribution {
+    display: none !important;
+  }
+`;
+
 export default function FlowDiagram() {
   return (
     <div style={flowStyles}>
+      <style>{customStyles}</style>
       <ReactFlow
         nodes={initialNodes}
         edges={initialEdges}
