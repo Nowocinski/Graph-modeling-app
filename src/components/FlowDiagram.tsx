@@ -173,18 +173,47 @@ export default function FlowDiagram() {
   );
 
   const onConnect = useCallback((params: Connection) => {
-    // Jeśli tworzymy nowe połączenie do mesh'a
-    if (params.target && params.targetHandle) {
-      // Znajdź i usuń stare połączenie do tego samego handlera
-      const updatedEdges = edges.filter(edge => 
-        !(edge.target === params.target && edge.targetHandle === params.targetHandle)
-      );
+    // Sprawdź typ node'a źródłowego i docelowego
+    const sourceNode = nodes.find(node => node.id === params.source);
+    const targetNode = nodes.find(node => node.id === params.target);
+
+    // Sprawdź czy połączenie jest dozwolone
+    const isValidConnection = () => {
+      // Scene może przyjmować połączenia od Mesh i Group
+      if (targetNode?.type === 'scene') {
+        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
+      }
       
-      // Dodaj nowe połączenie
-      setEdges(addEdge(params, updatedEdges));
-      
-      // Aktualizuj kontekst sceny
-      updateSceneState(nodes, [...updatedEdges, params]);
+      // Mesh może przyjmować połączenia od geometry i material
+      if (targetNode?.type === 'mesh') {
+        const isGeometry = sourceNode?.type?.toLowerCase().includes('geometry');
+        const isMaterial = sourceNode?.type?.toLowerCase().includes('material');
+        return isGeometry || isMaterial;
+      }
+
+      // Group może przyjmować połączenia od Mesh
+      if (targetNode?.type === 'group') {
+        return sourceNode?.type === 'mesh';
+      }
+
+      return false;
+    };
+
+    if (isValidConnection()) {
+      // Jeśli tworzymy nowe połączenie
+      if (params.source && params.target) {
+        // Znajdź i usuń stare połączenie do tego samego handlera
+        const updatedEdges = edges.filter(edge => 
+          !(edge.target === params.target && edge.targetHandle === params.targetHandle)
+        );
+        
+        // Dodaj nowe połączenie
+        const newEdges = addEdge(params, updatedEdges);
+        setEdges(newEdges);
+        
+        // Aktualizuj kontekst sceny
+        updateSceneState(nodes, newEdges);
+      }
     }
   }, [edges, nodes, updateSceneState]);
 

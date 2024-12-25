@@ -99,58 +99,53 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
     <div className="node-box" style={{
       background: '#fff',
       border: '1px solid #777',
+      padding: '16px',
       borderRadius: '8px',
-      padding: '10px',
-      minWidth: '250px',
-      color: '#333',
+      minWidth: '300px'
     }}>
       <Handle type="target" position={Position.Left} />
-      
-      <div style={{ padding: '5px' }}>
-        <h4 style={{ margin: '0 0 8px 0' }}>Scene</h4>
-        
-        <div style={{ fontSize: '12px' }}>
-          <div style={{ marginBottom: '8px' }}>
-            <label>Background Color:</label>
-            <input
-              type="color"
-              value={data.backgroundColor}
-              style={colorInputStyles}
-              onChange={(e) => handleChange('backgroundColor', e.target.value)}
-            />
-          </div>
-
-          <div style={{ marginBottom: '8px' }}>
-            <label>Ambient Light Intensity:</label>
-            <input
-              type="number"
-              value={data.ambientLightIntensity}
-              style={inputStyles}
-              step="0.1"
-              min="0"
-              max="1"
-              onChange={(e) => handleChange('ambientLightIntensity', parseFloat(e.target.value))}
-            />
-          </div>
-
-          <div style={{ marginBottom: '8px' }}>
-            <label>Point Light Intensity:</label>
-            <input
-              type="number"
-              value={data.pointLightIntensity}
-              style={inputStyles}
-              step="0.1"
-              min="0"
-              onChange={(e) => handleChange('pointLightIntensity', parseFloat(e.target.value))}
-            />
-          </div>
-
-          <Vector3Input
-            label="Point Light Position"
-            values={data.pointLightPosition}
-            onChange={(axis, value) => handleChange('pointLightPosition', { [axis]: value })}
+      <div style={{ fontWeight: 'bold', marginBottom: '12px' }}>Scene Settings</div>
+      <div style={{ fontSize: '12px' }}>
+        <div style={{ marginBottom: '8px' }}>
+          <label>Background Color:</label>
+          <input
+            type="color"
+            value={data.backgroundColor}
+            style={colorInputStyles}
+            onChange={(e) => handleChange('backgroundColor', e.target.value)}
           />
         </div>
+
+        <div style={{ marginBottom: '8px' }}>
+          <label>Ambient Light Intensity:</label>
+          <input
+            type="number"
+            value={data.ambientLightIntensity}
+            style={inputStyles}
+            step="0.1"
+            min="0"
+            max="1"
+            onChange={(e) => handleChange('ambientLightIntensity', parseFloat(e.target.value))}
+          />
+        </div>
+
+        <div style={{ marginBottom: '8px' }}>
+          <label>Point Light Intensity:</label>
+          <input
+            type="number"
+            value={data.pointLightIntensity}
+            style={inputStyles}
+            step="0.1"
+            min="0"
+            onChange={(e) => handleChange('pointLightIntensity', parseFloat(e.target.value))}
+          />
+        </div>
+
+        <Vector3Input
+          label="Point Light Position"
+          values={data.pointLightPosition}
+          onChange={(axis, value) => handleChange('pointLightPosition', { [axis]: value })}
+        />
       </div>
     </div>
   );
