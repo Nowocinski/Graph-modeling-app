@@ -9,7 +9,7 @@ const FlowDiagram = dynamic(
 
 export default function DiagramWrapper() {
   return (
-    <div style={{ width: '100%', height: '600px', border: '1px solid #ccc' }}>
+    <div style={{ width: '100%', height: '100%' }}>
       <FlowDiagram />
     </div>
   );

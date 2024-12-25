@@ -3,11 +3,8 @@ import DiagramWrapper from '../components/DiagramWrapper';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1>React Flow Demo</h1>
-        <DiagramWrapper />
-      </main>
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <DiagramWrapper />
     </div>
   );
 }
