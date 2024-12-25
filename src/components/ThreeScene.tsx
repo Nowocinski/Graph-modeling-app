@@ -82,6 +82,29 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('extrude')) {
+    // Create a default shape (heart shape) for extrusion
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.bezierCurveTo(0, 0.5, -0.5, 1, -1, 1);
+    shape.bezierCurveTo(-1.5, 1, -2, 0.5, -2, 0);
+    shape.bezierCurveTo(-2, -0.5, -1.5, -1.5, 0, -2);
+    shape.bezierCurveTo(1.5, -1.5, 2, -0.5, 2, 0);
+    shape.bezierCurveTo(2, 0.5, 1.5, 1, 1, 1);
+    shape.bezierCurveTo(0.5, 1, 0, 0.5, 0, 0);
+
+    const extrudeSettings = {
+      depth: geometryNode.data.depth,
+      bevelEnabled: geometryNode.data.bevelEnabled,
+      bevelThickness: geometryNode.data.bevelThickness,
+      bevelSize: geometryNode.data.bevelSize,
+      bevelSegments: geometryNode.data.bevelSegments,
+      steps: geometryNode.data.steps
+    };
+
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  }
+
   console.warn('Unknown geometry type:', geometryNode.type);
   return new THREE.BoxGeometry(1, 1, 1);
 };
