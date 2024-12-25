@@ -119,7 +119,7 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
       width: '320px' 
     }}>
       <Handle type="target" position={Position.Left} />
-      <div style={{ marginBottom: '12px', fontWeight: 'bold' }}>Group: {data.name}</div>
+      <div style={{ marginBottom: '12px', fontWeight: 'bold' }}>Group</div>
       
       <Vector3Input
         label="Position"
