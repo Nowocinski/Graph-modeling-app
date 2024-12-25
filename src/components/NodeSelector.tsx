@@ -141,7 +141,7 @@ const nodes = {
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },
     { type: 'meshBasicMaterial', label: 'Basic Material', icon: '◈' },
-    { type: 'meshPhongMaterial', label: 'Phong Material', icon: '◆' },
+    { type: 'meshPhongMaterial', label: 'Phong Material', icon: '◆' }
   ],
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
@@ -150,6 +150,7 @@ const nodes = {
   'CSG Operations': [
     { type: 'subtract', label: 'Subtract Operation', icon: '⊖' },
     { type: 'intersect', label: 'Intersect Operation', icon: '⊗' },
+    { type: 'union', label: 'Union Operation', icon: '⊕' }
   ]
 };
 
