@@ -100,6 +100,7 @@ const nodes = {
     { type: 'octahedronGeometry', label: 'Octahedron Geometry', icon: '◈' },
     { type: 'planeGeometry', label: 'Plane Geometry', icon: '▭' },
     { type: 'ringGeometry', label: 'Ring Geometry', icon: '◍' },
+    { type: 'tetrahedronGeometry', label: 'Tetrahedron Geometry', icon: '△' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },
