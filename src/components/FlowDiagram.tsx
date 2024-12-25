@@ -1,11 +1,14 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import ReactFlow, { 
   Node, 
   Edge, 
   Background,
   Controls,
-  NodeTypes
+  NodeTypes,
+  applyNodeChanges,
+  NodeChange
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/BoxGeometryNode';
@@ -63,13 +66,45 @@ const customStyles = `
 `;
 
 export default function FlowDiagram() {
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+
+  const handleNodeUpdate = useCallback((nodeId: string, newData: any) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...newData,
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, []);
+
   return (
     <div style={flowStyles}>
       <style>{customStyles}</style>
       <ReactFlow
-        nodes={initialNodes}
-        edges={initialEdges}
+        nodes={nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            onUpdate: handleNodeUpdate
+          }
+        }))}
+        edges={edges}
         nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
         fitView
         style={flowStyles}
       >
