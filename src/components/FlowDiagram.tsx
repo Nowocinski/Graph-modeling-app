@@ -220,31 +220,55 @@ const defaultNodeData = {
   }
 };
 
+const defaultSceneNode: Node = {
+  id: 'scene',
+  type: 'scene',
+  position: { x: 500, y: 200 },
+  data: {
+    backgroundColor: '#f0f0f0',
+    ambientLightIntensity: 0.5,
+    pointLightIntensity: 0.8,
+    pointLightPosition: { x: 10, y: 10, z: 10 }
+  }
+};
+
 const initialNodes: Node[] = [
+  defaultSceneNode,
   {
-    id: 'scene',
-    type: 'scene',
-    position: { x: 500, y: 200 },
-    data: {
-      backgroundColor: '#f0f0f0',
-      ambientLightIntensity: 0.5,
-      pointLightIntensity: 0.8,
-      pointLightPosition: { x: 10, y: 10, z: 10 }
-    }
+    id: 'boxGeometry_1',
+    type: 'boxGeometry',
+    position: { x: 100, y: 100 },
+    data: defaultNodeData.boxGeometry
+  },
+  {
+    id: 'meshNormalMaterial_1',
+    type: 'meshNormalMaterial',
+    position: { x: 100, y: 250 },
+    data: defaultNodeData.meshNormalMaterial
+  },
+  {
+    id: 'mesh_1',
+    type: 'mesh',
+    position: { x: 400, y: 175 },
+    data: defaultNodeData.mesh
   }
 ];
 
-const initialEdges: Edge[] = [];
+const initialEdges: Edge[] = [
+  { id: 'e1-3', source: 'boxGeometry_1', target: 'mesh_1', targetHandle: 'geometry' },
+  { id: 'e2-3', source: 'meshNormalMaterial_1', target: 'mesh_1', targetHandle: 'material' },
+  { id: 'e3-4', source: 'mesh_1', target: 'scene' }
+];
 
 const flowStyles = {
   width: '100%',
-  height: '100%'
+  height: '100vh'
 };
 
 // Style do ukrycia linku reactflow.dev
 const customStyles = `
-  .react-flow__attribution {
-    display: none !important;
+  .react-flow__node {
+    width: fit-content;
   }
 `;
 
@@ -255,9 +279,15 @@ const FlowDiagramInner = () => {
     const savedNodes = localStorage.getItem('flowNodes');
     if (savedNodes) {
       try {
-        return JSON.parse(savedNodes);
+        const parsedNodes = JSON.parse(savedNodes);
+        // Jeśli jest tylko node sceny, dodaj domyślne node'y
+        if (parsedNodes.length === 1 && parsedNodes[0].type === 'scene') {
+          return initialNodes;
+        }
+        return parsedNodes;
       } catch (e) {
         console.error('Error parsing saved nodes:', e);
+        return initialNodes;
       }
     }
     return initialNodes;
@@ -268,9 +298,15 @@ const FlowDiagramInner = () => {
     const savedEdges = localStorage.getItem('flowEdges');
     if (savedEdges) {
       try {
-        return JSON.parse(savedEdges);
+        const parsedEdges = JSON.parse(savedEdges);
+        // Jeśli nie ma krawędzi, dodaj domyślne krawędzie
+        if (parsedEdges.length === 0) {
+          return initialEdges;
+        }
+        return parsedEdges;
       } catch (e) {
         console.error('Error parsing saved edges:', e);
+        return initialEdges;
       }
     }
     return initialEdges;
