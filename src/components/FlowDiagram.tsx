@@ -355,15 +355,16 @@ const FlowDiagramInner = () => {
       const sourceNode = nodes.find(node => node.id === connection.source);
       const targetNode = nodes.find(node => node.id === connection.target);
 
-      // Scene może przyjmować połączenia tylko od Mesh i operacji CSG
+      // Scene może przyjmować połączenia od Mesh, Group i operacji CSG
       if (targetNode?.type === 'scene') {
         return sourceNode?.type === 'mesh' || 
+               sourceNode?.type === 'group' ||
                sourceNode?.type === 'subtract' || 
                sourceNode?.type === 'intersect' ||
                sourceNode?.type === 'union';
       }
 
-      // Group może przyjmować połączenia tylko od Mesh i operacji CSG
+      // Group może przyjmować połączenia od Mesh i operacji CSG
       if (targetNode?.type === 'group') {
         return sourceNode?.type === 'mesh' || 
                sourceNode?.type === 'subtract' || 
