@@ -248,12 +248,27 @@ export default function ThreeScene() {
       if (geometryNode && materialNode) {
         let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
 
+        // Sprawdź czy mesh istnieje
         if (!mesh) {
           const geometry = createGeometry(geometryNode);
           const material = createMaterial(materialNode);
           mesh = new THREE.Mesh(geometry, material);
           objectsRef.current[meshNode.id] = mesh;
           scene.add(mesh);
+        } else {
+          // Aktualizuj geometrię i materiał
+          const newGeometry = createGeometry(geometryNode);
+          const newMaterial = createMaterial(materialNode);
+
+          // Usuń starą geometrię i materiał
+          mesh.geometry.dispose();
+          if (mesh.material instanceof THREE.Material) {
+            mesh.material.dispose();
+          }
+
+          // Przypisz nową geometrię i materiał
+          mesh.geometry = newGeometry;
+          mesh.material = newMaterial;
         }
 
         // Update position
