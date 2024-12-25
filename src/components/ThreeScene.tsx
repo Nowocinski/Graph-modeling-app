@@ -70,12 +70,26 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
 };
 
 const createMaterial = (materialNode: any): THREE.Material => {
+  const getSide = (side: string) => {
+    switch (side) {
+      case 'front':
+        return THREE.FrontSide;
+      case 'back':
+        return THREE.BackSide;
+      case 'double':
+        return THREE.DoubleSide;
+      default:
+        return THREE.FrontSide;
+    }
+  };
+
   switch (materialNode.type) {
     case 'meshNormalMaterial':
       return new THREE.MeshNormalMaterial({
         wireframe: materialNode.data.wireframe,
         transparent: materialNode.data.transparent,
-        opacity: materialNode.data.opacity
+        opacity: materialNode.data.opacity,
+        side: getSide(materialNode.data.side)
       });
     case 'meshBasicMaterial':
       return new THREE.MeshBasicMaterial({
@@ -84,11 +98,7 @@ const createMaterial = (materialNode: any): THREE.Material => {
         transparent: materialNode.data.transparent,
         opacity: materialNode.data.opacity,
         visible: materialNode.data.visible,
-        side: materialNode.data.side === 'front' 
-          ? THREE.FrontSide 
-          : materialNode.data.side === 'back' 
-            ? THREE.BackSide 
-            : THREE.DoubleSide
+        side: getSide(materialNode.data.side)
       });
     case 'meshPhongMaterial':
       return new THREE.MeshPhongMaterial({
@@ -100,11 +110,7 @@ const createMaterial = (materialNode: any): THREE.Material => {
         transparent: materialNode.data.transparent,
         opacity: materialNode.data.opacity,
         visible: materialNode.data.visible,
-        side: materialNode.data.side === 'front' 
-          ? THREE.FrontSide 
-          : materialNode.data.side === 'back' 
-            ? THREE.BackSide 
-            : THREE.DoubleSide,
+        side: getSide(materialNode.data.side),
         flatShading: materialNode.data.flatShading
       });
     default:

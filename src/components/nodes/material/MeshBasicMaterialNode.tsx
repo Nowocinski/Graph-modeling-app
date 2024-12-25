@@ -171,7 +171,7 @@ const MeshBasicMaterialNode = ({ data, id }: NodeProps<MeshBasicMaterialData>) =
             <label>
               Side:
               <select
-                value={data.side}
+                value={data.side || 'double'}
                 style={selectStyles}
                 onChange={(e) => handleChange('side', e.target.value)}
               >

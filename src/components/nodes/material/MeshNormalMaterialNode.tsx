@@ -7,6 +7,7 @@ interface MeshNormalMaterialData {
   wireframe: boolean;
   transparent: boolean;
   opacity: number;
+  side: string;
   onUpdate?: (id: string, data: Partial<MeshNormalMaterialData>) => void;
   onDelete?: (id: string) => void;
 }
@@ -22,6 +23,14 @@ const inputStyles = {
 
 const checkboxStyles = {
   marginLeft: '8px'
+};
+
+const selectStyles = {
+  marginLeft: '8px',
+  padding: '2px 4px',
+  fontSize: '12px',
+  border: '1px solid #ccc',
+  borderRadius: '4px'
 };
 
 const deleteButtonStyles = {
@@ -125,6 +134,21 @@ const MeshNormalMaterialNode = ({ data, id }: NodeProps<MeshNormalMaterialData>)
               onChange={(e) => handleChange('opacity', parseFloat(e.target.value))}
               disabled={!data.transparent}
             />
+          </div>
+
+          <div style={{ marginBottom: '8px' }}>
+            <label>
+              Side:
+              <select
+                value={data.side || 'double'}
+                style={selectStyles}
+                onChange={(e) => handleChange('side', e.target.value)}
+              >
+                <option value="front">Front</option>
+                <option value="back">Back</option>
+                <option value="double">Double</option>
+              </select>
+            </label>
           </div>
         </div>
       </div>
