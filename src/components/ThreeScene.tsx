@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls as OrbitControlsImpl } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useScene } from '../context/SceneContext';
+import { CSG } from 'three-csg-ts';
 
 const sceneStyles = {
   width: '100%',
@@ -562,7 +563,7 @@ export default function ThreeScene() {
     });
 
     // Update or create meshes
-    const meshNodes = nodes.filter(node => node.type === 'mesh');
+    const meshNodes = nodes.filter(node => node.type === 'mesh' || node.type === 'subtract');
     meshNodes.forEach(meshNode => {
       // Sprawdź czy mesh jest połączony ze sceną lub grupą
       if (!isConnectedToScene(meshNode.id)) {
@@ -576,83 +577,176 @@ export default function ThreeScene() {
         return;
       }
 
-      // Znajdź połączone geometry i material nodes
-      const geometryEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
-      const materialEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'material');
-
-      const geometryNode = nodes.find(node => node.id === geometryEdge?.source);
-      const materialNode = nodes.find(node => node.id === materialEdge?.source);
-
-      if (geometryNode && materialNode) {
-        let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
-
-        // Sprawdź czy mesh istnieje
-        if (!mesh) {
-          const geometry = createGeometry(geometryNode);
-          const material = createMaterial(materialNode);
-          mesh = new THREE.Mesh(geometry, material);
-          objectsRef.current[meshNode.id] = mesh;
-        } else {
-          // Aktualizuj geometrię i materiał
-          const newGeometry = createGeometry(geometryNode);
-          const newMaterial = createMaterial(materialNode);
-
-          // Usuń starą geometrię i materiał
-          mesh.geometry.dispose();
-          if (mesh.material instanceof THREE.Material) {
-            mesh.material.dispose();
-          }
-
-          // Przypisz nową geometrię i materiał
-          mesh.geometry = newGeometry;
-          mesh.material = newMaterial;
-        }
-
-        // Znajdź rodzica (scenę lub grupę)
-        const parentEdge = edges.find(edge => edge.source === meshNode.id);
-        const parentNode = nodes.find(node => node.id === parentEdge?.target);
-        
-        if (parentNode?.type === 'group') {
-          const parentGroup = objectsRef.current[parentNode.id] as THREE.Group;
-          if (parentGroup && mesh.parent !== parentGroup) {
-            if (mesh.parent) {
-              mesh.parent.remove(mesh);
-            }
-            parentGroup.add(mesh);
-          }
-        } else if (scene) {
-          if (mesh.parent !== scene) {
-            if (mesh.parent) {
-              mesh.parent.remove(mesh);
-            }
-            scene.add(mesh);
-          }
-        }
-
-        // Update position
-        mesh.position.set(
-          meshNode.data.position.x,
-          meshNode.data.position.y,
-          meshNode.data.position.z
-        );
-
-        // Update rotation
-        mesh.rotation.set(
-          meshNode.data.rotation.x,
-          meshNode.data.rotation.y,
-          meshNode.data.rotation.z
-        );
-
-        // Update scale
-        mesh.scale.set(
-          meshNode.data.scale.x,
-          meshNode.data.scale.y,
-          meshNode.data.scale.z
-        );
+      // Obsługa node'a subtract
+      if (meshNode.type === 'subtract') {
+        handleSubtractNode(meshNode, edges, scene, objectsRef.current);
+        return;
       }
-    });
 
+      // Standardowa obsługa zwykłych meshy
+      handleMeshNode(meshNode, edges, scene, objectsRef.current);
+    });
   }, [nodes, edges]);
+
+  // Funkcja obsługująca operację subtract
+  const handleSubtractNode = (
+    meshNode: any, 
+    edges: any[], 
+    scene: THREE.Scene,
+    objectsRef: { [key: string]: THREE.Object3D }
+  ) => {
+    // Znajdź połączone meshe
+    const meshAEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'meshA');
+    const meshBEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'meshB');
+
+    const meshA = meshAEdge ? objectsRef[meshAEdge.source] as THREE.Mesh : null;
+    const meshB = meshBEdge ? objectsRef[meshBEdge.source] as THREE.Mesh : null;
+
+    if (!meshA || !meshB) return;
+
+    // Sklonuj meshe aby nie modyfikować oryginalnych
+    const meshAClone = meshA.clone();
+    const meshBClone = meshB.clone();
+
+    // Zastosuj transformacje z oryginalnych meshy
+    meshAClone.position.copy(meshA.position);
+    meshAClone.rotation.copy(meshA.rotation);
+    meshAClone.scale.copy(meshA.scale);
+
+    meshBClone.position.copy(meshB.position);
+    meshBClone.rotation.copy(meshB.rotation);
+    meshBClone.scale.copy(meshB.scale);
+
+    try {
+      // Wykonaj operację subtract
+      const bspA = CSG.fromMesh(meshAClone);
+      const bspB = CSG.fromMesh(meshBClone);
+      const bspResult = bspA.subtract(bspB);
+      
+      let resultMesh = objectsRef[meshNode.id] as THREE.Mesh;
+
+      // Jeśli mesh wynikowy nie istnieje, stwórz nowy
+      if (!resultMesh) {
+        resultMesh = CSG.toMesh(bspResult, meshAClone.matrix, meshA.material);
+        objectsRef[meshNode.id] = resultMesh;
+      } else {
+        // Aktualizuj istniejący mesh
+        const newMesh = CSG.toMesh(bspResult, meshAClone.matrix, meshA.material);
+        resultMesh.geometry.dispose();
+        resultMesh.geometry = newMesh.geometry;
+        resultMesh.material = newMesh.material;
+      }
+
+      // Znajdź rodzica (scenę lub grupę)
+      const parentEdge = edges.find(edge => edge.source === meshNode.id);
+      const parentNode = nodes.find(node => node.id === parentEdge?.target);
+      
+      if (parentNode?.type === 'group') {
+        const parentGroup = objectsRef[parentNode.id] as THREE.Group;
+        if (parentGroup && resultMesh.parent !== parentGroup) {
+          if (resultMesh.parent) {
+            resultMesh.parent.remove(resultMesh);
+          }
+          parentGroup.add(resultMesh);
+        }
+      } else if (scene) {
+        if (resultMesh.parent !== scene) {
+          if (resultMesh.parent) {
+            resultMesh.parent.remove(resultMesh);
+          }
+          scene.add(resultMesh);
+        }
+      }
+
+      // Wyczyść sklonowane meshe
+      meshAClone.geometry.dispose();
+      meshBClone.geometry.dispose();
+    } catch (error) {
+      console.error('Error performing CSG operation:', error);
+    }
+  };
+
+  // Funkcja obsługująca zwykłe meshe
+  const handleMeshNode = (
+    meshNode: any, 
+    edges: any[], 
+    scene: THREE.Scene,
+    objectsRef: { [key: string]: THREE.Object3D }
+  ) => {
+    const geometryEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
+    const materialEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'material');
+
+    const geometryNode = nodes.find(node => node.id === geometryEdge?.source);
+    const materialNode = nodes.find(node => node.id === materialEdge?.source);
+
+    if (!geometryNode || !materialNode) return;
+
+    let mesh = objectsRef[meshNode.id] as THREE.Mesh;
+
+    // Sprawdź czy mesh istnieje
+    if (!mesh) {
+      const geometry = createGeometry(geometryNode);
+      const material = createMaterial(materialNode);
+      mesh = new THREE.Mesh(geometry, material);
+      objectsRef[meshNode.id] = mesh;
+    } else {
+      // Aktualizuj geometrię i materiał
+      const newGeometry = createGeometry(geometryNode);
+      const newMaterial = createMaterial(materialNode);
+
+      // Usuń starą geometrię i materiał
+      mesh.geometry.dispose();
+      if (mesh.material instanceof THREE.Material) {
+        mesh.material.dispose();
+      }
+
+      // Przypisz nową geometrię i materiał
+      mesh.geometry = newGeometry;
+      mesh.material = newMaterial;
+    }
+
+    // Znajdź rodzica (scenę lub grupę)
+    const parentEdge = edges.find(edge => edge.source === meshNode.id);
+    const parentNode = nodes.find(node => node.id === parentEdge?.target);
+    
+    if (parentNode?.type === 'group') {
+      const parentGroup = objectsRef[parentNode.id] as THREE.Group;
+      if (parentGroup && mesh.parent !== parentGroup) {
+        if (mesh.parent) {
+          mesh.parent.remove(mesh);
+        }
+        parentGroup.add(mesh);
+      }
+    } else if (scene) {
+      if (mesh.parent !== scene) {
+        if (mesh.parent) {
+          mesh.parent.remove(mesh);
+        }
+        scene.add(mesh);
+      }
+    }
+
+    // Update position
+    mesh.position.set(
+      meshNode.data.position.x,
+      meshNode.data.position.y,
+      meshNode.data.position.z
+    );
+
+    // Update rotation
+    mesh.rotation.set(
+      meshNode.data.rotation.x,
+      meshNode.data.rotation.y,
+      meshNode.data.rotation.z
+    );
+
+    // Update scale
+    mesh.scale.set(
+      meshNode.data.scale.x,
+      meshNode.data.scale.y,
+      meshNode.data.scale.z
+    );
+  };
 
   // Animation
   useEffect(() => {

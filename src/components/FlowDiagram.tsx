@@ -42,6 +42,7 @@ import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
 import GroupNode from './nodes/GroupNode';
+import SubtractNode from './nodes/operation/SubtractNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -69,7 +70,8 @@ const nodeTypes: NodeTypes = {
   meshPhongMaterial: MeshPhongMaterialNode,
   mesh: MeshNode,
   scene: SceneNode,
-  group: GroupNode
+  group: GroupNode,
+  subtract: SubtractNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -217,7 +219,8 @@ const defaultNodeData = {
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 }
-  }
+  },
+  subtract: {}
 };
 
 const defaultSceneNode: Node = {
@@ -343,9 +346,11 @@ const FlowDiagramInner = () => {
 
     // Sprawdź czy połączenie jest dozwolone
     const isValidConnection = () => {
-      // Scene może przyjmować połączenia od Mesh i Group
+      // Scene może przyjmować połączenia od Mesh, Group i Subtract
       if (targetNode?.type === 'scene') {
-        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
+        return sourceNode?.type === 'mesh' || 
+               sourceNode?.type === 'group' || 
+               sourceNode?.type === 'subtract';
       }
       
       // Mesh może przyjmować połączenia od geometry i material
@@ -355,9 +360,16 @@ const FlowDiagramInner = () => {
         return isGeometry || isMaterial;
       }
 
-      // Group może przyjmować połączenia od Mesh i Group
+      // Group może przyjmować połączenia od Mesh, Group i Subtract
       if (targetNode?.type === 'group') {
-        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
+        return sourceNode?.type === 'mesh' || 
+               sourceNode?.type === 'group' || 
+               sourceNode?.type === 'subtract';
+      }
+
+      // Subtract może przyjmować połączenia tylko od Mesh
+      if (targetNode?.type === 'subtract') {
+        return sourceNode?.type === 'mesh';
       }
 
       return false;
