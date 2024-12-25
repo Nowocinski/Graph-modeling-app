@@ -17,12 +17,14 @@ import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/BoxGeometryNode';
 import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
 import MeshNode from './nodes/MeshNode';
+import SceneNode from './nodes/SceneNode';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
   boxGeometry: BoxGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
-  mesh: MeshNode
+  mesh: MeshNode,
+  scene: SceneNode
 };
 
 const initialNodes: Node[] = [
@@ -56,12 +58,24 @@ const initialNodes: Node[] = [
       rotation: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 }
     }
+  },
+  {
+    id: '4',
+    type: 'scene',
+    position: { x: 700, y: 175 },
+    data: {
+      backgroundColor: '#e0e0e0',
+      ambientLightIntensity: 0.5,
+      pointLightIntensity: 1.0,
+      pointLightPosition: { x: 5, y: 5, z: 5 }
+    }
   }
 ];
 
 const initialEdges: Edge[] = [
   { id: 'e1-3', source: '1', target: '3', targetHandle: 'geometry' },
-  { id: 'e2-3', source: '2', target: '3', targetHandle: 'material' }
+  { id: 'e2-3', source: '2', target: '3', targetHandle: 'material' },
+  { id: 'e3-4', source: '3', target: '4' }
 ];
 
 const flowStyles = {
