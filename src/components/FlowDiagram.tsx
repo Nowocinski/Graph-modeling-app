@@ -22,6 +22,7 @@ import CylinderGeometryNode from './nodes/geometry/CylinderGeometryNode';
 import CapsuleGeometryNode from './nodes/geometry/CapsuleGeometryNode';
 import CircleGeometryNode from './nodes/geometry/CircleGeometryNode';
 import ConeGeometryNode from './nodes/geometry/ConeGeometryNode';
+import DodecahedronGeometryNode from './nodes/geometry/DodecahedronGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -39,6 +40,7 @@ const nodeTypes: NodeTypes = {
   capsuleGeometry: CapsuleGeometryNode,
   circleGeometry: CircleGeometryNode,
   coneGeometry: ConeGeometryNode,
+  dodecahedronGeometry: DodecahedronGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -83,6 +85,10 @@ const defaultNodeData = {
     radialSegments: 32,
     heightSegments: 1,
     openEnded: false
+  },
+  dodecahedronGeometry: {
+    radius: 1,
+    detail: 0
   },
   meshNormalMaterial: {
     wireframe: false,

@@ -75,6 +75,13 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('dodecahedron')) {
+    return new THREE.DodecahedronGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.detail
+    );
+  }
+
   console.warn('Unknown geometry type:', geometryNode.type);
   return new THREE.BoxGeometry(1, 1, 1);
 };
