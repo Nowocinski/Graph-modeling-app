@@ -4,8 +4,7 @@ import ReactFlow, {
   Node, 
   Edge, 
   Background,
-  Controls,
-  MiniMap
+  Controls
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -50,7 +49,6 @@ export default function FlowDiagram() {
       >
         <Background />
         <Controls />
-        <MiniMap />
       </ReactFlow>
     </div>
   );
