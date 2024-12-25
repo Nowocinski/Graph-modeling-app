@@ -223,7 +223,7 @@ const defaultNodeData = {
 const defaultSceneNode: Node = {
   id: 'scene',
   type: 'scene',
-  position: { x: 800, y: 200 },
+  position: { x: 900, y: 200 },
   data: {
     backgroundColor: '#f0f0f0',
     ambientLightIntensity: 0.5,
