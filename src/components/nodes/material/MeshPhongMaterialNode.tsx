@@ -226,7 +226,7 @@ const MeshPhongMaterialNode = ({ data, id }: NodeProps<MeshPhongMaterialData>) =
             <label>
               Side:
               <select
-                value={data.side || 'double'}
+                value={data.side}
                 style={selectStyles}
                 onChange={(e) => handleChange('side', e.target.value)}
               >

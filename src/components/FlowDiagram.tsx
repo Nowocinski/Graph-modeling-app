@@ -177,7 +177,8 @@ const defaultNodeData = {
   meshNormalMaterial: {
     wireframe: false,
     transparent: false,
-    opacity: 1
+    opacity: 1,
+    side: 'front'
   },
   meshBasicMaterial: {
     color: '#ffffff',

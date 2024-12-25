@@ -136,11 +136,11 @@ const MeshNormalMaterialNode = ({ data, id }: NodeProps<MeshNormalMaterialData>)
             />
           </div>
 
-          <div style={{ marginBottom: '8px' }}>
+          <div style={{ marginBottom: '4px' }}>
             <label>
               Side:
               <select
-                value={data.side || 'double'}
+                value={data.side}
                 style={selectStyles}
                 onChange={(e) => handleChange('side', e.target.value)}
               >
