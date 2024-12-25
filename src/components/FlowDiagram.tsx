@@ -44,6 +44,7 @@ import SceneNode from './nodes/SceneNode';
 import GroupNode from './nodes/GroupNode';
 import SubtractNode from './nodes/operation/SubtractNode';
 import IntersectNode from './nodes/operation/IntersectNode';
+import UnionNode from './nodes/operation/UnionNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -73,7 +74,8 @@ const nodeTypes: NodeTypes = {
   scene: SceneNode,
   group: GroupNode,
   subtract: SubtractNode,
-  intersect: IntersectNode
+  intersect: IntersectNode,
+  union: UnionNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -223,7 +225,8 @@ const defaultNodeData = {
     scale: { x: 1, y: 1, z: 1 }
   },
   subtract: {},
-  intersect: {}
+  intersect: {},
+  union: {}
 };
 
 const defaultSceneNode: Node = {
@@ -356,14 +359,16 @@ const FlowDiagramInner = () => {
       if (targetNode?.type === 'scene') {
         return sourceNode?.type === 'mesh' || 
                sourceNode?.type === 'subtract' || 
-               sourceNode?.type === 'intersect';
+               sourceNode?.type === 'intersect' ||
+               sourceNode?.type === 'union';
       }
 
       // Group może przyjmować połączenia tylko od Mesh i operacji CSG
       if (targetNode?.type === 'group') {
         return sourceNode?.type === 'mesh' || 
                sourceNode?.type === 'subtract' || 
-               sourceNode?.type === 'intersect';
+               sourceNode?.type === 'intersect' ||
+               sourceNode?.type === 'union';
       }
 
       // Mesh może przyjmować połączenia tylko od Geometry
@@ -379,6 +384,11 @@ const FlowDiagramInner = () => {
 
       // Intersect może przyjmować połączenia tylko od Mesh
       if (targetNode?.type === 'intersect') {
+        return sourceNode?.type === 'mesh';
+      }
+
+      // Union może przyjmować połączenia tylko od Mesh
+      if (targetNode?.type === 'union') {
         return sourceNode?.type === 'mesh';
       }
 
