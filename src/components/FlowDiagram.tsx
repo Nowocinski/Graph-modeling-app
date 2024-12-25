@@ -43,6 +43,7 @@ import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
 import GroupNode from './nodes/GroupNode';
 import SubtractNode from './nodes/operation/SubtractNode';
+import IntersectNode from './nodes/operation/IntersectNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -71,7 +72,8 @@ const nodeTypes: NodeTypes = {
   mesh: MeshNode,
   scene: SceneNode,
   group: GroupNode,
-  subtract: SubtractNode
+  subtract: SubtractNode,
+  intersect: IntersectNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -220,7 +222,8 @@ const defaultNodeData = {
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 }
   },
-  subtract: {}
+  subtract: {},
+  intersect: {}
 };
 
 const defaultSceneNode: Node = {
@@ -369,6 +372,11 @@ const FlowDiagramInner = () => {
 
       // Subtract może przyjmować połączenia tylko od Mesh
       if (targetNode?.type === 'subtract') {
+        return sourceNode?.type === 'mesh';
+      }
+
+      // Intersect może przyjmować połączenia tylko od Mesh
+      if (targetNode?.type === 'intersect') {
         return sourceNode?.type === 'mesh';
       }
 
