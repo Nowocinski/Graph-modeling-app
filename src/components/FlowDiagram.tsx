@@ -8,42 +8,28 @@ import ReactFlow, {
   Controls,
   NodeTypes,
   applyNodeChanges,
-  NodeChange
+  NodeChange,
+  addEdge,
+  Connection,
+  Edge as FlowEdge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/BoxGeometryNode';
 import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
+import MeshNode from './nodes/MeshNode';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
   boxGeometry: BoxGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
-  input: undefined,
-  output: undefined
+  mesh: MeshNode
 };
 
 const initialNodes: Node[] = [
   {
     id: '1',
-    position: { x: 100, y: 100 },
-    data: { label: 'Node 1' },
-    type: 'input'
-  },
-  {
-    id: '2',
-    position: { x: 300, y: 100 },
-    data: { label: 'Node 2' }
-  },
-  {
-    id: '3',
-    position: { x: 500, y: 100 },
-    data: { label: 'Node 3' },
-    type: 'output'
-  },
-  {
-    id: '4',
     type: 'boxGeometry',
-    position: { x: 700, y: 100 },
+    position: { x: 100, y: 100 },
     data: { 
       width: 2,
       height: 2,
@@ -51,25 +37,36 @@ const initialNodes: Node[] = [
     }
   },
   {
-    id: '5',
+    id: '2',
     type: 'meshNormalMaterial',
-    position: { x: 900, y: 100 },
+    position: { x: 100, y: 250 },
     data: {
       wireframe: false,
       transparent: false,
       opacity: 1
     }
+  },
+  {
+    id: '3',
+    type: 'mesh',
+    position: { x: 400, y: 175 },
+    data: {
+      name: 'Mesh',
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 }
+    }
   }
 ];
 
 const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2' },
-  { id: 'e2-3', source: '2', target: '3' }
+  { id: 'e1-3', source: '1', target: '3', targetHandle: 'geometry' },
+  { id: 'e2-3', source: '2', target: '3', targetHandle: 'material' }
 ];
 
 const flowStyles = {
   width: '100%',
-  height: '100vh',
+  height: '100%'
 };
 
 // Style do ukrycia linku reactflow.dev
@@ -85,6 +82,16 @@ export default function FlowDiagram() {
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
+
+  const onEdgesChange = useCallback(
+    (changes: NodeChange[]) => setEdges((eds) => applyNodeChanges(changes, eds)),
+    []
+  );
+
+  const onConnect = useCallback(
+    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
     []
   );
 
@@ -119,6 +126,8 @@ export default function FlowDiagram() {
         edges={edges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
         fitView
         style={flowStyles}
       >
