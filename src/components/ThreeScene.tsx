@@ -454,7 +454,7 @@ export default function ThreeScene() {
       
       for (const edge of nodeEdges) {
         const targetNode = nodes.find(node => node.id === edge.target);
-        if (targetNode?.type === 'scene') {
+        if (targetNode?.type === 'scene' || targetNode?.type === 'group') {
           return true;
         }
         if (isConnectedToScene(edge.target, visited)) {
@@ -483,7 +483,7 @@ export default function ThreeScene() {
       scene.add(pointLight);
     }
 
-    // Clean up removed or disconnected meshes
+    // Clean up removed or disconnected objects
     Object.entries(objectsRef.current).forEach(([id, object]) => {
       const node = nodes.find(node => node.id === id);
       if (!node || !isConnectedToScene(id)) {
@@ -492,14 +492,58 @@ export default function ThreeScene() {
       }
     });
 
+    // Update or create groups
+    const groupNodes = nodes.filter(node => node.type === 'group');
+    groupNodes.forEach(groupNode => {
+      // Sprawdź czy grupa jest połączona ze sceną
+      if (!isConnectedToScene(groupNode.id)) {
+        if (objectsRef.current[groupNode.id]) {
+          scene.remove(objectsRef.current[groupNode.id]);
+          delete objectsRef.current[groupNode.id];
+        }
+        return;
+      }
+
+      let group = objectsRef.current[groupNode.id] as THREE.Group;
+      
+      // Stwórz nową grupę jeśli nie istnieje
+      if (!group) {
+        group = new THREE.Group();
+        objectsRef.current[groupNode.id] = group;
+        scene.add(group);
+      }
+
+      // Aktualizuj transformacje grupy
+      group.position.set(
+        groupNode.data.position.x,
+        groupNode.data.position.y,
+        groupNode.data.position.z
+      );
+
+      group.rotation.set(
+        groupNode.data.rotation.x,
+        groupNode.data.rotation.y,
+        groupNode.data.rotation.z
+      );
+
+      group.scale.set(
+        groupNode.data.scale.x,
+        groupNode.data.scale.y,
+        groupNode.data.scale.z
+      );
+    });
+
     // Update or create meshes
     const meshNodes = nodes.filter(node => node.type === 'mesh');
     meshNodes.forEach(meshNode => {
-      // Sprawdź czy mesh jest połączony ze sceną
+      // Sprawdź czy mesh jest połączony ze sceną lub grupą
       if (!isConnectedToScene(meshNode.id)) {
-        // Jeśli nie jest połączony, usuń go ze sceny
         if (objectsRef.current[meshNode.id]) {
-          scene.remove(objectsRef.current[meshNode.id]);
+          const mesh = objectsRef.current[meshNode.id];
+          const parent = mesh.parent;
+          if (parent) {
+            parent.remove(mesh);
+          }
           delete objectsRef.current[meshNode.id];
         }
         return;
@@ -521,7 +565,6 @@ export default function ThreeScene() {
           const material = createMaterial(materialNode);
           mesh = new THREE.Mesh(geometry, material);
           objectsRef.current[meshNode.id] = mesh;
-          scene.add(mesh);
         } else {
           // Aktualizuj geometrię i materiał
           const newGeometry = createGeometry(geometryNode);
@@ -536,6 +579,27 @@ export default function ThreeScene() {
           // Przypisz nową geometrię i materiał
           mesh.geometry = newGeometry;
           mesh.material = newMaterial;
+        }
+
+        // Znajdź rodzica (scenę lub grupę)
+        const parentEdge = edges.find(edge => edge.source === meshNode.id);
+        const parentNode = nodes.find(node => node.id === parentEdge?.target);
+        
+        if (parentNode?.type === 'group') {
+          const parentGroup = objectsRef.current[parentNode.id] as THREE.Group;
+          if (mesh.parent !== parentGroup) {
+            if (mesh.parent) {
+              mesh.parent.remove(mesh);
+            }
+            parentGroup.add(mesh);
+          }
+        } else {
+          if (mesh.parent !== scene) {
+            if (mesh.parent) {
+              mesh.parent.remove(mesh);
+            }
+            scene.add(mesh);
+          }
         }
 
         // Update position
@@ -560,6 +624,7 @@ export default function ThreeScene() {
         );
       }
     });
+
   }, [nodes, edges]);
 
   // Animation
