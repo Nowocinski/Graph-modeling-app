@@ -16,6 +16,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import BoxGeometryNode from './nodes/BoxGeometryNode';
 import SphereGeometryNode from './nodes/SphereGeometryNode';
+import CylinderGeometryNode from './nodes/CylinderGeometryNode';
 import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
@@ -26,6 +27,7 @@ import { useScene } from '../context/SceneContext';
 const nodeTypes: NodeTypes = {
   boxGeometry: BoxGeometryNode,
   sphereGeometry: SphereGeometryNode,
+  cylinderGeometry: CylinderGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   mesh: MeshNode,
   scene: SceneNode
@@ -42,6 +44,14 @@ const defaultNodeData = {
     radius: 1,
     widthSegments: 32,
     heightSegments: 16
+  },
+  cylinderGeometry: {
+    radiusTop: 1,
+    radiusBottom: 1,
+    height: 1,
+    radialSegments: 32,
+    heightSegments: 1,
+    openEnded: false
   },
   meshNormalMaterial: {
     wireframe: false,
