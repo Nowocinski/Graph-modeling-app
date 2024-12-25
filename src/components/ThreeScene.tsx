@@ -10,11 +10,7 @@ const sceneStyles = {
   margin: 0,
   padding: 0,
   overflow: 'hidden',
-  position: 'fixed' as const,
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
+  position: 'relative' as const,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'

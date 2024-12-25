@@ -9,8 +9,9 @@ const FlowDiagram = dynamic(
 
 const wrapperStyle = {
   width: '100%',
-  height: '100vh',
-  position: 'relative' as const
+  height: '100%',
+  position: 'relative' as const,
+  overflow: 'hidden'
 };
 
 export default function DiagramWrapper() {
