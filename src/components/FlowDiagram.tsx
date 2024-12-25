@@ -18,6 +18,7 @@ import BoxGeometryNode from './nodes/BoxGeometryNode';
 import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
+import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
 // Definicja typów node'ów
@@ -28,48 +29,56 @@ const nodeTypes: NodeTypes = {
   scene: SceneNode
 };
 
+// Domyślne wartości dla nowych node'ów
+const defaultNodeData = {
+  boxGeometry: {
+    width: 1,
+    height: 1,
+    depth: 1
+  },
+  meshNormalMaterial: {
+    wireframe: false,
+    transparent: false,
+    opacity: 1
+  },
+  mesh: {
+    name: 'Mesh',
+    position: { x: 0, y: 0, z: 0 },
+    rotation: { x: 0, y: 0, z: 0 },
+    scale: { x: 1, y: 1, z: 1 }
+  },
+  scene: {
+    backgroundColor: '#e0e0e0',
+    ambientLightIntensity: 0.5,
+    pointLightIntensity: 1.0,
+    pointLightPosition: { x: 5, y: 5, z: 5 }
+  }
+};
+
 const initialNodes: Node[] = [
   {
     id: '1',
     type: 'boxGeometry',
     position: { x: 100, y: 100 },
-    data: { 
-      width: 2,
-      height: 2,
-      depth: 2
-    }
+    data: defaultNodeData.boxGeometry
   },
   {
     id: '2',
     type: 'meshNormalMaterial',
     position: { x: 100, y: 250 },
-    data: {
-      wireframe: false,
-      transparent: false,
-      opacity: 1
-    }
+    data: defaultNodeData.meshNormalMaterial
   },
   {
     id: '3',
     type: 'mesh',
     position: { x: 400, y: 175 },
-    data: {
-      name: 'Mesh',
-      position: { x: 0, y: 0, z: 0 },
-      rotation: { x: 0, y: 0, z: 0 },
-      scale: { x: 1, y: 1, z: 1 }
-    }
+    data: defaultNodeData.mesh
   },
   {
     id: '4',
     type: 'scene',
     position: { x: 700, y: 175 },
-    data: {
-      backgroundColor: '#e0e0e0',
-      ambientLightIntensity: 0.5,
-      pointLightIntensity: 1.0,
-      pointLightPosition: { x: 5, y: 5, z: 5 }
-    }
+    data: defaultNodeData.scene
   }
 ];
 
@@ -134,9 +143,21 @@ export default function FlowDiagram() {
     );
   }, []);
 
+  const handleAddNode = useCallback((type: string) => {
+    const newNode: Node = {
+      id: `${type}_${Date.now()}`,
+      type,
+      position: { x: 100, y: 100 },
+      data: defaultNodeData[type as keyof typeof defaultNodeData] || {}
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+  }, []);
+
   return (
     <div style={flowStyles}>
       <style>{customStyles}</style>
+      <NodeSelector onSelect={handleAddNode} />
       <ReactFlow
         nodes={nodes.map(node => ({
           ...node,
