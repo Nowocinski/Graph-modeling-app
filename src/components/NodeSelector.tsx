@@ -91,7 +91,7 @@ const nodes = {
     { type: 'sphereGeometry', label: 'Sphere Geometry', icon: '○' },
     { type: 'cylinderGeometry', label: 'Cylinder Geometry', icon: '⬤' },
     { type: 'capsuleGeometry', label: 'Capsule Geometry', icon: '⧫' }, // Added CapsuleGeometry
-    { type: 'circleGeometryNode', label: 'Circle Geometry', icon: '◯' }, // Added CircleGeometryNode
+    { type: 'circleGeometry', label: 'Circle Geometry', icon: '◯' }, // Poprawiono typ na circleGeometry
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },
