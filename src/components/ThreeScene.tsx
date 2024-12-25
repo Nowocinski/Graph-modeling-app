@@ -595,52 +595,113 @@ export default function ThreeScene() {
     scene: THREE.Scene,
     objectsRef: { [key: string]: THREE.Object3D }
   ) => {
+    console.log('Handling subtract node:', meshNode.id);
+    
     // Znajdź połączone meshe
     const meshAEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'meshA');
     const meshBEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'meshB');
 
+    console.log('Found edges:', { meshAEdge, meshBEdge });
+
     const meshA = meshAEdge ? objectsRef[meshAEdge.source] as THREE.Mesh : null;
     const meshB = meshBEdge ? objectsRef[meshBEdge.source] as THREE.Mesh : null;
 
-    if (!meshA || !meshB) return;
+    console.log('Mesh A position:', meshA?.position);
+    console.log('Mesh B position:', meshB?.position);
+    console.log('Mesh A matrix:', meshA?.matrix);
+    console.log('Mesh B matrix:', meshB?.matrix);
 
-    // Sklonuj meshe aby nie modyfikować oryginalnych
-    const meshAClone = meshA.clone();
-    const meshBClone = meshB.clone();
-
-    // Zastosuj transformacje z oryginalnych meshy
-    meshAClone.position.copy(meshA.position);
-    meshAClone.rotation.copy(meshA.rotation);
-    meshAClone.scale.copy(meshA.scale);
-
-    meshBClone.position.copy(meshB.position);
-    meshBClone.rotation.copy(meshB.rotation);
-    meshBClone.scale.copy(meshB.scale);
+    if (!meshA || !meshB) {
+      console.warn('Missing meshes for subtract operation');
+      return;
+    }
 
     try {
-      // Wykonaj operację subtract
+      // Update world matrices
+      meshA.updateMatrixWorld(true);
+      meshB.updateMatrixWorld(true);
+
+      console.log('Mesh A world matrix:', meshA.matrixWorld);
+      console.log('Mesh B world matrix:', meshB.matrixWorld);
+
+      // Clone meshes
+      const meshAClone = meshA.clone();
+      const meshBClone = meshB.clone();
+
+      // Apply world transformations to geometries
+      const geometryA = meshA.geometry.clone().applyMatrix4(meshA.matrixWorld);
+      const geometryB = meshB.geometry.clone().applyMatrix4(meshB.matrixWorld);
+
+      meshAClone.geometry = geometryA;
+      meshBClone.geometry = geometryB;
+
+      // Reset transformations
+      meshAClone.position.set(0, 0, 0);
+      meshAClone.rotation.set(0, 0, 0);
+      meshAClone.scale.set(1, 1, 1);
+      meshAClone.updateMatrix();
+
+      meshBClone.position.set(0, 0, 0);
+      meshBClone.rotation.set(0, 0, 0);
+      meshBClone.scale.set(1, 1, 1);
+      meshBClone.updateMatrix();
+
+      console.log('Starting CSG operation');
+
+      // Perform CSG operation
       const bspA = CSG.fromMesh(meshAClone);
       const bspB = CSG.fromMesh(meshBClone);
       const bspResult = bspA.subtract(bspB);
-      
-      let resultMesh = objectsRef[meshNode.id] as THREE.Mesh;
 
-      // Jeśli mesh wynikowy nie istnieje, stwórz nowy
+      console.log('CSG operation completed');
+
+      // Calculate center position
+      const centerA = new THREE.Vector3();
+      const centerB = new THREE.Vector3();
+      
+      meshA.geometry.computeBoundingBox();
+      meshB.geometry.computeBoundingBox();
+      
+      meshA.geometry.boundingBox!.getCenter(centerA);
+      meshB.geometry.boundingBox!.getCenter(centerB);
+      
+      centerA.applyMatrix4(meshA.matrixWorld);
+      centerB.applyMatrix4(meshB.matrixWorld);
+      
+      const resultPosition = centerA.clone().add(centerB).multiplyScalar(0.5);
+      
+      console.log('Result position:', resultPosition);
+
+      // Create or update result mesh
+      let resultMesh = objectsRef[meshNode.id] as THREE.Mesh;
+      
       if (!resultMesh) {
-        resultMesh = CSG.toMesh(bspResult, meshAClone.matrix, meshA.material);
+        console.log('Creating new result mesh');
+        resultMesh = CSG.toMesh(bspResult, new THREE.Matrix4(), meshA.material);
+        resultMesh.position.copy(resultPosition);
         objectsRef[meshNode.id] = resultMesh;
       } else {
-        // Aktualizuj istniejący mesh
-        const newMesh = CSG.toMesh(bspResult, meshAClone.matrix, meshA.material);
+        console.log('Updating existing result mesh');
+        const newMesh = CSG.toMesh(bspResult, new THREE.Matrix4(), meshA.material);
         resultMesh.geometry.dispose();
         resultMesh.geometry = newMesh.geometry;
         resultMesh.material = newMesh.material;
+        resultMesh.position.copy(resultPosition);
       }
 
-      // Znajdź rodzica (scenę lub grupę)
+      // Force geometry update
+      resultMesh.geometry.computeBoundingSphere();
+      resultMesh.geometry.computeBoundingBox();
+
+      // Find parent
       const parentEdge = edges.find(edge => edge.source === meshNode.id);
       const parentNode = nodes.find(node => node.id === parentEdge?.target);
-      
+
+      console.log('Parent node:', parentNode);
+      console.log('Result mesh position:', resultMesh.position);
+      console.log('Result mesh matrix:', resultMesh.matrix);
+
+      // Update parent
       if (parentNode?.type === 'group') {
         const parentGroup = objectsRef[parentNode.id] as THREE.Group;
         if (parentGroup && resultMesh.parent !== parentGroup) {
@@ -648,21 +709,40 @@ export default function ThreeScene() {
             resultMesh.parent.remove(resultMesh);
           }
           parentGroup.add(resultMesh);
+          console.log('Added result to group');
         }
-      } else if (scene) {
+      } else {
         if (resultMesh.parent !== scene) {
           if (resultMesh.parent) {
             resultMesh.parent.remove(resultMesh);
           }
           scene.add(resultMesh);
+          console.log('Added result to scene');
         }
       }
 
-      // Wyczyść sklonowane meshe
+      // Ensure the result mesh is visible
+      resultMesh.visible = true;
+      resultMesh.material.visible = true;
+      resultMesh.material.needsUpdate = true;
+      resultMesh.geometry.attributes.position.needsUpdate = true;
+
+      console.log('Final result mesh state:', {
+        position: resultMesh.position,
+        visible: resultMesh.visible,
+        materialVisible: resultMesh.material.visible,
+        geometryVertices: resultMesh.geometry.attributes.position.count
+      });
+
+      // Clean up
+      geometryA.dispose();
+      geometryB.dispose();
       meshAClone.geometry.dispose();
       meshBClone.geometry.dispose();
+
+      console.log('Subtract operation completed successfully');
     } catch (error) {
-      console.error('Error performing CSG operation:', error);
+      console.error('Error in CSG operation:', error);
     }
   };
 
