@@ -136,7 +136,18 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
         onChange={(axis, value) => handleChange('scale', axis, value)}
       />
 
-      <button onClick={handleDelete} style={deleteButtonStyles}>
+      <button 
+        onClick={handleDelete} 
+        style={deleteButtonStyles}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = '#ef4444';
+          e.currentTarget.style.background = '#fee2e2';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = '#666';
+          e.currentTarget.style.background = 'transparent';
+        }}
+      >
         🗑️
       </button>
       <Handle type="source" position={Position.Right} />
