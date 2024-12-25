@@ -222,36 +222,19 @@ const defaultNodeData = {
 
 const initialNodes: Node[] = [
   {
-    id: '1',
-    type: 'boxGeometry',
-    position: { x: 100, y: 100 },
-    data: defaultNodeData.boxGeometry
-  },
-  {
-    id: '2',
-    type: 'meshNormalMaterial',
-    position: { x: 100, y: 250 },
-    data: defaultNodeData.meshNormalMaterial
-  },
-  {
-    id: '3',
-    type: 'mesh',
-    position: { x: 400, y: 175 },
-    data: defaultNodeData.mesh
-  },
-  {
-    id: '4',
+    id: 'scene',
     type: 'scene',
-    position: { x: 750, y: 175 },
-    data: defaultNodeData.scene
+    position: { x: 500, y: 200 },
+    data: {
+      backgroundColor: '#f0f0f0',
+      ambientLightIntensity: 0.5,
+      pointLightIntensity: 0.8,
+      pointLightPosition: { x: 10, y: 10, z: 10 }
+    }
   }
 ];
 
-const initialEdges: Edge[] = [
-  { id: 'e1-3', source: '1', target: '3', targetHandle: 'geometry' },
-  { id: 'e2-3', source: '2', target: '3', targetHandle: 'material' },
-  { id: 'e3-4', source: '3', target: '4' }
-];
+const initialEdges: Edge[] = [];
 
 const flowStyles = {
   width: '100%',
@@ -267,9 +250,39 @@ const customStyles = `
 
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [nodes, setNodes] = useState<Node[]>(() => {
+    // Próba pobrania zapisanego stanu z localStorage
+    const savedNodes = localStorage.getItem('flowNodes');
+    if (savedNodes) {
+      try {
+        return JSON.parse(savedNodes);
+      } catch (e) {
+        console.error('Error parsing saved nodes:', e);
+      }
+    }
+    return initialNodes;
+  });
+
+  const [edges, setEdges] = useState<Edge[]>(() => {
+    // Próba pobrania zapisanego stanu z localStorage
+    const savedEdges = localStorage.getItem('flowEdges');
+    if (savedEdges) {
+      try {
+        return JSON.parse(savedEdges);
+      } catch (e) {
+        console.error('Error parsing saved edges:', e);
+      }
+    }
+    return initialEdges;
+  });
+
   const { project, getViewport } = useReactFlow();
+
+  // Zapisz stan do localStorage przy każdej zmianie
+  useEffect(() => {
+    localStorage.setItem('flowNodes', JSON.stringify(nodes));
+    localStorage.setItem('flowEdges', JSON.stringify(edges));
+  }, [nodes, edges]);
 
   // Aktualizuj kontekst przy każdej zmianie nodes lub edges
   useEffect(() => {
@@ -408,6 +421,37 @@ const FlowDiagramInner = () => {
     <div style={flowStyles}>
       <style>{customStyles}</style>
       <NodeSelector onSelect={handleAddNode} />
+      <button
+        onClick={() => {
+          localStorage.removeItem('flowNodes');
+          localStorage.removeItem('flowEdges');
+          setNodes(initialNodes);
+          setEdges(initialEdges);
+        }}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000,
+          padding: '8px 16px',
+          background: '#ef4444',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontWeight: '500',
+          fontSize: '14px',
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#dc2626';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#ef4444';
+        }}
+      >
+        Reset Graph
+      </button>
       <ReactFlow
         nodes={nodes.map(node => ({
           ...node,
