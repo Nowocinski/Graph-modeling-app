@@ -101,11 +101,12 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
       border: '1px solid #777',
       padding: '16px',
       borderRadius: '8px',
-      minWidth: '300px'
+      minWidth: '300px',
+      color: '#333'
     }}>
       <Handle type="target" position={Position.Left} />
-      <div style={{ fontWeight: 'bold', marginBottom: '12px' }}>Scene Settings</div>
-      <div style={{ fontSize: '12px' }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '12px', color: '#333' }}>Scene Settings</div>
+      <div style={{ fontSize: '12px', color: '#333' }}>
         <div style={{ marginBottom: '8px' }}>
           <label>Background Color:</label>
           <input
