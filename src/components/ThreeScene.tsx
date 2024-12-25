@@ -4,15 +4,19 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 const sceneStyles = {
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   margin: 0,
   padding: 0,
   overflow: 'hidden',
   position: 'fixed' as const,
   top: 0,
   left: 0,
-  display: 'block'
+  right: 0,
+  bottom: 0,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 export default function ThreeScene() {
@@ -68,6 +72,15 @@ export default function ThreeScene() {
 
     // Initialize renderer
     updateSize();
+    renderer.setSize(dimensions.width, dimensions.height, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    
+    // Ustaw viewport na środek
+    const viewportWidth = dimensions.width;
+    const viewportHeight = dimensions.height;
+    renderer.setViewport(0, 0, viewportWidth, viewportHeight);
+    
     mountRef.current.appendChild(renderer.domElement);
 
     // Add a simple cube
@@ -77,6 +90,7 @@ export default function ThreeScene() {
       shininess: 60,
     });
     const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(0, 0, 0); // Ustawienie kostki w środku sceny
     scene.add(cube);
 
     // Add lights
@@ -88,7 +102,8 @@ export default function ThreeScene() {
     scene.add(ambientLight);
 
     // Position camera
-    camera.position.z = 5;
+    camera.position.set(0, 0, 5);
+    camera.lookAt(0, 0, 0); // Skierowanie kamery na środek sceny
 
     // Animation
     let animationFrameId: number;
