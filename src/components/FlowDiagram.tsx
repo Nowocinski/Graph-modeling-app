@@ -22,6 +22,7 @@ import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
+import GroupNode from './nodes/GroupNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -34,7 +35,8 @@ const nodeTypes: NodeTypes = {
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
   mesh: MeshNode,
-  scene: SceneNode
+  scene: SceneNode,
+  group: GroupNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -93,6 +95,12 @@ const defaultNodeData = {
     ambientLightIntensity: 0.5,
     pointLightIntensity: 1.0,
     pointLightPosition: { x: 5, y: 5, z: 5 }
+  },
+  group: {
+    name: 'Group',
+    position: { x: 0, y: 0, z: 0 },
+    rotation: { x: 0, y: 0, z: 0 },
+    scale: { x: 1, y: 1, z: 1 }
   }
 };
 
