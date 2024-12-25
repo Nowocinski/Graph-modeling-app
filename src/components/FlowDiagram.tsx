@@ -14,10 +14,10 @@ import ReactFlow, {
   Edge as FlowEdge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import BoxGeometryNode from './nodes/BoxGeometryNode';
-import SphereGeometryNode from './nodes/SphereGeometryNode';
-import CylinderGeometryNode from './nodes/CylinderGeometryNode';
-import MeshNormalMaterialNode from './nodes/MeshNormalMaterialNode';
+import BoxGeometryNode from './nodes/geometry/BoxGeometryNode';
+import SphereGeometryNode from './nodes/geometry/SphereGeometryNode';
+import CylinderGeometryNode from './nodes/geometry/CylinderGeometryNode';
+import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
 import NodeSelector from './NodeSelector';
