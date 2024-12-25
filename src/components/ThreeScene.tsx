@@ -47,7 +47,7 @@ export default function ThreeScene() {
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    scene.background = new THREE.Color(0xe0e0e0);
 
     const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
