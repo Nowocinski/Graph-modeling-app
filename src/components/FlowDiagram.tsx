@@ -26,6 +26,7 @@ import DodecahedronGeometryNode from './nodes/geometry/DodecahedronGeometryNode'
 import ExtrudeGeometryNode from './nodes/geometry/ExtrudeGeometryNode';
 import IcosahedronGeometryNode from './nodes/geometry/IcosahedronGeometryNode';
 import LatheGeometryNode from './nodes/geometry/LatheGeometryNode';
+import OctahedronGeometryNode from './nodes/geometry/OctahedronGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
@@ -47,6 +48,7 @@ const nodeTypes: NodeTypes = {
   extrudeGeometry: ExtrudeGeometryNode,
   icosahedronGeometry: IcosahedronGeometryNode,
   latheGeometry: LatheGeometryNode,
+  octahedronGeometry: OctahedronGeometryNode,
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
@@ -112,6 +114,10 @@ const defaultNodeData = {
     segments: 32,
     phiStart: 0,
     phiLength: Math.PI * 2
+  },
+  octahedronGeometry: {
+    radius: 1,
+    detail: 0
   },
   meshNormalMaterial: {
     wireframe: false,

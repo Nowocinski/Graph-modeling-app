@@ -97,6 +97,7 @@ const nodes = {
     { type: 'extrudeGeometry', label: 'Extrude Geometry', icon: '⬗' },
     { type: 'icosahedronGeometry', label: 'Icosahedron Geometry', icon: '⬡' },
     { type: 'latheGeometry', label: 'Lathe Geometry', icon: '◎' },
+    { type: 'octahedronGeometry', label: 'Octahedron Geometry', icon: '◈' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },

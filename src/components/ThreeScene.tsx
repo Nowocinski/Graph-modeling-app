@@ -89,6 +89,13 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('octahedron')) {
+    return new THREE.OctahedronGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.detail
+    );
+  }
+
   if (nodeType.includes('lathe')) {
     // Create a default profile shape for the lathe
     const points = [];
