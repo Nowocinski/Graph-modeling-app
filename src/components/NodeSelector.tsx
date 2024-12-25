@@ -90,8 +90,9 @@ const nodes = {
     { type: 'boxGeometry', label: 'Box Geometry', icon: '□' },
     { type: 'sphereGeometry', label: 'Sphere Geometry', icon: '○' },
     { type: 'cylinderGeometry', label: 'Cylinder Geometry', icon: '⬤' },
-    { type: 'capsuleGeometry', label: 'Capsule Geometry', icon: '⧫' }, // Added CapsuleGeometry
-    { type: 'circleGeometry', label: 'Circle Geometry', icon: '◯' }, // Poprawiono typ na circleGeometry
+    { type: 'capsuleGeometry', label: 'Capsule Geometry', icon: '⧫' },
+    { type: 'circleGeometry', label: 'Circle Geometry', icon: '◯' },
+    { type: 'coneGeometry', label: 'Cone Geometry', icon: '▼' },
   ],
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },

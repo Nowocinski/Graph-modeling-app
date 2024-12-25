@@ -65,6 +65,16 @@ const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
     );
   }
 
+  if (nodeType.includes('cone')) {
+    return new THREE.ConeGeometry(
+      geometryNode.data.radius,
+      geometryNode.data.height,
+      geometryNode.data.radialSegments,
+      geometryNode.data.heightSegments,
+      geometryNode.data.openEnded
+    );
+  }
+
   console.warn('Unknown geometry type:', geometryNode.type);
   return new THREE.BoxGeometry(1, 1, 1);
 };
