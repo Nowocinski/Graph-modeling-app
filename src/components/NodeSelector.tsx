@@ -11,12 +11,9 @@ const selectorStyles = {
   top: '20px',
   left: '20px',
   zIndex: 1000,
-  background: '#ffffff',
-  borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-  padding: '12px',
+  background: 'transparent',
+  padding: '0',
   minWidth: '220px',
-  border: '1px solid #e1e4e8'
 };
 
 const buttonStyles = {
