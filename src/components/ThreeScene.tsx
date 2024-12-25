@@ -69,10 +69,7 @@ export default function ThreeScene() {
     
     // Add a simple cube
     const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshPhongMaterial({ 
-      color: 0x00ff00,
-      shininess: 60,
-    });
+    const material = new THREE.MeshNormalMaterial({ });
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, 0);
     scene.add(cube);
