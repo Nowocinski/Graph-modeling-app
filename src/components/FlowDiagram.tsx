@@ -366,6 +366,8 @@ const FlowDiagramInner = () => {
       setNodes(graph.nodes);
       setEdges(graph.edges);
       setOriginalGraph(graph);
+      setIsGraphModalOpen(false);
+      setShowOverwriteConfirm(false);
     }
   };
 
