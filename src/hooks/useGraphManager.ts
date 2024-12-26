@@ -53,10 +53,6 @@ export const useGraphManager = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        if (data.error === 'Graph already exists' && !overwrite) {
-          setError('Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?');
-          return false;
-        }
         throw new Error(data.error || 'Failed to save graph');
       }
 
@@ -68,7 +64,9 @@ export const useGraphManager = () => {
       setError(null);
       return true;
     } catch (err) {
-      setError(err.message);
+      if (!err.message.includes('already exists')) {
+        setError(err.message);
+      }
       console.error('Error saving graph:', err);
       return false;
     } finally {
