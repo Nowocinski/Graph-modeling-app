@@ -275,7 +275,12 @@ const initialNodes: Node[] = [
     id: 'mesh_1',
     type: 'mesh',
     position: { x: 500, y: 400 }, // Przesunięty na środek
-    data: defaultNodeData.mesh
+    data: {
+      ...defaultNodeData.mesh,
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 }
+    }
   }
 ];
 
@@ -457,6 +462,11 @@ const FlowDiagramInner = () => {
     linkElement.click();
   }, [nodes, edges]);
 
+  const handleResetScene = useCallback(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, []);
+
   const [selectedInputs, setSelectedInputs] = useState<{
     nodeId: string;
     field: string;
@@ -520,108 +530,51 @@ const FlowDiagramInner = () => {
   };
 
   return (
-    <div 
-      style={flowStyles}
-    >
-      <style>{customStyles}</style>
-      <NodeSelector onSelect={handleAddNode} />
+    <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        zIndex: 4,
+        display: 'flex',
+        gap: '10px'
+      }}>
+        <button
+          onClick={handleExportGraph}
+          style={{
+            padding: '8px 16px',
+            background: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <span>📤</span> Export
+        </button>
+        <button
+          onClick={handleResetScene}
+          style={{
+            padding: '8px 16px',
+            background: '#ef4444',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <span>🔄</span> Reset
+        </button>
+      </div>
 
-      {/* Panel kontrolny dla zbiorowej edycji */}
-      {selectedInputs.length > 0 && (
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#1e293b',
-          padding: '12px',
-          borderRadius: '8px',
-          display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
-          zIndex: 1000,
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-        }}>
-          <span style={{ color: 'white', fontSize: '14px' }}>
-            Wybrano {selectedInputs.length} {selectedInputs.length === 1 ? 'input' : 'inputów'}
-          </span>
-          {!bulkEditMode ? (
-            <button
-              onClick={() => setBulkEditMode(true)}
-              style={{
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              Zmień wartości
-            </button>
-          ) : (
-            <>
-              <input
-                type="number"
-                value={bulkEditValue}
-                onChange={(e) => setBulkEditValue(e.target.value)}
-                style={{
-                  width: '80px',
-                  padding: '6px',
-                  borderRadius: '4px',
-                  border: '1px solid #4b5563',
-                  background: '#374151',
-                  color: 'white'
-                }}
-                placeholder="Wartość"
-              />
-              <button
-                onClick={applyBulkEdit}
-                style={{
-                  background: '#22c55e',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Zastosuj
-              </button>
-              <button
-                onClick={cancelBulkEdit}
-                style={{
-                  background: '#ef4444',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Anuluj
-              </button>
-            </>
-          )}
-          <button
-            onClick={createBulkEditNode}
-            style={{
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            Stwórz node kontrolny
-          </button>
-        </div>
-      )}
       <ReactFlow
         nodes={nodes.map(node => ({
           ...node,
@@ -640,10 +593,10 @@ const FlowDiagramInner = () => {
         onConnect={onConnect}
         onEdgeClick={onEdgeClick}
         fitView
-        style={flowStyles}
       >
         <Background />
         <Controls />
+        <NodeSelector onSelect={handleAddNode} />
       </ReactFlow>
     </div>
   );
