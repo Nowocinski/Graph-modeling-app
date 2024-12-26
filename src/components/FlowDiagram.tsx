@@ -371,7 +371,8 @@ const FlowDiagramInner = () => {
                sourceNode?.type === 'group' ||
                sourceNode?.type === 'subtract' || 
                sourceNode?.type === 'intersect' ||
-               sourceNode?.type === 'union';
+               sourceNode?.type === 'union' ||
+               sourceNode?.type === 'loop';
       }
 
       // Group może przyjmować połączenia od Mesh i operacji CSG
@@ -379,7 +380,13 @@ const FlowDiagramInner = () => {
         return sourceNode?.type === 'mesh' || 
                sourceNode?.type === 'subtract' || 
                sourceNode?.type === 'intersect' ||
-               sourceNode?.type === 'union';
+               sourceNode?.type === 'union' ||
+               sourceNode?.type === 'loop';
+      }
+
+      // Loop może przyjmować połączenia tylko od Mesh i Group
+      if (targetNode?.type === 'loop') {
+        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
       }
 
       // Mesh może przyjmować połączenia od Geometry i Material

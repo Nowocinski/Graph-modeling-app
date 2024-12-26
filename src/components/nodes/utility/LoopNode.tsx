@@ -98,7 +98,12 @@ export const LoopNode = ({ data, id }: LoopNodeProps) => {
 
   return (
     <div className="node-container">
-      <Handle type="target" position={Position.Left} />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="input"
+        style={{ background: '#64748b' }}
+      />
       
       <div style={{ padding: '12px' }}>
         <h4 style={{ margin: '0 0 8px 0' }}>Loop</h4>
@@ -230,7 +235,12 @@ export const LoopNode = ({ data, id }: LoopNodeProps) => {
         </div>
       </div>
 
-      <Handle type="source" position={Position.Right} />
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="output"
+        style={{ background: '#64748b' }}
+      />
     </div>
   );
 };
