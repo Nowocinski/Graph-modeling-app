@@ -332,13 +332,16 @@ const FlowDiagramInner = () => {
 
   const handleSaveGraph = async (overwrite = false) => {
     if (graphName.trim()) {
+      if (!overwrite && getGraphList().includes(graphName.trim())) {
+        setShowOverwriteConfirm(true);
+        return;
+      }
+      
       const success = await saveGraph(graphName.trim(), nodes, edges, overwrite);
       if (success) {
         setGraphName('');
         setShowOverwriteConfirm(false);
         setIsGraphModalOpen(false);
-      } else if (error?.includes('już istnieje')) {
-        setShowOverwriteConfirm(true);
       }
     }
   };
@@ -661,7 +664,10 @@ const FlowDiagramInner = () => {
                 Zarządzaj Grafami
               </h3>
               <button
-                onClick={() => setIsGraphModalOpen(false)}
+                onClick={() => {
+                  setIsGraphModalOpen(false);
+                  setShowOverwriteConfirm(false);
+                }}
                 disabled={isLoading}
                 style={{
                   background: 'none',
@@ -680,7 +686,7 @@ const FlowDiagramInner = () => {
               </button>
             </div>
             
-            {error && (
+            {error && !error.includes('już istnieje') && (
               <div style={{
                 padding: '12px',
                 marginBottom: '16px',
@@ -694,60 +700,14 @@ const FlowDiagramInner = () => {
               </div>
             )}
             
-            {showOverwriteConfirm && (
-              <div style={{
-                padding: '12px',
-                marginBottom: '20px',
-                background: '#854d0e',
-                border: '1px solid #a16207',
-                borderRadius: '8px',
-                color: '#fef3c7'
-              }}>
-                <div style={{ marginBottom: '8px', fontSize: '0.875rem' }}>
-                  Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => handleSaveGraph(true)}
-                    disabled={isLoading}
-                    style={{
-                      padding: '6px 12px',
-                      background: !isLoading ? '#b45309' : '#475569',
-                      color: '#fef3c7',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: !isLoading ? 'pointer' : 'not-allowed',
-                      fontSize: '0.75rem',
-                      fontWeight: 500
-                    }}
-                  >
-                    Nadpisz
-                  </button>
-                  <button
-                    onClick={() => setShowOverwriteConfirm(false)}
-                    disabled={isLoading}
-                    style={{
-                      padding: '6px 12px',
-                      background: 'transparent',
-                      color: '#fef3c7',
-                      border: '1px solid #fef3c7',
-                      borderRadius: '6px',
-                      cursor: !isLoading ? 'pointer' : 'not-allowed',
-                      fontSize: '0.75rem',
-                      fontWeight: 500
-                    }}
-                  >
-                    Anuluj
-                  </button>
-                </div>
-              </div>
-            )}
-            
             <div style={{ marginBottom: '20px' }}>
               <input
                 type="text"
                 value={graphName}
-                onChange={(e) => setGraphName(e.target.value)}
+                onChange={(e) => {
+                  setGraphName(e.target.value);
+                  setShowOverwriteConfirm(false);
+                }}
                 placeholder="Nazwa nowego grafu"
                 disabled={isLoading}
                 style={{
@@ -763,29 +723,78 @@ const FlowDiagramInner = () => {
                   transition: 'all 0.2s'
                 }}
               />
-              <button
-                onClick={() => handleSaveGraph()}
-                disabled={!graphName.trim() || isLoading}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  background: graphName.trim() && !isLoading ? '#3b82f6' : '#475569',
-                  color: '#e2e8f0',
-                  border: 'none',
+              {showOverwriteConfirm ? (
+                <div style={{
+                  padding: '12px',
+                  marginBottom: '12px',
+                  background: '#854d0e',
+                  border: '1px solid #a16207',
                   borderRadius: '8px',
-                  cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  transition: 'all 0.2s'
-                }}
-              >
-                {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
-                Zapisz jako nowy graf
-              </button>
+                  color: '#fef3c7'
+                }}>
+                  <div style={{ marginBottom: '8px', fontSize: '0.875rem' }}>
+                    Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleSaveGraph(true)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: !isLoading ? '#b45309' : '#475569',
+                        color: '#fef3c7',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Nadpisz
+                    </button>
+                    <button
+                      onClick={() => setShowOverwriteConfirm(false)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: 'transparent',
+                        color: '#fef3c7',
+                        border: '1px solid #fef3c7',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Anuluj
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSaveGraph(false)}
+                  disabled={!graphName.trim() || isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: graphName.trim() && !isLoading ? '#3b82f6' : '#475569',
+                    color: '#e2e8f0',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
+                  Zapisz jako nowy graf
+                </button>
+              )}
             </div>
 
             <div>
