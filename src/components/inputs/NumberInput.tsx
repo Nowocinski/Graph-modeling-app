@@ -77,7 +77,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
       <label style={{ 
         minWidth: '80px',
         fontSize: '14px',
-        color: '#e5e7eb'
+        color: '#1e293b'
       }}>
         {label}
       </label>
@@ -105,10 +105,10 @@ const NumberInput: React.FC<NumberInputProps> = ({
           style={{
             width: '80px',
             padding: '4px 8px',
-            background: '#374151',
-            border: '1px solid #4b5563',
+            background: '#f3f4f6',
+            border: '1px solid #d1d5db',
             borderRadius: '4px',
-            color: '#e5e7eb',
+            color: '#1e293b',
             fontSize: '14px'
           }}
           step={step}
