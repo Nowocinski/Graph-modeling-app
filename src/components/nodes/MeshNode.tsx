@@ -110,8 +110,8 @@ const MeshNode = ({ data, id }: NodeProps<MeshData>) => {
 
   return (
     <div className="node-box" style={{
-      background: '#f3f4f6',
-      border: '1px solid #d1d5db',
+      background: '#fecaca',
+      border: '1px solid #f87171',
       borderRadius: '8px',
       padding: '10px',
       minWidth: '300px',
