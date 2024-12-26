@@ -64,8 +64,8 @@ const CircleGeometryNode = ({ data, id }: NodeProps<CircleGeometryData>) => {
 
   return (
     <div className="node-box" style={{
-      background: '#fff',
-      border: '1px solid #777',
+      background: '#bbf7d0',
+      border: '1px solid #4ade80',
       borderRadius: '8px',
       padding: '10px',
       minWidth: '150px',
