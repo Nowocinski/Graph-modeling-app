@@ -25,7 +25,18 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
     
     // Aktualizuj wszystkie połączone inputy
     connectedInputs.forEach(input => {
-      onUpdate(input.nodeId, { [input.field]: newValue });
+      const [category, field] = input.field.split('.');
+      if (field) {
+        // Dla zagnieżdżonych właściwości (np. position.x)
+        onUpdate(input.nodeId, {
+          [category]: {
+            [field]: newValue
+          }
+        });
+      } else {
+        // Dla prostych właściwości
+        onUpdate(input.nodeId, { [category]: newValue });
+      }
     });
   };
 

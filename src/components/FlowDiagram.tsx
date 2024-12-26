@@ -482,22 +482,27 @@ const FlowDiagramInner = () => {
     }
   }, [edges, nodes, updateSceneState]);
 
-  const handleNodeUpdate = useCallback((nodeId: string, newData: any) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === nodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...newData,
-            },
-          };
-        }
-        return node;
-      })
-    );
-  }, []);
+  const handleNodeUpdate = (id: string, newData: any) => {
+    setNodes(nds => nds.map(node => {
+      if (node.id === id) {
+        // Dla zagnieżdżonych właściwości (np. position.x)
+        const updatedData = { ...node.data };
+        Object.entries(newData).forEach(([key, value]) => {
+          if (typeof value === 'object' && value !== null) {
+            updatedData[key] = { ...updatedData[key], ...value };
+          } else {
+            updatedData[key] = value;
+          }
+        });
+        
+        return {
+          ...node,
+          data: updatedData
+        };
+      }
+      return node;
+    }));
+  };
 
   const handleAddNode = useCallback((type: string) => {
     const { x: viewX, y: viewY, zoom } = getViewport();
@@ -516,18 +521,18 @@ const FlowDiagramInner = () => {
       data: defaultNodeData[type as keyof typeof defaultNodeData] || {}
     };
 
-    setNodes((nds) => [...nds, newNode]);
+    setNodes(prev => [...prev, newNode]);
   }, [project]);
 
   const handleDeleteNode = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-    setEdges((eds) => eds.filter((edge) => 
+    setNodes(nds => nds.filter(node => node.id !== nodeId));
+    setEdges(eds => eds.filter(edge => 
       edge.source !== nodeId && edge.target !== nodeId
     ));
   }, []);
 
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    setEdges(eds => eds.filter(e => e.id !== edge.id));
   }, []);
 
   const handleExportGraph = useCallback(() => {
