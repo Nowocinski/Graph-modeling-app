@@ -13,12 +13,15 @@ interface BulkEditNodeProps {
     }>;
     onUpdate: (id: string, data: any) => void;
     onDelete?: () => void;
+    onIdChange?: (oldId: string, newId: string) => void;
   };
 }
 
 const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
-  const { value, onUpdate, onDelete, connectedInputs } = data;
+  const { value, onUpdate, onDelete, connectedInputs, onIdChange } = data;
   const [isExpanded, setIsExpanded] = useState(false);
+  const [nodeId, setNodeId] = useState(id);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleChange = (newValue: number) => {
     onUpdate(id, { value: newValue });
@@ -38,6 +41,15 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
         onUpdate(input.nodeId, { [category]: newValue });
       }
     });
+  };
+
+  const handleIdChange = (e: React.FocusEvent<HTMLInputElement>) => {
+    const newId = e.target.value.trim();
+    if (newId && newId !== id && onIdChange) {
+      onIdChange(id, newId);
+      setNodeId(newId);
+    }
+    setIsEditing(false);
   };
 
   // Funkcja pomocnicza do formatowania nazwy pola
@@ -67,7 +79,45 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
           alignItems: 'center',
           marginBottom: '8px'
         }}>
-          <strong style={{ color: '#1e293b' }}>Bulk Edit Node</strong>
+          {isEditing ? (
+            <input
+              type="text"
+              defaultValue={nodeId}
+              onBlur={handleIdChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              autoFocus
+              style={{
+                background: '#374151',
+                border: '1px solid #4b5563',
+                borderRadius: '4px',
+                color: '#e5e7eb',
+                padding: '2px 4px',
+                fontSize: '14px',
+                width: '120px'
+              }}
+            />
+          ) : (
+            <div 
+              onClick={() => setIsEditing(true)}
+              style={{ 
+                cursor: 'pointer',
+                padding: '2px 4px',
+                borderRadius: '4px',
+                fontSize: '14px',
+                color: '#1e293b',
+                background: '#fef3c7',
+                border: '1px solid transparent',
+                width: 'fit-content'
+              }}
+              title="Kliknij aby edytować ID"
+            >
+              {nodeId}
+            </div>
+          )}
           {onDelete && (
             <button
               onClick={onDelete}

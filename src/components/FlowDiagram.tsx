@@ -378,6 +378,20 @@ const FlowDiagramInner = () => {
     }));
   }, []);
 
+  const handleNodeIdChange = useCallback((oldId: string, newId: string) => {
+    // Aktualizuj node
+    setNodes(nds => nds.map(node => 
+      node.id === oldId ? { ...node, id: newId } : node
+    ));
+
+    // Aktualizuj krawędzie
+    setEdges(eds => eds.map(edge => ({
+      ...edge,
+      source: edge.source === oldId ? newId : edge.source,
+      target: edge.target === oldId ? newId : edge.target
+    })));
+  }, []);
+
   const onConnect = useCallback((params: Connection) => {
     const sourceNode = nodes.find(node => node.id === params.source);
     const targetNode = nodes.find(node => node.id === params.target);
@@ -513,6 +527,7 @@ const FlowDiagramInner = () => {
       },
       data: {
         onUpdate: handleNodeUpdate,
+        onIdChange: handleNodeIdChange,
         connectedInputs: selectedInputs
       }
     };
@@ -683,6 +698,7 @@ const FlowDiagramInner = () => {
             ...node.data,
             onUpdate: handleNodeUpdate,
             onDelete: node.type !== 'scene' ? handleDeleteNode : undefined,
+            onIdChange: handleNodeIdChange,
             toggleInputSelection: toggleInputSelection,
             selectedInputs: selectedInputs
           }
