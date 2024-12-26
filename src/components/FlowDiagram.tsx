@@ -657,6 +657,31 @@ const FlowDiagramInner = () => {
             };
           });
 
+        // Create a border node to visually group imported nodes
+        const BORDER_PADDING = 50;
+        const borderNode = {
+          id: `import_border_${Date.now()}`,
+          type: 'default', // Using default type as it's just a visual element
+          position: {
+            x: importBounds.minX + offsetX - BORDER_PADDING,
+            y: importBounds.minY + offsetY - BORDER_PADDING
+          },
+          style: {
+            width: importBounds.maxX - importBounds.minX + (BORDER_PADDING * 2),
+            height: importBounds.maxY - importBounds.minY + (BORDER_PADDING * 2),
+            backgroundColor: 'transparent',
+            border: '2px dashed #666',
+            borderRadius: '8px',
+            padding: '10px',
+            pointerEvents: 'none' as const, // Make the border non-interactive
+            zIndex: -1, // Place behind other nodes
+          },
+          data: {
+            label: `Imported from: ${selectedGraphToImport}`,
+            importedAt: new Date().toLocaleString()
+          }
+        };
+
         // Update edge references to use new node IDs, excluding edges connected to scene nodes
         const newEdges = graphToImport.edges
           .filter(edge => !sceneNodeIds.has(edge.source) && !sceneNodeIds.has(edge.target)) // Exclude edges connected to scene nodes
@@ -667,8 +692,8 @@ const FlowDiagramInner = () => {
             target: oldToNewIds.get(edge.target) || edge.target
           }));
 
-        // Add imported nodes and edges to current graph
-        setNodes(currentNodes => [...currentNodes, ...newNodes]);
+        // Add imported nodes, border and edges to current graph
+        setNodes(currentNodes => [...currentNodes, borderNode, ...newNodes]);
         setEdges(currentEdges => [...currentEdges, ...newEdges]);
         setIsImportModalOpen(false);
         setSelectedGraphToImport('');
@@ -1101,7 +1126,7 @@ const FlowDiagramInner = () => {
           gap: '8px',
           alignItems: 'center',
           zIndex: 1000,
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         }}>
           <span style={{ color: 'white', fontSize: '14px' }}>
             Wybrano {selectedInputs.length} {selectedInputs.length === 1 ? 'input' : 'inputów'}
