@@ -94,8 +94,8 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
               onChange={(value) => handleChange(category, 'x', value)}
               nodeId={id}
               field={`${category}.x`}
-              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.x`, 'number')}
-              selected={isInputSelected(category, 'x')}
+              onSelect={data.toggleInputSelection}
+              isSelected={isInputSelected(category, 'x')}
             />
             <NumberInput
               label="Y"
@@ -103,8 +103,8 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
               onChange={(value) => handleChange(category, 'y', value)}
               nodeId={id}
               field={`${category}.y`}
-              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.y`, 'number')}
-              selected={isInputSelected(category, 'y')}
+              onSelect={data.toggleInputSelection}
+              isSelected={isInputSelected(category, 'y')}
             />
             <NumberInput
               label="Z"
@@ -112,8 +112,8 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
               onChange={(value) => handleChange(category, 'z', value)}
               nodeId={id}
               field={`${category}.z`}
-              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.z`, 'number')}
-              selected={isInputSelected(category, 'z')}
+              onSelect={data.toggleInputSelection}
+              isSelected={isInputSelected(category, 'z')}
             />
           </div>
         )}

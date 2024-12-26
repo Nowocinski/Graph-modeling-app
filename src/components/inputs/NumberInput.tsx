@@ -65,15 +65,19 @@ const NumberInput: React.FC<NumberInputProps> = ({
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '8px',
-      background: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-      padding: '4px',
-      borderRadius: '4px',
-      border: isSelected ? '1px solid #3b82f6' : '1px solid transparent'
-    }}>
+    <div 
+      style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px',
+        background: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+        padding: '4px',
+        borderRadius: '4px',
+        border: isSelected ? '1px solid #3b82f6' : '1px solid transparent',
+        cursor: 'context-menu'
+      }}
+      onContextMenu={handleRightClick}
+    >
       <label style={{ 
         minWidth: '80px',
         fontSize: '14px',
@@ -89,7 +93,6 @@ const NumberInput: React.FC<NumberInputProps> = ({
           cursor: isDragging ? 'ns-resize' : 'pointer',
         }}
         onMouseDown={handleMouseDown}
-        onContextMenu={handleRightClick}
       >
         <input
           type="number"
