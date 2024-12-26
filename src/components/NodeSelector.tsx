@@ -25,8 +25,7 @@ const buttonStyles = {
   color: '#1f2937',
   display: 'flex',
   alignItems: 'center',
-  flex: '0 0 auto',
-  minWidth: '180px',
+  width: 'calc(50% - 4px)',
   ':hover': {
     backgroundColor: '#f3f4f6'
   }
@@ -55,7 +54,7 @@ const categoryContainerStyles = {
   display: 'flex',
   flexDirection: 'row' as const,
   flexWrap: 'wrap' as const,
-  gap: '4px',
+  gap: '8px',
   padding: '0 8px'
 };
 
