@@ -311,6 +311,8 @@ const FlowDiagramInner = () => {
   const [graphName, setGraphName] = useState('');
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [originalGraph, setOriginalGraph] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
   // Wczytaj domyślny graf przy starcie
   useEffect(() => {
@@ -318,8 +320,19 @@ const FlowDiagramInner = () => {
     if (defaultGraph) {
       setNodes(defaultGraph.nodes);
       setEdges(defaultGraph.edges);
+      setOriginalGraph(defaultGraph);
     }
   }, []);
+
+  // Sprawdź czy są niezapisane zmiany
+  useEffect(() => {
+    if (!originalGraph) return;
+
+    const nodesChanged = JSON.stringify(nodes) !== JSON.stringify(originalGraph.nodes);
+    const edgesChanged = JSON.stringify(edges) !== JSON.stringify(originalGraph.edges);
+    
+    setHasUnsavedChanges(nodesChanged || edgesChanged);
+  }, [nodes, edges, originalGraph]);
 
   // Ustaw nazwę grafu gdy modal jest otwierany
   useEffect(() => {
@@ -342,6 +355,7 @@ const FlowDiagramInner = () => {
         setGraphName('');
         setShowOverwriteConfirm(false);
         setIsGraphModalOpen(false);
+        setOriginalGraph({ nodes, edges });
       }
     }
   };
@@ -351,7 +365,7 @@ const FlowDiagramInner = () => {
     if (graph) {
       setNodes(graph.nodes);
       setEdges(graph.edges);
-      setIsGraphModalOpen(false);
+      setOriginalGraph(graph);
     }
   };
 
@@ -1004,6 +1018,28 @@ const FlowDiagramInner = () => {
         <Controls />
         <NodeSelector onSelect={handleAddNode} />
       </ReactFlow>
+
+      {currentGraph !== 'default' && hasUnsavedChanges && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          padding: '12px 16px',
+          background: '#854d0e',
+          border: '1px solid #a16207',
+          borderRadius: '8px',
+          color: '#fef3c7',
+          fontSize: '0.875rem',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+          Niezapisane zmiany
+        </div>
+      )}
     </div>
   );
 };
