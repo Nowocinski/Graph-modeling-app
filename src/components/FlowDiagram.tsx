@@ -313,6 +313,8 @@ const FlowDiagramInner = () => {
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [originalGraph, setOriginalGraph] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [selectedGraphToImport, setSelectedGraphToImport] = useState('');
 
   // Wczytaj domyślny graf przy starcie
   useEffect(() => {
@@ -577,6 +579,47 @@ const FlowDiagramInner = () => {
     });
   };
 
+  const handleImportGraph = () => {
+    if (selectedGraphToImport) {
+      const graphToImport = loadGraph(selectedGraphToImport);
+      if (graphToImport) {
+        // Adjust positions of imported nodes to avoid overlap
+        const viewport = getViewport();
+        const offsetX = 100;
+        const offsetY = 100;
+
+        // Generate new IDs for imported nodes and edges to avoid conflicts
+        const oldToNewIds = new Map<string, string>();
+        const newNodes = graphToImport.nodes.map(node => {
+          const newId = `${node.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          oldToNewIds.set(node.id, newId);
+          return {
+            ...node,
+            id: newId,
+            position: {
+              x: node.position.x + offsetX,
+              y: node.position.y + offsetY
+            }
+          };
+        });
+
+        // Update edge references to use new node IDs
+        const newEdges = graphToImport.edges.map(edge => ({
+          ...edge,
+          id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          source: oldToNewIds.get(edge.source) || edge.source,
+          target: oldToNewIds.get(edge.target) || edge.target
+        }));
+
+        // Add imported nodes and edges to current graph
+        setNodes(currentNodes => [...currentNodes, ...newNodes]);
+        setEdges(currentEdges => [...currentEdges, ...newEdges]);
+        setIsImportModalOpen(false);
+        setSelectedGraphToImport('');
+      }
+    }
+  };
+
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
       <div style={{
@@ -603,6 +646,23 @@ const FlowDiagramInner = () => {
           }}
         >
           <span>💾</span> Zapisz/Wczytaj
+        </button>
+        <button
+          onClick={() => setIsImportModalOpen(true)}
+          style={{
+            padding: '8px 16px',
+            background: '#10b981',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <span>📦</span> Importuj
         </button>
         <button
           onClick={handleExportGraph}
@@ -894,6 +954,78 @@ const FlowDiagramInner = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImportModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '400px'
+          }}>
+            <h3 style={{ marginTop: 0 }}>Importuj Graf</h3>
+            <p>Wybierz graf do zaimportowania do obecnego grafu:</p>
+            <select
+              value={selectedGraphToImport}
+              onChange={(e) => setSelectedGraphToImport(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '16px',
+                borderRadius: '4px',
+                border: '1px solid #e2e8f0'
+              }}
+            >
+              <option value="">Wybierz graf...</option>
+              {getGraphList().filter(name => name !== currentGraph).map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setSelectedGraphToImport('');
+                }}
+                style={{
+                  padding: '8px 16px',
+                  background: '#e2e8f0',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Anuluj
+              </button>
+              <button
+                onClick={handleImportGraph}
+                disabled={!selectedGraphToImport}
+                style={{
+                  padding: '8px 16px',
+                  background: selectedGraphToImport ? '#10b981' : '#e2e8f0',
+                  color: selectedGraphToImport ? 'white' : '#666',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: selectedGraphToImport ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Importuj
+              </button>
             </div>
           </div>
         </div>
