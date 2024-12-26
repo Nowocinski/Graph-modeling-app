@@ -97,8 +97,8 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
 
   return (
     <div className="node-box" style={{
-      background: '#fff',
-      border: '1px solid #777',
+      background: '#fef08a',
+      border: '1px solid #facc15',
       padding: '16px',
       borderRadius: '8px',
       minWidth: '300px',
