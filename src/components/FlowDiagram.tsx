@@ -49,6 +49,7 @@ import LoopNode from './nodes/utility/LoopNode';
 import BulkEditNode from './nodes/utility/BulkEditNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
+import { useGraphManager } from '../hooks/useGraphManager';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
@@ -304,43 +305,37 @@ const customStyles = `
 
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
-  const [nodes, setNodes] = useState<Node[]>(() => {
-    // Próba pobrania zapisanego stanu z localStorage
-    const savedNodes = localStorage.getItem('flowNodes');
-    if (savedNodes) {
-      try {
-        const parsedNodes = JSON.parse(savedNodes);
-        // Jeśli jest tylko node sceny, dodaj domyślne node'y
-        if (parsedNodes.length === 1 && parsedNodes[0].type === 'scene') {
-          return initialNodes;
-        }
-        return parsedNodes;
-      } catch (e) {
-        console.error('Error parsing saved nodes:', e);
-        return initialNodes;
-      }
-    }
-    return initialNodes;
-  });
+  const { currentGraph, saveGraph, loadGraph, deleteGraph, getGraphList } = useGraphManager();
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [graphName, setGraphName] = useState('');
+  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
 
-  const [edges, setEdges] = useState<Edge[]>(() => {
-    // Próba pobrania zapisanego stanu z localStorage
-    const savedEdges = localStorage.getItem('flowEdges');
-    if (savedEdges) {
-      try {
-        const parsedEdges = JSON.parse(savedEdges);
-        // Jeśli nie ma krawędzi, dodaj domyślne krawędzie
-        if (parsedEdges.length === 0) {
-          return initialEdges;
-        }
-        return parsedEdges;
-      } catch (e) {
-        console.error('Error parsing saved edges:', e);
-        return initialEdges;
-      }
+  // Wczytaj domyślny graf przy starcie
+  useEffect(() => {
+    const defaultGraph = loadGraph('default');
+    if (defaultGraph) {
+      setNodes(defaultGraph.nodes);
+      setEdges(defaultGraph.edges);
     }
-    return initialEdges;
-  });
+  }, []);
+
+  const handleSaveGraph = () => {
+    if (graphName.trim()) {
+      saveGraph(graphName.trim(), nodes, edges);
+      setGraphName('');
+      setIsGraphModalOpen(false);
+    }
+  };
+
+  const handleLoadGraph = (name: string) => {
+    const graph = loadGraph(name);
+    if (graph) {
+      setNodes(graph.nodes);
+      setEdges(graph.edges);
+      setIsGraphModalOpen(false);
+    }
+  };
 
   const { project, getViewport } = useReactFlow();
 
@@ -559,6 +554,23 @@ const FlowDiagramInner = () => {
         gap: '10px'
       }}>
         <button
+          onClick={() => setIsGraphModalOpen(true)}
+          style={{
+            padding: '8px 16px',
+            background: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <span>💾</span> Zapisz/Wczytaj
+        </button>
+        <button
           onClick={handleExportGraph}
           style={{
             padding: '8px 16px',
@@ -593,6 +605,125 @@ const FlowDiagramInner = () => {
           <span>🔄</span> Reset
         </button>
       </div>
+
+      {isGraphModalOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+          zIndex: 1000,
+          minWidth: '300px'
+        }}>
+          <h3 style={{ marginTop: 0, marginBottom: '16px' }}>Zarządzaj Grafami</h3>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <input
+              type="text"
+              value={graphName}
+              onChange={(e) => setGraphName(e.target.value)}
+              placeholder="Nazwa nowego grafu"
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #d1d5db',
+                marginBottom: '8px'
+              }}
+            />
+            <button
+              onClick={handleSaveGraph}
+              disabled={!graphName.trim()}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: graphName.trim() ? '#3b82f6' : '#9ca3af',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: graphName.trim() ? 'pointer' : 'not-allowed'
+              }}
+            >
+              Zapisz jako nowy graf
+            </button>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '8px' }}>Zapisane grafy:</h4>
+            <div style={{ 
+              maxHeight: '200px', 
+              overflowY: 'auto',
+              border: '1px solid #d1d5db',
+              borderRadius: '4px'
+            }}>
+              {getGraphList().map(name => (
+                <div
+                  key={name}
+                  style={{
+                    padding: '8px',
+                    borderBottom: '1px solid #d1d5db',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <span>{name}</span>
+                  <div>
+                    <button
+                      onClick={() => handleLoadGraph(name)}
+                      style={{
+                        padding: '4px 8px',
+                        background: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        marginRight: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Wczytaj
+                    </button>
+                    {name !== 'default' && (
+                      <button
+                        onClick={() => deleteGraph(name)}
+                        style={{
+                          padding: '4px 8px',
+                          background: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Usuń
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsGraphModalOpen(false)}
+            style={{
+              width: '100%',
+              padding: '8px',
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Zamknij
+          </button>
+        </div>
+      )}
 
       {/* Panel kontrolny dla zbiorowej edycji */}
       {selectedInputs.length > 0 && (
