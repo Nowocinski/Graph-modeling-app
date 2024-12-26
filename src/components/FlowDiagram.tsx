@@ -588,28 +588,39 @@ const FlowDiagramInner = () => {
         const offsetX = 100;
         const offsetY = 100;
 
+        // Filter out scene nodes and get their IDs
+        const sceneNodeIds = new Set(
+          graphToImport.nodes
+            .filter(node => node.type === 'scene')
+            .map(node => node.id)
+        );
+
         // Generate new IDs for imported nodes and edges to avoid conflicts
         const oldToNewIds = new Map<string, string>();
-        const newNodes = graphToImport.nodes.map(node => {
-          const newId = `${node.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          oldToNewIds.set(node.id, newId);
-          return {
-            ...node,
-            id: newId,
-            position: {
-              x: node.position.x + offsetX,
-              y: node.position.y + offsetY
-            }
-          };
-        });
+        const newNodes = graphToImport.nodes
+          .filter(node => node.type !== 'scene') // Exclude scene nodes
+          .map(node => {
+            const newId = `${node.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            oldToNewIds.set(node.id, newId);
+            return {
+              ...node,
+              id: newId,
+              position: {
+                x: node.position.x + offsetX,
+                y: node.position.y + offsetY
+              }
+            };
+          });
 
-        // Update edge references to use new node IDs
-        const newEdges = graphToImport.edges.map(edge => ({
-          ...edge,
-          id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          source: oldToNewIds.get(edge.source) || edge.source,
-          target: oldToNewIds.get(edge.target) || edge.target
-        }));
+        // Update edge references to use new node IDs, excluding edges connected to scene nodes
+        const newEdges = graphToImport.edges
+          .filter(edge => !sceneNodeIds.has(edge.source) && !sceneNodeIds.has(edge.target)) // Exclude edges connected to scene nodes
+          .map(edge => ({
+            ...edge,
+            id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            source: oldToNewIds.get(edge.source) || edge.source,
+            target: oldToNewIds.get(edge.target) || edge.target
+          }));
 
         // Add imported nodes and edges to current graph
         setNodes(currentNodes => [...currentNodes, ...newNodes]);
