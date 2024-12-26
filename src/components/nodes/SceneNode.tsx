@@ -1,7 +1,8 @@
 'use client';
 
-import { memo } from 'react';
+import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+import NumberInput from '../inputs/NumberInput';
 
 interface SceneData {
   backgroundColor: string;
@@ -14,6 +15,13 @@ interface SceneData {
   };
   onUpdate?: (id: string, data: Partial<SceneData>) => void;
 }
+
+const defaultValues = {
+  backgroundColor: '#ffffff',
+  ambientLightIntensity: 0.5,
+  pointLightIntensity: 1,
+  pointLightPosition: { x: 0, y: 0, z: 0 }
+};
 
 const inputStyles = {
   width: '60px',
@@ -80,17 +88,25 @@ const Vector3Input = ({
 );
 
 const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
+  const {
+    backgroundColor = defaultValues.backgroundColor,
+    ambientLightIntensity = defaultValues.ambientLightIntensity,
+    pointLightIntensity = defaultValues.pointLightIntensity,
+    pointLightPosition = defaultValues.pointLightPosition,
+    onUpdate
+  } = data;
+
   const handleChange = (field: string, value: any) => {
-    if (data.onUpdate) {
+    if (onUpdate) {
       if (field === 'pointLightPosition') {
-        data.onUpdate(id, {
+        onUpdate(id, {
           pointLightPosition: {
             ...data.pointLightPosition,
             ...value
           }
         });
       } else {
-        data.onUpdate(id, { [field]: value });
+        onUpdate(id, { [field]: value });
       }
     }
   };
@@ -111,7 +127,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
           <label>Background Color:</label>
           <input
             type="color"
-            value={data.backgroundColor}
+            value={backgroundColor}
             style={colorInputStyles}
             onChange={(e) => handleChange('backgroundColor', e.target.value)}
           />
@@ -121,7 +137,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
           <label>Ambient Light Intensity:</label>
           <input
             type="number"
-            value={data.ambientLightIntensity}
+            value={ambientLightIntensity}
             style={inputStyles}
             step="0.1"
             min="0"
@@ -134,7 +150,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
           <label>Point Light Intensity:</label>
           <input
             type="number"
-            value={data.pointLightIntensity}
+            value={pointLightIntensity}
             style={inputStyles}
             step="0.1"
             min="0"
@@ -144,7 +160,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
 
         <Vector3Input
           label="Point Light Position"
-          values={data.pointLightPosition}
+          values={pointLightPosition}
           onChange={(axis, value) => handleChange('pointLightPosition', { [axis]: value })}
         />
       </div>
@@ -152,4 +168,4 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
   );
 };
 
-export default memo(SceneNode);
+export default SceneNode;

@@ -46,8 +46,10 @@ import SubtractNode from './nodes/operation/SubtractNode';
 import IntersectNode from './nodes/operation/IntersectNode';
 import UnionNode from './nodes/operation/UnionNode';
 import LoopNode from './nodes/utility/LoopNode';
+import BulkEditNode from './nodes/utility/BulkEditNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
+import { useGraphManager } from '../hooks/useGraphManager';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
@@ -77,7 +79,8 @@ const nodeTypes: NodeTypes = {
   subtract: SubtractNode,
   intersect: IntersectNode,
   union: UnionNode,
-  loop: LoopNode
+  loop: LoopNode,
+  bulkEdit: BulkEditNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -236,6 +239,10 @@ const defaultNodeData = {
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 }
+  },
+  bulkEdit: {
+    value: 0,
+    connectedInputs: []
   }
 };
 
@@ -269,7 +276,12 @@ const initialNodes: Node[] = [
     id: 'mesh_1',
     type: 'mesh',
     position: { x: 500, y: 400 }, // Przesunięty na środek
-    data: defaultNodeData.mesh
+    data: {
+      ...defaultNodeData.mesh,
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 }
+    }
   }
 ];
 
@@ -293,43 +305,71 @@ const customStyles = `
 
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
-  const [nodes, setNodes] = useState<Node[]>(() => {
-    // Próba pobrania zapisanego stanu z localStorage
-    const savedNodes = localStorage.getItem('flowNodes');
-    if (savedNodes) {
-      try {
-        const parsedNodes = JSON.parse(savedNodes);
-        // Jeśli jest tylko node sceny, dodaj domyślne node'y
-        if (parsedNodes.length === 1 && parsedNodes[0].type === 'scene') {
-          return initialNodes;
-        }
-        return parsedNodes;
-      } catch (e) {
-        console.error('Error parsing saved nodes:', e);
-        return initialNodes;
-      }
-    }
-    return initialNodes;
-  });
+  const { currentGraph, saveGraph, loadGraph, deleteGraph, getGraphList, isLoading, error } = useGraphManager();
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [graphName, setGraphName] = useState('');
+  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [originalGraph, setOriginalGraph] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
-  const [edges, setEdges] = useState<Edge[]>(() => {
-    // Próba pobrania zapisanego stanu z localStorage
-    const savedEdges = localStorage.getItem('flowEdges');
-    if (savedEdges) {
-      try {
-        const parsedEdges = JSON.parse(savedEdges);
-        // Jeśli nie ma krawędzi, dodaj domyślne krawędzie
-        if (parsedEdges.length === 0) {
-          return initialEdges;
-        }
-        return parsedEdges;
-      } catch (e) {
-        console.error('Error parsing saved edges:', e);
-        return initialEdges;
+  // Wczytaj domyślny graf przy starcie
+  useEffect(() => {
+    const defaultGraph = loadGraph('default');
+    if (defaultGraph) {
+      setNodes(defaultGraph.nodes);
+      setEdges(defaultGraph.edges);
+      setOriginalGraph(defaultGraph);
+    }
+  }, []);
+
+  // Sprawdź czy są niezapisane zmiany
+  useEffect(() => {
+    if (!originalGraph) return;
+
+    const nodesChanged = JSON.stringify(nodes) !== JSON.stringify(originalGraph.nodes);
+    const edgesChanged = JSON.stringify(edges) !== JSON.stringify(originalGraph.edges);
+    
+    setHasUnsavedChanges(nodesChanged || edgesChanged);
+  }, [nodes, edges, originalGraph]);
+
+  // Ustaw nazwę grafu gdy modal jest otwierany
+  useEffect(() => {
+    if (isGraphModalOpen && currentGraph !== 'default') {
+      setGraphName(currentGraph);
+    } else {
+      setGraphName('');
+    }
+  }, [isGraphModalOpen, currentGraph]);
+
+  const handleSaveGraph = async (overwrite = false) => {
+    if (graphName.trim()) {
+      if (!overwrite && getGraphList().includes(graphName.trim())) {
+        setShowOverwriteConfirm(true);
+        return;
+      }
+      
+      const success = await saveGraph(graphName.trim(), nodes, edges, overwrite);
+      if (success) {
+        setGraphName('');
+        setShowOverwriteConfirm(false);
+        setIsGraphModalOpen(false);
+        setOriginalGraph({ nodes, edges });
       }
     }
-    return initialEdges;
-  });
+  };
+
+  const handleLoadGraph = (name: string) => {
+    const graph = loadGraph(name);
+    if (graph) {
+      setNodes(graph.nodes);
+      setEdges(graph.edges);
+      setOriginalGraph(graph);
+      setIsGraphModalOpen(false);
+      setShowOverwriteConfirm(false);
+    }
+  };
 
   const { project, getViewport } = useReactFlow();
 
@@ -345,6 +385,63 @@ const FlowDiagramInner = () => {
     updateEdges(edges);
   }, [nodes, edges, updateNodes, updateEdges]);
 
+  const handleNodeUpdate = useCallback((id: string, newData: any) => {
+    setNodes(nds => nds.map(node => {
+      if (node.id === id) {
+        // Dla zagnieżdżonych właściwości (np. position.x)
+        const updatedData = { ...node.data };
+        Object.entries(newData).forEach(([key, value]) => {
+          if (typeof value === 'object' && value !== null) {
+            updatedData[key] = { ...updatedData[key], ...value };
+          } else {
+            updatedData[key] = value;
+          }
+        });
+        
+        return {
+          ...node,
+          data: updatedData
+        };
+      }
+      return node;
+    }));
+  }, []);
+
+  const handleNodeIdChange = useCallback((oldId: string, newId: string) => {
+    // Aktualizuj node
+    setNodes(nds => nds.map(node => 
+      node.id === oldId ? { ...node, id: newId } : node
+    ));
+
+    // Aktualizuj krawędzie
+    setEdges(eds => eds.map(edge => ({
+      ...edge,
+      source: edge.source === oldId ? newId : edge.source,
+      target: edge.target === oldId ? newId : edge.target
+    })));
+  }, []);
+
+  const onConnect = useCallback((params: Connection) => {
+    const sourceNode = nodes.find(node => node.id === params.source);
+    const targetNode = nodes.find(node => node.id === params.target);
+
+    if (sourceNode && targetNode) {
+      // Aktualizuj target node z danymi ze source node
+      const sourceData = sourceNode.data;
+      const targetData = { ...targetNode.data };
+
+      if (params.targetHandle === 'geometry' && sourceNode.type.includes('Geometry')) {
+        targetData.geometry = sourceData;
+      } else if (params.targetHandle === 'material' && sourceNode.type.includes('Material')) {
+        targetData.material = sourceData;
+      }
+
+      handleNodeUpdate(targetNode.id, targetData);
+    }
+
+    setEdges((eds) => addEdge(params, eds));
+  }, [nodes, handleNodeUpdate]);
+
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
@@ -355,146 +452,8 @@ const FlowDiagramInner = () => {
     []
   );
 
-  const onConnect = useCallback((params: Connection) => {
-    // Sprawdź typ node'a źródłowego i docelowego
-    const sourceNode = nodes.find(node => node.id === params.source);
-    const targetNode = nodes.find(node => node.id === params.target);
-
-    // Funkcja sprawdzająca czy połączenie jest dozwolone
-    const isValidConnection = (connection: Connection) => {
-      const sourceNode = nodes.find(node => node.id === connection.source);
-      const targetNode = nodes.find(node => node.id === connection.target);
-
-      // Scene może przyjmować połączenia od Mesh, Group i operacji CSG
-      if (targetNode?.type === 'scene') {
-        return sourceNode?.type === 'mesh' || 
-               sourceNode?.type === 'group' ||
-               sourceNode?.type === 'subtract' || 
-               sourceNode?.type === 'intersect' ||
-               sourceNode?.type === 'union' ||
-               sourceNode?.type === 'loop';
-      }
-
-      // Group może przyjmować połączenia od Mesh i operacji CSG
-      if (targetNode?.type === 'group') {
-        return sourceNode?.type === 'mesh' || 
-               sourceNode?.type === 'subtract' || 
-               sourceNode?.type === 'intersect' ||
-               sourceNode?.type === 'union' ||
-               sourceNode?.type === 'loop';
-      }
-
-      // Loop może przyjmować połączenia od Mesh, Group i operacji CSG
-      if (targetNode?.type === 'loop') {
-        return sourceNode?.type === 'mesh' || 
-               sourceNode?.type === 'group' ||
-               sourceNode?.type === 'subtract' || 
-               sourceNode?.type === 'intersect' ||
-               sourceNode?.type === 'union';
-      }
-
-      // Mesh może przyjmować połączenia od Geometry i Material
-      if (targetNode?.type === 'mesh') {
-        const isGeometry = sourceNode?.type?.toLowerCase().includes('geometry');
-        const isMaterial = sourceNode?.type?.toLowerCase().includes('material');
-        return isGeometry || isMaterial;
-      }
-
-      // Subtract może przyjmować połączenia tylko od Mesh
-      if (targetNode?.type === 'subtract') {
-        return sourceNode?.type === 'mesh';
-      }
-
-      // Intersect może przyjmować połączenia tylko od Mesh
-      if (targetNode?.type === 'intersect') {
-        return sourceNode?.type === 'mesh';
-      }
-
-      // Union może przyjmować połączenia tylko od Mesh
-      if (targetNode?.type === 'union') {
-        return sourceNode?.type === 'mesh';
-      }
-
-      return false;
-    };
-
-    // Sprawdź czy nie tworzymy cyklu w grafie
-    const wouldCreateCycle = (sourceId: string, targetId: string, visited = new Set<string>()): boolean => {
-      if (sourceId === targetId) return true;
-      if (visited.has(targetId)) return false;
-      
-      visited.add(targetId);
-      
-      const outgoingEdges = edges.filter(edge => edge.source === targetId);
-      return outgoingEdges.some(edge => wouldCreateCycle(sourceId, edge.target, visited));
-    };
-
-    if (isValidConnection(params) && params.source && params.target) {
-      // Sprawdź czy nie tworzymy cyklu
-      if (sourceNode?.type === 'group' && targetNode?.type === 'group') {
-        if (wouldCreateCycle(params.source, params.target)) {
-          console.warn('Cannot create cyclic group dependencies');
-          return;
-        }
-      }
-
-      let updatedEdges = [...edges];
-      
-      // Usuń stare połączenie tylko dla Mesh (nie dla Scene i Group)
-      if (targetNode?.type === 'mesh') {
-        updatedEdges = edges.filter(edge => 
-          !(edge.target === params.target && edge.targetHandle === params.targetHandle)
-        );
-      }
-      
-      // Dodaj nowe połączenie
-      const newEdges = addEdge(params, updatedEdges);
-      setEdges(newEdges);
-      
-      // Aktualizuj kontekst sceny
-      updateSceneState(nodes, newEdges);
-
-      // Dodaj node do GroupNode
-      if (targetNode?.type === 'group') {
-        const targetGroupNode = nodes.find(node => node.id === params.target);
-        if (targetGroupNode) {
-          const updatedNodes = nodes.map(node => {
-            if (node.id === targetGroupNode.id) {
-              return {
-                ...node,
-                data: {
-                  ...node.data,
-                  nodes: [...(node.data.nodes || []), params.source]
-                }
-              };
-            }
-            return node;
-          });
-          setNodes(updatedNodes);
-        }
-      }
-    }
-  }, [edges, nodes, updateSceneState]);
-
-  const handleNodeUpdate = useCallback((nodeId: string, newData: any) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === nodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...newData,
-            },
-          };
-        }
-        return node;
-      })
-    );
-  }, []);
-
   const handleAddNode = useCallback((type: string) => {
-    const { x: viewX, y: viewY, zoom } = getViewport();
+    const { x: viewX, y: viewY } = getViewport();
     
     // Pobierz środek widoku
     const centerX = window.innerWidth / 4;
@@ -510,18 +469,18 @@ const FlowDiagramInner = () => {
       data: defaultNodeData[type as keyof typeof defaultNodeData] || {}
     };
 
-    setNodes((nds) => [...nds, newNode]);
+    setNodes(prev => [...prev, newNode]);
   }, [project]);
 
   const handleDeleteNode = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-    setEdges((eds) => eds.filter((edge) => 
+    setNodes(nds => nds.filter(node => node.id !== nodeId));
+    setEdges(eds => eds.filter(edge => 
       edge.source !== nodeId && edge.target !== nodeId
     ));
   }, []);
 
   const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    setEdges(eds => eds.filter(e => e.id !== edge.id));
   }, []);
 
   const handleExportGraph = useCallback(() => {
@@ -546,45 +505,104 @@ const FlowDiagramInner = () => {
     linkElement.click();
   }, [nodes, edges]);
 
+  const handleResetScene = useCallback(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, []);
+
+  const [selectedInputs, setSelectedInputs] = useState<{
+    nodeId: string;
+    field: string;
+    type: string;
+  }[]>([]);
+  const [bulkEditMode, setBulkEditMode] = useState(false);
+  const [bulkEditValue, setBulkEditValue] = useState('');
+
+  const applyBulkEdit = () => {
+    const value = parseFloat(bulkEditValue);
+    if (!isNaN(value)) {
+      selectedInputs.forEach(input => {
+        const [category, field] = input.field.split('.');
+        if (field) {
+          handleNodeUpdate(input.nodeId, {
+            [category]: {
+              [field]: value
+            }
+          });
+        } else {
+          handleNodeUpdate(input.nodeId, {
+            [category]: value
+          });
+        }
+      });
+    }
+    setBulkEditMode(false);
+    setBulkEditValue('');
+  };
+
+  const cancelBulkEdit = () => {
+    setBulkEditMode(false);
+    setBulkEditValue('');
+  };
+
+  const createBulkEditNode = () => {
+    const { x: viewX, y: viewY } = getViewport();
+    const newNode: Node = {
+      id: `bulkEdit_${Date.now()}`,
+      type: 'bulkEdit',
+      position: { 
+        x: -viewX + window.innerWidth/2 - 100,
+        y: -viewY + window.innerHeight/2 - 100
+      },
+      data: {
+        onUpdate: handleNodeUpdate,
+        onIdChange: handleNodeIdChange,
+        connectedInputs: selectedInputs
+      }
+    };
+
+    setNodes(nds => [...nds, newNode]);
+    setSelectedInputs([]);
+  };
+
+  // Funkcja do dodawania/usuwania inputu z selekcji
+  const toggleInputSelection = (nodeId: string, field: string, type: string) => {
+    setSelectedInputs(prev => {
+      const exists = prev.some(item => item.nodeId === nodeId && item.field === field);
+      if (exists) {
+        return prev.filter(item => !(item.nodeId === nodeId && item.field === field));
+      } else {
+        return [...prev, { nodeId, field, type }];
+      }
+    });
+  };
+
   return (
-    <div style={flowStyles}>
-      <style>{customStyles}</style>
-      <NodeSelector onSelect={handleAddNode} />
+    <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
       <div style={{
         position: 'absolute',
         top: '20px',
         right: '20px',
-        zIndex: 1000,
+        zIndex: 4,
         display: 'flex',
-        flexDirection: 'column',
         gap: '10px'
       }}>
         <button
-          onClick={() => {
-            localStorage.removeItem('flowNodes');
-            localStorage.removeItem('flowEdges');
-            setNodes(initialNodes);
-            setEdges(initialEdges);
-          }}
+          onClick={() => setIsGraphModalOpen(true)}
           style={{
             padding: '8px 16px',
-            background: '#ef4444',
+            background: '#3b82f6',
             color: 'white',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '4px',
             cursor: 'pointer',
-            fontWeight: '500',
             fontSize: '14px',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#dc2626';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#ef4444';
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}
         >
-          Reset Graph
+          <span>💾</span> Zapisz/Wczytaj
         </button>
         <button
           onClick={handleExportGraph}
@@ -593,29 +611,401 @@ const FlowDiagramInner = () => {
             background: '#3b82f6',
             color: 'white',
             border: 'none',
-            borderRadius: '8px',
+            borderRadius: '4px',
             cursor: 'pointer',
-            fontWeight: '500',
             fontSize: '14px',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#2563eb';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#3b82f6';
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}
         >
-          Export Graph
+          <span>📤</span> Export
+        </button>
+        <button
+          onClick={handleResetScene}
+          style={{
+            padding: '8px 16px',
+            background: '#ef4444',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <span>🔄</span> Reset
         </button>
       </div>
+
+      {isGraphModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            background: '#1e293b',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+            width: '400px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative',
+            border: '1px solid #334155'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ 
+                margin: 0,
+                color: '#e2e8f0',
+                fontSize: '1.25rem',
+                fontWeight: 600
+              }}>
+                Zarządzaj Grafami
+              </h3>
+              <button
+                onClick={() => {
+                  setIsGraphModalOpen(false);
+                  setShowOverwriteConfirm(false);
+                }}
+                disabled={isLoading}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: !isLoading ? 'pointer' : 'not-allowed',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            {error && !error.includes('już istnieje') && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                background: '#7f1d1d',
+                border: '1px solid #991b1b',
+                borderRadius: '8px',
+                color: '#fecaca',
+                fontSize: '0.875rem'
+              }}>
+                {error}
+              </div>
+            )}
+            
+            <div style={{ marginBottom: '20px' }}>
+              <input
+                type="text"
+                value={graphName}
+                onChange={(e) => {
+                  setGraphName(e.target.value);
+                  setShowOverwriteConfirm(false);
+                }}
+                placeholder="Nazwa nowego grafu"
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #475569',
+                  background: '#334155',
+                  color: '#e2e8f0',
+                  fontSize: '0.875rem',
+                  marginBottom: '12px',
+                  outline: 'none',
+                  transition: 'all 0.2s'
+                }}
+              />
+              {showOverwriteConfirm ? (
+                <div style={{
+                  padding: '12px',
+                  marginBottom: '12px',
+                  background: '#854d0e',
+                  border: '1px solid #a16207',
+                  borderRadius: '8px',
+                  color: '#fef3c7'
+                }}>
+                  <div style={{ marginBottom: '8px', fontSize: '0.875rem' }}>
+                    Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => handleSaveGraph(true)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: !isLoading ? '#b45309' : '#475569',
+                        color: '#fef3c7',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Nadpisz
+                    </button>
+                    <button
+                      onClick={() => setShowOverwriteConfirm(false)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: 'transparent',
+                        color: '#fef3c7',
+                        border: '1px solid #fef3c7',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Anuluj
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSaveGraph(false)}
+                  disabled={!graphName.trim() || isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: graphName.trim() && !isLoading ? '#3b82f6' : '#475569',
+                    color: '#e2e8f0',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
+                  Zapisz jako nowy graf
+                </button>
+              )}
+            </div>
+
+            <div>
+              <h4 style={{ 
+                margin: '0 0 12px',
+                color: '#e2e8f0',
+                fontSize: '1rem',
+                fontWeight: 500
+              }}>
+                Zapisane grafy:
+              </h4>
+              <div style={{ 
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                {getGraphList().map((name, index) => (
+                  <div
+                    key={name}
+                    style={{
+                      padding: '12px',
+                      borderBottom: index < getGraphList().length - 1 ? '1px solid #475569' : 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: '#334155',
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}>
+                      {name}
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => handleLoadGraph(name)}
+                        disabled={isLoading}
+                        style={{
+                          padding: '6px 12px',
+                          background: !isLoading ? '#3b82f6' : '#475569',
+                          color: '#e2e8f0',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: !isLoading ? 'pointer' : 'not-allowed',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span>📂</span> Wczytaj
+                      </button>
+                      {name !== 'default' && (
+                        <button
+                          onClick={() => deleteGraph(name)}
+                          disabled={isLoading}
+                          style={{
+                            padding: '6px 12px',
+                            background: !isLoading ? '#dc2626' : '#475569',
+                            color: '#e2e8f0',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: !isLoading ? 'pointer' : 'not-allowed',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>🗑️</span> Usuń
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Panel kontrolny dla zbiorowej edycji */}
+      {selectedInputs.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#1e293b',
+          padding: '12px',
+          borderRadius: '8px',
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'center',
+          zIndex: 1000,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        }}>
+          <span style={{ color: 'white', fontSize: '14px' }}>
+            Wybrano {selectedInputs.length} {selectedInputs.length === 1 ? 'input' : 'inputów'}
+          </span>
+          {!bulkEditMode ? (
+            <button
+              onClick={() => setBulkEditMode(true)}
+              style={{
+                background: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Zmień wartości
+            </button>
+          ) : (
+            <>
+              <input
+                type="number"
+                value={bulkEditValue}
+                onChange={(e) => setBulkEditValue(e.target.value)}
+                style={{
+                  width: '80px',
+                  padding: '6px',
+                  borderRadius: '4px',
+                  border: '1px solid #4b5563',
+                  background: '#374151',
+                  color: 'white'
+                }}
+                placeholder="Wartość"
+              />
+              <button
+                onClick={applyBulkEdit}
+                style={{
+                  background: '#22c55e',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Zastosuj
+              </button>
+              <button
+                onClick={cancelBulkEdit}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Anuluj
+              </button>
+            </>
+          )}
+          <button
+            onClick={createBulkEditNode}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Stwórz node kontrolny
+          </button>
+        </div>
+      )}
+
       <ReactFlow
         nodes={nodes.map(node => ({
           ...node,
           data: {
             ...node.data,
             onUpdate: handleNodeUpdate,
-            onDelete: node.type !== 'scene' ? handleDeleteNode : undefined
+            onDelete: node.type !== 'scene' ? handleDeleteNode : undefined,
+            onIdChange: handleNodeIdChange,
+            toggleInputSelection: toggleInputSelection,
+            selectedInputs: selectedInputs
           }
         }))}
         edges={edges}
@@ -625,11 +1015,33 @@ const FlowDiagramInner = () => {
         onConnect={onConnect}
         onEdgeClick={onEdgeClick}
         fitView
-        style={flowStyles}
       >
         <Background />
         <Controls />
+        <NodeSelector onSelect={handleAddNode} />
       </ReactFlow>
+
+      {currentGraph !== 'default' && hasUnsavedChanges && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          padding: '12px 16px',
+          background: '#854d0e',
+          border: '1px solid #a16207',
+          borderRadius: '8px',
+          color: '#fef3c7',
+          fontSize: '0.875rem',
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+          Niezapisane zmiany
+        </div>
+      )}
     </div>
   );
 };
