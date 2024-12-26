@@ -25,7 +25,7 @@ const nodeStyles = {
   background: '#bfdbfe',
   border: '1px solid #60a5fa',
   position: 'relative' as const,
-  width: '320px'
+  width: '380px'
 };
 
 const inputStyles = {
