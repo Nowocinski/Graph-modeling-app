@@ -34,7 +34,14 @@ const buttonStyles = {
 const iconStyles = {
   marginRight: '8px',
   fontSize: '16px',
-  color: '#6b7280'
+  color: '#6b7280',
+  background: '#f3f4f6',
+  width: '24px',
+  height: '24px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '4px'
 };
 
 const dropdownStyles = {
