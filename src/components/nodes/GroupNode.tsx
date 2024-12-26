@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import NumberInput from '../inputs/NumberInput';
 
@@ -22,27 +22,9 @@ interface GroupData {
   selectedInputs?: { nodeId: string; field: string; type: string; }[];
 }
 
-const deleteButtonStyles = {
-  position: 'absolute' as const,
-  top: '8px',
-  right: '8px',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: '4px',
-  borderRadius: '4px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#666',
-  transition: 'all 0.2s ease',
-  ':hover': {
-    color: '#ef4444',
-    background: '#fee2e2'
-  }
-};
-
 const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
+  const [expandedSection, setExpandedSection] = useState<'position' | 'rotation' | 'scale' | null>(null);
+
   const handleChange = (category: keyof GroupData, axis: keyof Vector3, value: number) => {
     if (data.onUpdate) {
       data.onUpdate(id, {
@@ -67,51 +49,77 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
     ) || false;
   };
 
-  const Vector3Input = ({ label, value, onChange, category }: { 
-    label: string; 
-    value: Vector3; 
-    onChange: (axis: keyof Vector3, value: number) => void;
-    category: string;
-  }) => (
-    <div style={{ marginBottom: '8px' }}>
-      <div style={{ marginBottom: '4px' }}>{label}:</div>
-      <div style={{ display: 'flex', gap: '8px', paddingLeft: '8px' }}>
-        <div>
-          <NumberInput
-            label="X"
-            value={value.x}
-            onChange={(val) => onChange('x', val)}
-            nodeId={id}
-            field={`${category}.x`}
-            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.x`, 'number')}
-            selected={isInputSelected(category, 'x')}
-          />
+  const renderSection = (title: string, values: Vector3, category: 'position' | 'rotation' | 'scale') => {
+    const isExpanded = expandedSection === category;
+
+    return (
+      <div style={{
+        marginBottom: '8px',
+        background: 'rgba(0,0,0,0.03)',
+        borderRadius: '4px',
+        overflow: 'hidden'
+      }}>
+        <div 
+          onClick={() => setExpandedSection(isExpanded ? null : category)}
+          style={{
+            padding: '8px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none',
+            borderBottom: isExpanded ? '1px solid rgba(0,0,0,0.1)' : 'none'
+          }}
+        >
+          <span style={{ 
+            fontSize: '14px',
+            fontWeight: 500,
+            color: '#1e293b'
+          }}>
+            {title}
+          </span>
+          <span style={{ 
+            transform: isExpanded ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s'
+          }}>
+            ▼
+          </span>
         </div>
-        <div>
-          <NumberInput
-            label="Y"
-            value={value.y}
-            onChange={(val) => onChange('y', val)}
-            nodeId={id}
-            field={`${category}.y`}
-            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.y`, 'number')}
-            selected={isInputSelected(category, 'y')}
-          />
-        </div>
-        <div>
-          <NumberInput
-            label="Z"
-            value={value.z}
-            onChange={(val) => onChange('z', val)}
-            nodeId={id}
-            field={`${category}.z`}
-            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.z`, 'number')}
-            selected={isInputSelected(category, 'z')}
-          />
-        </div>
+        
+        {isExpanded && (
+          <div style={{ padding: '8px' }}>
+            <NumberInput
+              label="X"
+              value={values.x}
+              onChange={(value) => handleChange(category, 'x', value)}
+              nodeId={id}
+              field={`${category}.x`}
+              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.x`, 'number')}
+              selected={isInputSelected(category, 'x')}
+            />
+            <NumberInput
+              label="Y"
+              value={values.y}
+              onChange={(value) => handleChange(category, 'y', value)}
+              nodeId={id}
+              field={`${category}.y`}
+              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.y`, 'number')}
+              selected={isInputSelected(category, 'y')}
+            />
+            <NumberInput
+              label="Z"
+              value={values.z}
+              onChange={(value) => handleChange(category, 'z', value)}
+              nodeId={id}
+              field={`${category}.z`}
+              onLabelClick={() => data.toggleInputSelection?.(id, `${category}.z`, 'number')}
+              selected={isInputSelected(category, 'z')}
+            />
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div style={{ 
@@ -123,41 +131,32 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
       width: '320px' 
     }}>
       <Handle type="target" position={Position.Left} />
-      <div style={{ marginBottom: '12px', fontWeight: 'bold' }}>Group</div>
+      <div style={{ 
+        marginBottom: '12px', 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <strong style={{ color: '#1e293b' }}>Group</strong>
+        <button 
+          onClick={handleDelete} 
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#ef4444',
+            cursor: 'pointer',
+            padding: '4px',
+            fontSize: '14px'
+          }}
+        >
+          ×
+        </button>
+      </div>
       
-      <Vector3Input
-        label="Position"
-        value={data.position}
-        onChange={(axis, value) => handleChange('position', axis, value)}
-        category="position"
-      />
-      <Vector3Input
-        label="Rotation"
-        value={data.rotation}
-        onChange={(axis, value) => handleChange('rotation', axis, value)}
-        category="rotation"
-      />
-      <Vector3Input
-        label="Scale"
-        value={data.scale}
-        onChange={(axis, value) => handleChange('scale', axis, value)}
-        category="scale"
-      />
+      {renderSection('Position', data.position, 'position')}
+      {renderSection('Rotation', data.rotation, 'rotation')}
+      {renderSection('Scale', data.scale, 'scale')}
 
-      <button 
-        onClick={handleDelete} 
-        style={deleteButtonStyles}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = '#ef4444';
-          e.currentTarget.style.background = '#fee2e2';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = '#666';
-          e.currentTarget.style.background = 'transparent';
-        }}
-      >
-        🗑️
-      </button>
       <Handle type="source" position={Position.Right} />
     </div>
   );
