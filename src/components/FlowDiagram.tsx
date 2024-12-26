@@ -524,41 +524,91 @@ const FlowDiagramInner = () => {
     setEdges((eds) => eds.filter((e) => e.id !== edge.id));
   }, []);
 
+  const handleExportGraph = useCallback(() => {
+    const graphData = {
+      nodes: nodes.map(({ id, type, position, data }) => ({
+        id,
+        type,
+        position,
+        data
+      })),
+      edges
+    };
+
+    const dataStr = JSON.stringify(graphData, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+    
+    const exportFileDefaultName = 'flow-export.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }, [nodes, edges]);
+
   return (
     <div style={flowStyles}>
       <style>{customStyles}</style>
       <NodeSelector onSelect={handleAddNode} />
-      <button
-        onClick={() => {
-          localStorage.removeItem('flowNodes');
-          localStorage.removeItem('flowEdges');
-          setNodes(initialNodes);
-          setEdges(initialEdges);
-        }}
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          zIndex: 1000,
-          padding: '8px 16px',
-          background: '#ef4444',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontWeight: '500',
-          fontSize: '14px',
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#dc2626';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = '#ef4444';
-        }}
-      >
-        Reset Graph
-      </button>
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px'
+      }}>
+        <button
+          onClick={() => {
+            localStorage.removeItem('flowNodes');
+            localStorage.removeItem('flowEdges');
+            setNodes(initialNodes);
+            setEdges(initialEdges);
+          }}
+          style={{
+            padding: '8px 16px',
+            background: '#ef4444',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: '500',
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#dc2626';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#ef4444';
+          }}
+        >
+          Reset Graph
+        </button>
+        <button
+          onClick={handleExportGraph}
+          style={{
+            padding: '8px 16px',
+            background: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: '500',
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#2563eb';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#3b82f6';
+          }}
+        >
+          Export Graph
+        </button>
+      </div>
       <ReactFlow
         nodes={nodes.map(node => ({
           ...node,
