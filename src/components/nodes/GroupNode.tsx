@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+import NumberInput from '../inputs/NumberInput';
 
 interface Vector3 {
   x: number;
@@ -17,16 +18,9 @@ interface GroupData {
   onUpdate?: (id: string, data: Partial<GroupData>) => void;
   onDelete?: (id: string) => void;
   nodes?: string[]; // Add nodes array to GroupData
+  toggleInputSelection?: (nodeId: string, field: string, type: string) => void;
+  selectedInputs?: { nodeId: string; field: string; type: string; }[];
 }
-
-const inputStyles = {
-  width: '60px',
-  padding: '2px 4px',
-  fontSize: '12px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-  marginLeft: '8px'
-};
 
 const deleteButtonStyles = {
   position: 'absolute' as const,
@@ -49,13 +43,12 @@ const deleteButtonStyles = {
 };
 
 const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
-  const handleChange = (category: keyof GroupData, axis: keyof Vector3, value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && data.onUpdate) {
+  const handleChange = (category: keyof GroupData, axis: keyof Vector3, value: number) => {
+    if (data.onUpdate) {
       data.onUpdate(id, {
         [category]: {
           ...data[category],
-          [axis]: numValue
+          [axis]: value
         }
       });
     }
@@ -67,42 +60,53 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
     }
   };
 
-  const Vector3Input = ({ label, value, onChange }: { 
+  const isInputSelected = (category: string, axis: string) => {
+    return data.selectedInputs?.some(input => 
+      input.nodeId === id && 
+      input.field === `${category}.${axis}`
+    ) || false;
+  };
+
+  const Vector3Input = ({ label, value, onChange, category }: { 
     label: string; 
     value: Vector3; 
-    onChange: (axis: keyof Vector3, value: string) => void;
+    onChange: (axis: keyof Vector3, value: number) => void;
+    category: string;
   }) => (
     <div style={{ marginBottom: '8px' }}>
       <div style={{ marginBottom: '4px' }}>{label}:</div>
       <div style={{ display: 'flex', gap: '8px', paddingLeft: '8px' }}>
         <div>
-          <label style={{ fontSize: '11px' }}>X:</label>
-          <input
-            type="number"
+          <NumberInput
+            label="X"
             value={value.x}
-            style={inputStyles}
-            step="0.1"
-            onChange={(e) => onChange('x', e.target.value)}
+            onChange={(val) => onChange('x', val)}
+            nodeId={id}
+            field={`${category}.x`}
+            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.x`, 'number')}
+            selected={isInputSelected(category, 'x')}
           />
         </div>
         <div>
-          <label style={{ fontSize: '11px' }}>Y:</label>
-          <input
-            type="number"
+          <NumberInput
+            label="Y"
             value={value.y}
-            style={inputStyles}
-            step="0.1"
-            onChange={(e) => onChange('y', e.target.value)}
+            onChange={(val) => onChange('y', val)}
+            nodeId={id}
+            field={`${category}.y`}
+            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.y`, 'number')}
+            selected={isInputSelected(category, 'y')}
           />
         </div>
         <div>
-          <label style={{ fontSize: '11px' }}>Z:</label>
-          <input
-            type="number"
+          <NumberInput
+            label="Z"
             value={value.z}
-            style={inputStyles}
-            step="0.1"
-            onChange={(e) => onChange('z', e.target.value)}
+            onChange={(val) => onChange('z', val)}
+            nodeId={id}
+            field={`${category}.z`}
+            onLabelClick={() => data.toggleInputSelection?.(id, `${category}.z`, 'number')}
+            selected={isInputSelected(category, 'z')}
           />
         </div>
       </div>
@@ -125,16 +129,19 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
         label="Position"
         value={data.position}
         onChange={(axis, value) => handleChange('position', axis, value)}
+        category="position"
       />
       <Vector3Input
         label="Rotation"
         value={data.rotation}
         onChange={(axis, value) => handleChange('rotation', axis, value)}
+        category="rotation"
       />
       <Vector3Input
         label="Scale"
         value={data.scale}
         onChange={(axis, value) => handleChange('scale', axis, value)}
+        category="scale"
       />
 
       <button 
