@@ -419,7 +419,7 @@ const FlowDiagramInner = () => {
   );
 
   const handleAddNode = useCallback((type: string) => {
-    const { x: viewX, y: viewY, zoom } = getViewport();
+    const { x: viewX, y: viewY } = getViewport();
     
     // Pobierz środek widoku
     const centerX = window.innerWidth / 4;
@@ -608,142 +608,205 @@ const FlowDiagramInner = () => {
 
       {isGraphModalOpen && (
         <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           zIndex: 1000,
-          minWidth: '300px'
         }}>
-          <h3 style={{ marginTop: 0, marginBottom: '16px' }}>Zarządzaj Grafami</h3>
-          
-          {error && (
+          <div style={{
+            background: '#1e293b',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+            width: '400px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative',
+            border: '1px solid #334155'
+          }}>
             <div style={{
-              padding: '8px',
-              marginBottom: '16px',
-              background: '#fee2e2',
-              border: '1px solid #ef4444',
-              borderRadius: '4px',
-              color: '#b91c1c'
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
             }}>
-              {error}
+              <h3 style={{ 
+                margin: 0,
+                color: '#e2e8f0',
+                fontSize: '1.25rem',
+                fontWeight: 600
+              }}>
+                Zarządzaj Grafami
+              </h3>
+              <button
+                onClick={() => setIsGraphModalOpen(false)}
+                disabled={isLoading}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: !isLoading ? 'pointer' : 'not-allowed',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ✕
+              </button>
             </div>
-          )}
-          
-          <div style={{ marginBottom: '16px' }}>
-            <input
-              type="text"
-              value={graphName}
-              onChange={(e) => setGraphName(e.target.value)}
-              placeholder="Nazwa nowego grafu"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '8px',
-                borderRadius: '4px',
-                border: '1px solid #d1d5db',
-                marginBottom: '8px'
-              }}
-            />
-            <button
-              onClick={handleSaveGraph}
-              disabled={!graphName.trim() || isLoading}
-              style={{
-                width: '100%',
-                padding: '8px',
-                background: graphName.trim() && !isLoading ? '#3b82f6' : '#9ca3af',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
-              Zapisz jako nowy graf
-            </button>
-          </div>
+            
+            {error && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '16px',
+                background: '#7f1d1d',
+                border: '1px solid #991b1b',
+                borderRadius: '8px',
+                color: '#fecaca',
+                fontSize: '0.875rem'
+              }}>
+                {error}
+              </div>
+            )}
+            
+            <div style={{ marginBottom: '20px' }}>
+              <input
+                type="text"
+                value={graphName}
+                onChange={(e) => setGraphName(e.target.value)}
+                placeholder="Nazwa nowego grafu"
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #475569',
+                  background: '#334155',
+                  color: '#e2e8f0',
+                  fontSize: '0.875rem',
+                  marginBottom: '12px',
+                  outline: 'none',
+                  transition: 'all 0.2s'
+                }}
+              />
+              <button
+                onClick={handleSaveGraph}
+                disabled={!graphName.trim() || isLoading}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  background: graphName.trim() && !isLoading ? '#3b82f6' : '#475569',
+                  color: '#e2e8f0',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  transition: 'all 0.2s'
+                }}
+              >
+                {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
+                Zapisz jako nowy graf
+              </button>
+            </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '8px' }}>Zapisane grafy:</h4>
-            <div style={{ 
-              maxHeight: '200px', 
-              overflowY: 'auto',
-              border: '1px solid #d1d5db',
-              borderRadius: '4px'
-            }}>
-              {getGraphList().map(name => (
-                <div
-                  key={name}
-                  style={{
-                    padding: '8px',
-                    borderBottom: '1px solid #d1d5db',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
-                  <span>{name}</span>
-                  <div>
-                    <button
-                      onClick={() => handleLoadGraph(name)}
-                      disabled={isLoading}
-                      style={{
-                        padding: '4px 8px',
-                        background: !isLoading ? '#3b82f6' : '#9ca3af',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        marginRight: '4px',
-                        cursor: !isLoading ? 'pointer' : 'not-allowed'
-                      }}
-                    >
-                      Wczytaj
-                    </button>
-                    {name !== 'default' && (
+            <div>
+              <h4 style={{ 
+                margin: '0 0 12px',
+                color: '#e2e8f0',
+                fontSize: '1rem',
+                fontWeight: 500
+              }}>
+                Zapisane grafy:
+              </h4>
+              <div style={{ 
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                {getGraphList().map((name, index) => (
+                  <div
+                    key={name}
+                    style={{
+                      padding: '12px',
+                      borderBottom: index < getGraphList().length - 1 ? '1px solid #475569' : 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: '#334155',
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}>
+                      {name}
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <button
-                        onClick={() => deleteGraph(name)}
+                        onClick={() => handleLoadGraph(name)}
                         disabled={isLoading}
                         style={{
-                          padding: '4px 8px',
-                          background: !isLoading ? '#ef4444' : '#9ca3af',
-                          color: 'white',
+                          padding: '6px 12px',
+                          background: !isLoading ? '#3b82f6' : '#475569',
+                          color: '#e2e8f0',
                           border: 'none',
-                          borderRadius: '4px',
-                          cursor: !isLoading ? 'pointer' : 'not-allowed'
+                          borderRadius: '6px',
+                          cursor: !isLoading ? 'pointer' : 'not-allowed',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
                         }}
                       >
-                        Usuń
+                        <span>📂</span> Wczytaj
                       </button>
-                    )}
+                      {name !== 'default' && (
+                        <button
+                          onClick={() => deleteGraph(name)}
+                          disabled={isLoading}
+                          style={{
+                            padding: '6px 12px',
+                            background: !isLoading ? '#dc2626' : '#475569',
+                            color: '#e2e8f0',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: !isLoading ? 'pointer' : 'not-allowed',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>🗑️</span> Usuń
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-
-          <button
-            onClick={() => setIsGraphModalOpen(false)}
-            disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '8px',
-              background: !isLoading ? '#6b7280' : '#9ca3af',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: !isLoading ? 'pointer' : 'not-allowed'
-            }}
-          >
-            Zamknij
-          </button>
         </div>
       )}
 
