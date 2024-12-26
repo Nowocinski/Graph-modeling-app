@@ -601,13 +601,14 @@ const FlowDiagramInner = () => {
         }
 
         // Calculate boundaries of imported nodes (excluding scene nodes)
+        const NODE_WIDTH = 250; // Approximate width of nodes
         const importBounds = graphToImport.nodes
           .filter(node => node.type !== 'scene')
           .reduce((bounds, node) => {
             bounds.minX = Math.min(bounds.minX, node.position.x);
-            bounds.maxX = Math.max(bounds.maxX, node.position.x);
+            bounds.maxX = Math.max(bounds.maxX, node.position.x + NODE_WIDTH); // Add node width
             bounds.minY = Math.min(bounds.minY, node.position.y);
-            bounds.maxY = Math.max(bounds.maxY, node.position.y);
+            bounds.maxY = Math.max(bounds.maxY, node.position.y + 100); // Add approximate node height
             return bounds;
           }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
 
@@ -659,6 +660,7 @@ const FlowDiagramInner = () => {
 
         // Create a border node to visually group imported nodes
         const BORDER_PADDING = 50;
+        const EXTRA_RIGHT_PADDING = 100; // Additional padding for the right side
         const borderNode = {
           id: `import_border_${Date.now()}`,
           type: 'default', // Using default type as it's just a visual element
@@ -667,7 +669,7 @@ const FlowDiagramInner = () => {
             y: importBounds.minY + offsetY - BORDER_PADDING
           },
           style: {
-            width: importBounds.maxX - importBounds.minX + (BORDER_PADDING * 2),
+            width: importBounds.maxX - importBounds.minX + (BORDER_PADDING * 2) + EXTRA_RIGHT_PADDING,
             height: importBounds.maxY - importBounds.minY + (BORDER_PADDING * 2),
             backgroundColor: 'transparent',
             border: '2px dashed #666',
