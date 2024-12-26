@@ -412,7 +412,7 @@ export default function ThreeScene() {
     controls.enableZoom = true;
     controlsRef.current = controls;
 
-    camera.position.set(0, 0, 5);
+    camera.position.set(5, 5, 5);
     camera.lookAt(0, 0, 0);
 
     mountRef.current.appendChild(renderer.domElement);
