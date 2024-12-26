@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import NumberInput from '../../inputs/NumberInput';
 
@@ -9,6 +9,7 @@ interface BulkEditNodeProps {
     connectedInputs: Array<{
       nodeId: string;
       field: string;
+      nodeName?: string; // Nazwa node'a (np. "Box", "Sphere")
     }>;
     onUpdate: (id: string, data: any) => void;
     onDelete?: () => void;
@@ -17,6 +18,7 @@ interface BulkEditNodeProps {
 
 const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
   const { value, onUpdate, onDelete, connectedInputs } = data;
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleChange = (newValue: number) => {
     onUpdate(id, { value: newValue });
@@ -25,6 +27,18 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
     connectedInputs.forEach(input => {
       onUpdate(input.nodeId, { [input.field]: newValue });
     });
+  };
+
+  // Funkcja pomocnicza do formatowania nazwy pola
+  const formatFieldName = (field: string) => {
+    return field.charAt(0).toUpperCase() + field.slice(1);
+  };
+
+  // Funkcja pomocnicza do formatowania nazwy node'a
+  const formatNodeName = (nodeId: string, nodeName?: string) => {
+    if (nodeName) return nodeName;
+    const type = nodeId.split('-')[0];
+    return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
   return (
@@ -78,7 +92,51 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
           fontSize: '12px',
           color: '#4b5563'
         }}>
-          Connected inputs: {connectedInputs.length}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }} onClick={() => setIsExpanded(!isExpanded)}>
+            <span>Connected inputs: {connectedInputs.length}</span>
+            <span style={{ 
+              transform: isExpanded ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.2s'
+            }}>▼</span>
+          </div>
+          
+          {isExpanded && (
+            <div style={{
+              marginTop: '8px',
+              borderTop: '1px solid rgba(0,0,0,0.1)',
+              paddingTop: '8px'
+            }}>
+              {connectedInputs.map((input, index) => (
+                <div key={index} style={{
+                  padding: '4px 0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontSize: '11px',
+                  color: '#6b7280',
+                  borderBottom: index < connectedInputs.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none'
+                }}>
+                  <span style={{ fontWeight: 500 }}>
+                    {formatNodeName(input.nodeId, input.nodeName)}
+                  </span>
+                  <span style={{ 
+                    background: '#e5e7eb',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '10px'
+                  }}>
+                    {formatFieldName(input.field)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

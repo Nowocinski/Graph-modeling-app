@@ -600,7 +600,13 @@ const FlowDiagramInner = () => {
       position: { x: 100, y: 100 },
       data: {
         value: 0,
-        connectedInputs: selectedInputs
+        connectedInputs: selectedInputs.map(input => {
+          const node = nodes.find(n => n.id === input.nodeId);
+          return {
+            ...input,
+            nodeName: node?.type.charAt(0).toUpperCase() + node?.type.slice(1)
+          };
+        })
       }
     };
 
