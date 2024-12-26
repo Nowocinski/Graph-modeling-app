@@ -563,7 +563,13 @@ export default function ThreeScene() {
     });
 
     // Update or create meshes
-    const meshNodes = nodes.filter(node => node.type === 'mesh' || node.type === 'subtract' || node.type === 'intersect' || node.type === 'union');
+    const meshNodes = nodes.filter(node => 
+      node.type === 'mesh' || 
+      node.type === 'subtract' || 
+      node.type === 'intersect' || 
+      node.type === 'union' ||
+      node.type === 'loop'
+    );
     meshNodes.forEach(meshNode => {
       // Sprawdź czy mesh jest połączony ze sceną lub grupą
       if (!isConnectedToScene(meshNode.id)) {
@@ -592,6 +598,12 @@ export default function ThreeScene() {
       // Obsługa node'a union
       if (meshNode.type === 'union') {
         handleUnionNode(meshNode, edges, scene, objectsRef.current);
+        return;
+      }
+
+      // Obsługa node'a loop
+      if (meshNode.type === 'loop') {
+        handleLoopNode(meshNode, edges, scene, objectsRef.current);
         return;
       }
 
@@ -1087,6 +1099,83 @@ export default function ThreeScene() {
       console.log('Union operation completed successfully');
     } catch (error) {
       console.error('Error in CSG operation:', error);
+    }
+  };
+
+  // Funkcja do obsługi Loop node'a
+  const handleLoopNode = (
+    loopNode: any,
+    edges: any[],
+    scene: THREE.Scene,
+    objects: { [key: string]: THREE.Object3D }
+  ) => {
+    // Znajdź input node (Mesh lub Group)
+    const inputEdge = edges.find(edge => edge.target === loopNode.id);
+    if (!inputEdge) return;
+
+    const inputNode = nodes.find(node => node.id === inputEdge.source);
+    if (!inputNode) return;
+
+    const inputObject = objects[inputNode.id];
+    if (!inputObject) return;
+
+    // Usuń poprzedni obiekt Loop jeśli istnieje
+    if (objects[loopNode.id]) {
+      const oldGroup = objects[loopNode.id];
+      if (oldGroup.parent) {
+        oldGroup.parent.remove(oldGroup);
+      }
+      delete objects[loopNode.id];
+    }
+
+    // Stwórz nową grupę dla Loop node'a
+    const loopGroup = new THREE.Group();
+    objects[loopNode.id] = loopGroup;
+
+    // Ustaw transformacje grupy
+    loopGroup.position.set(
+      loopNode.data.position.x,
+      loopNode.data.position.y,
+      loopNode.data.position.z
+    );
+    loopGroup.rotation.set(
+      loopNode.data.rotation.x,
+      loopNode.data.rotation.y,
+      loopNode.data.rotation.z
+    );
+    loopGroup.scale.set(
+      loopNode.data.scale.x,
+      loopNode.data.scale.y,
+      loopNode.data.scale.z
+    );
+
+    // Stwórz kopie obiektu wejściowego
+    for (let i = 0; i < loopNode.data.iterations; i++) {
+      const clone = inputObject.clone(true);
+      
+      // Ustaw pozycję klona w zależności od kierunku
+      const offset = i * loopNode.data.spacing;
+      if (loopNode.data.direction === 'x') {
+        clone.position.x = offset;
+      } else if (loopNode.data.direction === 'y') {
+        clone.position.y = offset;
+      } else {
+        clone.position.z = offset;
+      }
+
+      loopGroup.add(clone);
+    }
+
+    // Znajdź rodzica dla Loop node'a
+    const parentEdge = edges.find(edge => edge.source === loopNode.id);
+    if (parentEdge) {
+      const parentNode = nodes.find(node => node.id === parentEdge.target);
+      if (parentNode) {
+        const parentObject = parentNode.type === 'scene' ? scene : objects[parentNode.id];
+        if (parentObject) {
+          parentObject.add(loopGroup);
+        }
+      }
     }
   };
 
