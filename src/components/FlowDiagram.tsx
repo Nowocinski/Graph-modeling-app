@@ -473,7 +473,53 @@ const FlowDiagramInner = () => {
     type: string;
   }[]>([]);
   const [bulkEditMode, setBulkEditMode] = useState(false);
-  const [bulkEditValue, setBulkEditValue] = useState("");
+  const [bulkEditValue, setBulkEditValue] = useState('');
+
+  const applyBulkEdit = () => {
+    const value = parseFloat(bulkEditValue);
+    if (!isNaN(value)) {
+      selectedInputs.forEach(input => {
+        const [category, field] = input.field.split('.');
+        if (field) {
+          handleNodeUpdate(input.nodeId, {
+            [category]: {
+              [field]: value
+            }
+          });
+        } else {
+          handleNodeUpdate(input.nodeId, {
+            [category]: value
+          });
+        }
+      });
+    }
+    setBulkEditMode(false);
+    setBulkEditValue('');
+  };
+
+  const cancelBulkEdit = () => {
+    setBulkEditMode(false);
+    setBulkEditValue('');
+  };
+
+  const createBulkEditNode = () => {
+    const { x: viewX, y: viewY } = getViewport();
+    const newNode: Node = {
+      id: `bulkEdit_${Date.now()}`,
+      type: 'bulkEdit',
+      position: { 
+        x: -viewX + window.innerWidth/2 - 100,
+        y: -viewY + window.innerHeight/2 - 100
+      },
+      data: {
+        onUpdate: handleNodeUpdate,
+        connectedInputs: selectedInputs
+      }
+    };
+
+    setNodes(nds => [...nds, newNode]);
+    setSelectedInputs([]);
+  };
 
   // Funkcja do dodawania/usuwania inputu z selekcji
   const toggleInputSelection = (nodeId: string, field: string, type: string) => {
@@ -485,48 +531,6 @@ const FlowDiagramInner = () => {
         return [...prev, { nodeId, field, type }];
       }
     });
-  };
-
-  // Funkcja do zastosowania zbiorowej zmiany
-  const applyBulkEdit = () => {
-    const value = parseFloat(bulkEditValue);
-    if (!isNaN(value)) {
-      selectedInputs.forEach(({ nodeId, field }) => {
-        handleNodeUpdate(nodeId, { [field]: value });
-      });
-    }
-    setBulkEditMode(false);
-    setBulkEditValue("");
-    setSelectedInputs([]);
-  };
-
-  // Funkcja do anulowania zbiorowej edycji
-  const cancelBulkEdit = () => {
-    setBulkEditMode(false);
-    setBulkEditValue("");
-    setSelectedInputs([]);
-  };
-
-  // Funkcja do tworzenia BulkEditNode
-  const createBulkEditNode = () => {
-    const newNode = {
-      id: `bulkEdit-${nodes.length + 1}`,
-      type: 'bulkEdit',
-      position: { x: 100, y: 100 },
-      data: {
-        value: 0,
-        connectedInputs: selectedInputs.map(input => {
-          const node = nodes.find(n => n.id === input.nodeId);
-          return {
-            ...input,
-            nodeName: node?.type.charAt(0).toUpperCase() + node?.type.slice(1)
-          };
-        })
-      }
-    };
-
-    setNodes(prev => [...prev, newNode]);
-    setSelectedInputs([]);
   };
 
   return (
@@ -574,6 +578,103 @@ const FlowDiagramInner = () => {
           <span>🔄</span> Reset
         </button>
       </div>
+
+      {/* Panel kontrolny dla zbiorowej edycji */}
+      {selectedInputs.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#1e293b',
+          padding: '12px',
+          borderRadius: '8px',
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'center',
+          zIndex: 1000,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        }}>
+          <span style={{ color: 'white', fontSize: '14px' }}>
+            Wybrano {selectedInputs.length} {selectedInputs.length === 1 ? 'input' : 'inputów'}
+          </span>
+          {!bulkEditMode ? (
+            <button
+              onClick={() => setBulkEditMode(true)}
+              style={{
+                background: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Zmień wartości
+            </button>
+          ) : (
+            <>
+              <input
+                type="number"
+                value={bulkEditValue}
+                onChange={(e) => setBulkEditValue(e.target.value)}
+                style={{
+                  width: '80px',
+                  padding: '6px',
+                  borderRadius: '4px',
+                  border: '1px solid #4b5563',
+                  background: '#374151',
+                  color: 'white'
+                }}
+                placeholder="Wartość"
+              />
+              <button
+                onClick={applyBulkEdit}
+                style={{
+                  background: '#22c55e',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Zastosuj
+              </button>
+              <button
+                onClick={cancelBulkEdit}
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Anuluj
+              </button>
+            </>
+          )}
+          <button
+            onClick={createBulkEditNode}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Stwórz node kontrolny
+          </button>
+        </div>
+      )}
 
       <ReactFlow
         nodes={nodes.map(node => ({
