@@ -321,6 +321,15 @@ const FlowDiagramInner = () => {
     }
   }, []);
 
+  // Ustaw nazwę grafu gdy modal jest otwierany
+  useEffect(() => {
+    if (isGraphModalOpen && currentGraph !== 'default') {
+      setGraphName(currentGraph);
+    } else {
+      setGraphName('');
+    }
+  }, [isGraphModalOpen, currentGraph]);
+
   const handleSaveGraph = async (overwrite = false) => {
     if (graphName.trim()) {
       const success = await saveGraph(graphName.trim(), nodes, edges, overwrite);
