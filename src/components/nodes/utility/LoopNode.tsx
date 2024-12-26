@@ -25,16 +25,17 @@ const nodeStyles = {
   background: 'white',
   border: '1px solid #e2e8f0',
   position: 'relative' as const,
-  width: '200px'
+  width: '320px'
 };
 
 const inputStyles = {
-  width: '60px',
+  width: '70px',
   padding: '2px 4px',
   fontSize: '12px',
   border: '1px solid #ccc',
   borderRadius: '4px',
-  marginLeft: '8px'
+  marginLeft: '6px',
+  marginRight: '6px'
 };
 
 const selectStyles = {
@@ -42,16 +43,16 @@ const selectStyles = {
   fontSize: '12px',
   border: '1px solid #ccc',
   borderRadius: '4px',
-  marginLeft: '8px',
+  marginLeft: '6px',
   background: 'white',
-  width: '60px'
+  width: '100px'
 };
 
 const labelStyles = {
   fontSize: '12px',
   color: '#666',
   display: 'inline-block',
-  width: '70px'
+  width: '90px'
 };
 
 const rowStyles = {
