@@ -113,7 +113,7 @@ const GroupNode = ({ data, id }: NodeProps<GroupData>) => {
     <div style={{ 
       padding: '16px', 
       borderRadius: '8px', 
-      background: 'white', 
+      background: '#FFC107', 
       border: '1px solid #e2e8f0', 
       position: 'relative',
       width: '320px' 
