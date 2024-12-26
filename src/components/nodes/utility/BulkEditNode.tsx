@@ -49,8 +49,6 @@ const BulkEditNode: React.FC<BulkEditNodeProps> = ({ id, data }) => {
       padding: '10px',
       minWidth: '200px',
     }}>
-      <Handle type="source" position={Position.Right} />
-      
       <div style={{ marginBottom: '8px' }}>
         <div style={{
           display: 'flex',
