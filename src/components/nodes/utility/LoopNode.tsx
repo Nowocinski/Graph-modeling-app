@@ -45,7 +45,13 @@ const selectStyles = {
   borderRadius: '4px',
   marginLeft: '6px',
   background: 'white',
-  width: '100px'
+  width: '100px',
+  color: '#1f2937'
+};
+
+const optionStyles = {
+  color: '#1f2937',
+  background: 'white'
 };
 
 const labelStyles = {
@@ -184,9 +190,9 @@ export const LoopNode = ({ data, id }: LoopNodeProps) => {
           value={data.direction}
           onChange={(e) => handleChange('direction', e.target.value as Direction)}
         >
-          <option value="x">X Axis</option>
-          <option value="y">Y Axis</option>
-          <option value="z">Z Axis</option>
+          <option style={optionStyles} value="x">X Axis</option>
+          <option style={optionStyles} value="y">Y Axis</option>
+          <option style={optionStyles} value="z">Z Axis</option>
         </select>
       </div>
 
