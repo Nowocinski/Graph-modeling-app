@@ -310,6 +310,7 @@ const FlowDiagramInner = () => {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [graphName, setGraphName] = useState('');
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
 
   // Wczytaj domyślny graf przy starcie
   useEffect(() => {
@@ -320,11 +321,16 @@ const FlowDiagramInner = () => {
     }
   }, []);
 
-  const handleSaveGraph = () => {
+  const handleSaveGraph = async (overwrite = false) => {
     if (graphName.trim()) {
-      saveGraph(graphName.trim(), nodes, edges);
-      setGraphName('');
-      setIsGraphModalOpen(false);
+      const success = await saveGraph(graphName.trim(), nodes, edges, overwrite);
+      if (success) {
+        setGraphName('');
+        setShowOverwriteConfirm(false);
+        setIsGraphModalOpen(false);
+      } else if (error?.includes('już istnieje')) {
+        setShowOverwriteConfirm(true);
+      }
     }
   };
 
@@ -679,6 +685,55 @@ const FlowDiagramInner = () => {
               </div>
             )}
             
+            {showOverwriteConfirm && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '20px',
+                background: '#854d0e',
+                border: '1px solid #a16207',
+                borderRadius: '8px',
+                color: '#fef3c7'
+              }}>
+                <div style={{ marginBottom: '8px', fontSize: '0.875rem' }}>
+                  Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => handleSaveGraph(true)}
+                    disabled={isLoading}
+                    style={{
+                      padding: '6px 12px',
+                      background: !isLoading ? '#b45309' : '#475569',
+                      color: '#fef3c7',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: !isLoading ? 'pointer' : 'not-allowed',
+                      fontSize: '0.75rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    Nadpisz
+                  </button>
+                  <button
+                    onClick={() => setShowOverwriteConfirm(false)}
+                    disabled={isLoading}
+                    style={{
+                      padding: '6px 12px',
+                      background: 'transparent',
+                      color: '#fef3c7',
+                      border: '1px solid #fef3c7',
+                      borderRadius: '6px',
+                      cursor: !isLoading ? 'pointer' : 'not-allowed',
+                      fontSize: '0.75rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    Anuluj
+                  </button>
+                </div>
+              </div>
+            )}
+            
             <div style={{ marginBottom: '20px' }}>
               <input
                 type="text"
@@ -700,7 +755,7 @@ const FlowDiagramInner = () => {
                 }}
               />
               <button
-                onClick={handleSaveGraph}
+                onClick={() => handleSaveGraph()}
                 disabled={!graphName.trim() || isLoading}
                 style={{
                   width: '100%',

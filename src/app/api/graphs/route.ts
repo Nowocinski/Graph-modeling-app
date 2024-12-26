@@ -32,15 +32,34 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   await ensureGraphsDir();
   
-  const { name, data } = await request.json();
+  const { name, data, overwrite } = await request.json();
+  
   if (!name || !data) {
     return NextResponse.json({ error: 'Name and data are required' }, { status: 400 });
   }
 
+  if (name === 'default') {
+    return NextResponse.json({ error: 'Cannot modify default graph' }, { status: 400 });
+  }
+
   const filePath = path.join(GRAPHS_DIR, `${name}.json`);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-  
-  return NextResponse.json({ success: true });
+
+  try {
+    // Sprawdź czy plik już istnieje
+    await fs.access(filePath);
+    if (!overwrite) {
+      return NextResponse.json({ error: 'Graph already exists' }, { status: 400 });
+    }
+  } catch {
+    // Plik nie istnieje, można kontynuować
+  }
+
+  try {
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to save graph' }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: NextRequest) {

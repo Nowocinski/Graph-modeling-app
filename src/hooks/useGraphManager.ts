@@ -30,8 +30,13 @@ export const useGraphManager = () => {
     fetchGraphs();
   }, []);
 
-  // Zapisz graf
-  const saveGraph = async (name: string, nodes: Node[], edges: Edge[]) => {
+  // Zapisz nowy lub nadpisz istniejący graf
+  const saveGraph = async (name: string, nodes: Node[], edges: Edge[], overwrite = false) => {
+    if (name === 'default') {
+      setError('Nie można nadpisać domyślnego grafu');
+      return false;
+    }
+
     try {
       setIsLoading(true);
       const response = await fetch('/api/graphs', {
@@ -41,11 +46,19 @@ export const useGraphManager = () => {
         },
         body: JSON.stringify({
           name,
-          data: { nodes, edges }
+          data: { nodes, edges },
+          overwrite
         })
       });
 
-      if (!response.ok) throw new Error('Failed to save graph');
+      if (!response.ok) {
+        const data = await response.json();
+        if (data.error === 'Graph already exists' && !overwrite) {
+          setError('Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?');
+          return false;
+        }
+        throw new Error(data.error || 'Failed to save graph');
+      }
 
       setGraphs(prev => ({
         ...prev,
@@ -53,9 +66,11 @@ export const useGraphManager = () => {
       }));
       
       setError(null);
+      return true;
     } catch (err) {
       setError(err.message);
       console.error('Error saving graph:', err);
+      return false;
     } finally {
       setIsLoading(false);
     }
