@@ -22,8 +22,8 @@ interface LoopNodeProps {
 const nodeStyles = {
   padding: '16px',
   borderRadius: '8px',
-  background: 'white',
-  border: '1px solid #e2e8f0',
+  background: '#bfdbfe',
+  border: '1px solid #60a5fa',
   position: 'relative' as const,
   width: '320px'
 };
