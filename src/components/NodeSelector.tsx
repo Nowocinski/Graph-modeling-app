@@ -82,28 +82,28 @@ const categoryStyles = {
 
 const nodes = {
   Geometry: [
-    { type: 'boxGeometry', label: 'Box Geometry', icon: '□' },
-    { type: 'sphereGeometry', label: 'Sphere Geometry', icon: '○' },
-    { type: 'cylinderGeometry', label: 'Cylinder Geometry', icon: '⬤' },
-    { type: 'capsuleGeometry', label: 'Capsule Geometry', icon: '⧫' },
-    { type: 'circleGeometry', label: 'Circle Geometry', icon: '◯' },
-    { type: 'coneGeometry', label: 'Cone Geometry', icon: '▼' },
-    { type: 'dodecahedronGeometry', label: 'Dodecahedron Geometry', icon: '⬢' },
-    { type: 'extrudeGeometry', label: 'Extrude Geometry', icon: '⬗' },
-    { type: 'icosahedronGeometry', label: 'Icosahedron Geometry', icon: '⬡' },
-    { type: 'latheGeometry', label: 'Lathe Geometry', icon: '◎' },
-    { type: 'octahedronGeometry', label: 'Octahedron Geometry', icon: '◈' },
-    { type: 'planeGeometry', label: 'Plane Geometry', icon: '▭' },
-    { type: 'ringGeometry', label: 'Ring Geometry', icon: '◍' },
-    { type: 'tetrahedronGeometry', label: 'Tetrahedron Geometry', icon: '△' },
-    { type: 'torusGeometry', label: 'Torus Geometry', icon: '⊗' },
-    { type: 'torusKnotGeometry', label: 'Torus Knot Geometry', icon: '✾' },
-    { type: 'tubeGeometry', label: 'Tube Geometry', icon: '⌇' },
+    { type: 'boxGeometry', label: 'Box', icon: '□' },
+    { type: 'sphereGeometry', label: 'Sphere', icon: '○' },
+    { type: 'cylinderGeometry', label: 'Cylinder', icon: '⬤' },
+    { type: 'capsuleGeometry', label: 'Capsule', icon: '⧫' },
+    { type: 'circleGeometry', label: 'Circle', icon: '◯' },
+    { type: 'coneGeometry', label: 'Cone', icon: '▼' },
+    { type: 'dodecahedronGeometry', label: 'Dodecahedron', icon: '⬢' },
+    { type: 'extrudeGeometry', label: 'Extrude', icon: '⬗' },
+    { type: 'icosahedronGeometry', label: 'Icosahedron', icon: '⬡' },
+    { type: 'latheGeometry', label: 'Lathe', icon: '◎' },
+    { type: 'octahedronGeometry', label: 'Octahedron', icon: '◈' },
+    { type: 'planeGeometry', label: 'Plane', icon: '▭' },
+    { type: 'ringGeometry', label: 'Ring', icon: '◍' },
+    { type: 'tetrahedronGeometry', label: 'Tetrahedron', icon: '△' },
+    { type: 'torusGeometry', label: 'Torus', icon: '⊗' },
+    { type: 'torusKnotGeometry', label: 'Torus Knot', icon: '✾' },
+    { type: 'tubeGeometry', label: 'Tube', icon: '⌇' },
   ],
   Material: [
-    { type: 'meshNormalMaterial', label: 'Normal Material', icon: '◇' },
-    { type: 'meshBasicMaterial', label: 'Basic Material', icon: '◈' },
-    { type: 'meshPhongMaterial', label: 'Phong Material', icon: '◆' }
+    { type: 'meshNormalMaterial', label: 'Normal', icon: '◇' },
+    { type: 'meshBasicMaterial', label: 'Basic', icon: '◈' },
+    { type: 'meshPhongMaterial', label: 'Phong', icon: '◆' }
   ],
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
@@ -113,9 +113,9 @@ const nodes = {
     { type: 'loop', label: 'Loop', icon: '↻' },
   ],
   'CSG Operations': [
-    { type: 'subtract', label: 'Subtract Operation', icon: '⊖' },
-    { type: 'intersect', label: 'Intersect Operation', icon: '⊗' },
-    { type: 'union', label: 'Union Operation', icon: '⊕' }
+    { type: 'subtract', label: 'Subtract', icon: '⊖' },
+    { type: 'intersect', label: 'Intersect', icon: '⊗' },
+    { type: 'union', label: 'Union', icon: '⊕' }
   ]
 };
 
