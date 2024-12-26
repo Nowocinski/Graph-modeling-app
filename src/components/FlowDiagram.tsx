@@ -46,6 +46,7 @@ import SubtractNode from './nodes/operation/SubtractNode';
 import IntersectNode from './nodes/operation/IntersectNode';
 import UnionNode from './nodes/operation/UnionNode';
 import LoopNode from './nodes/utility/LoopNode';
+import BulkEditNode from './nodes/utility/BulkEditNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -77,7 +78,8 @@ const nodeTypes: NodeTypes = {
   subtract: SubtractNode,
   intersect: IntersectNode,
   union: UnionNode,
-  loop: LoopNode
+  loop: LoopNode,
+  bulkEdit: BulkEditNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -236,6 +238,10 @@ const defaultNodeData = {
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 }
+  },
+  bulkEdit: {
+    value: 0,
+    connectedInputs: []
   }
 };
 
@@ -586,6 +592,22 @@ const FlowDiagramInner = () => {
     setSelectedInputs([]);
   };
 
+  // Funkcja do tworzenia BulkEditNode
+  const createBulkEditNode = () => {
+    const newNode = {
+      id: `bulkEdit-${nodes.length + 1}`,
+      type: 'bulkEdit',
+      position: { x: 100, y: 100 },
+      data: {
+        value: 0,
+        connectedInputs: selectedInputs
+      }
+    };
+
+    setNodes(prev => [...prev, newNode]);
+    setSelectedInputs([]);
+  };
+
   return (
     <div 
       style={flowStyles}
@@ -673,6 +695,20 @@ const FlowDiagramInner = () => {
               </button>
             </>
           )}
+          <button
+            onClick={createBulkEditNode}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Stwórz node kontrolny
+          </button>
         </div>
       )}
       <ReactFlow
