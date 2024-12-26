@@ -19,6 +19,15 @@ interface LoopNodeProps {
   id: string;
 }
 
+const nodeStyles = {
+  padding: '16px',
+  borderRadius: '8px',
+  background: 'white',
+  border: '1px solid #e2e8f0',
+  position: 'relative' as const,
+  width: '200px'
+};
+
 const inputStyles = {
   width: '60px',
   padding: '2px 4px',
@@ -34,17 +43,34 @@ const selectStyles = {
   border: '1px solid #ccc',
   borderRadius: '4px',
   marginLeft: '8px',
-  background: 'white'
+  background: 'white',
+  width: '60px'
 };
 
 const labelStyles = {
   fontSize: '12px',
-  color: '#666'
+  color: '#666',
+  display: 'inline-block',
+  width: '70px'
 };
 
 const rowStyles = {
   display: 'flex',
   alignItems: 'center',
+  marginBottom: '8px'
+};
+
+const sectionStyles = {
+  marginTop: '12px',
+  padding: '8px',
+  backgroundColor: '#f8fafc',
+  borderRadius: '4px'
+};
+
+const sectionTitleStyles = {
+  fontSize: '12px',
+  color: '#475569',
+  fontWeight: '500' as const,
   marginBottom: '8px'
 };
 
@@ -66,6 +92,13 @@ const deleteButtonStyles = {
     color: '#ef4444',
     background: '#fee2e2'
   }
+};
+
+const titleStyles = {
+  margin: '0 0 16px 0',
+  fontSize: '14px',
+  fontWeight: '500' as const,
+  color: '#1f2937'
 };
 
 export const LoopNode = ({ data, id }: LoopNodeProps) => {
@@ -97,7 +130,7 @@ export const LoopNode = ({ data, id }: LoopNodeProps) => {
   }, [data.scale, handleChange]);
 
   return (
-    <div className="node-container">
+    <div style={nodeStyles}>
       <Handle 
         type="target" 
         position={Position.Left} 
@@ -105,133 +138,133 @@ export const LoopNode = ({ data, id }: LoopNodeProps) => {
         style={{ background: '#64748b' }}
       />
       
-      <div style={{ padding: '12px' }}>
-        <h4 style={{ margin: '0 0 8px 0' }}>Loop</h4>
-        
-        <button
-          onClick={handleDelete}
-          style={deleteButtonStyles}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#ef4444';
-            e.currentTarget.style.background = '#fee2e2';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#666';
-            e.currentTarget.style.background = 'transparent';
-          }}
+      <h4 style={titleStyles}>Loop</h4>
+      
+      <button
+        onClick={handleDelete}
+        style={deleteButtonStyles}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = '#ef4444';
+          e.currentTarget.style.background = '#fee2e2';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = '#666';
+          e.currentTarget.style.background = 'transparent';
+        }}
+      >
+        🗑️
+      </button>
+
+      <div style={rowStyles}>
+        <label style={labelStyles}>Iterations:</label>
+        <input
+          type="number"
+          style={inputStyles}
+          value={data.iterations}
+          onChange={(e) => handleChange('iterations', Math.max(1, parseInt(e.target.value) || 1))}
+          min={1}
+        />
+      </div>
+      
+      <div style={rowStyles}>
+        <label style={labelStyles}>Spacing:</label>
+        <input
+          type="number"
+          style={inputStyles}
+          value={data.spacing}
+          onChange={(e) => handleChange('spacing', parseFloat(e.target.value) || 0)}
+        />
+      </div>
+
+      <div style={rowStyles}>
+        <label style={labelStyles}>Direction:</label>
+        <select
+          style={selectStyles}
+          value={data.direction}
+          onChange={(e) => handleChange('direction', e.target.value as Direction)}
         >
-          🗑️
-        </button>
+          <option value="x">X Axis</option>
+          <option value="y">Y Axis</option>
+          <option value="z">Z Axis</option>
+        </select>
+      </div>
 
-        <div style={rowStyles}>
-          <label style={labelStyles}>Iterations:</label>
-          <input
-            type="number"
-            style={inputStyles}
-            value={data.iterations}
-            onChange={(e) => handleChange('iterations', Math.max(1, parseInt(e.target.value) || 1))}
-            min={1}
-          />
-        </div>
+      <div style={sectionStyles}>
+        <div style={sectionTitleStyles}>Transform</div>
         
         <div style={rowStyles}>
-          <label style={labelStyles}>Spacing:</label>
+          <label style={labelStyles}>Position:</label>
           <input
             type="number"
             style={inputStyles}
-            value={data.spacing}
-            onChange={(e) => handleChange('spacing', parseFloat(e.target.value) || 0)}
+            value={data.position.x}
+            onChange={(e) => handlePositionChange('x', e.target.value)}
+            placeholder="X"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.position.y}
+            onChange={(e) => handlePositionChange('y', e.target.value)}
+            placeholder="Y"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.position.z}
+            onChange={(e) => handlePositionChange('z', e.target.value)}
+            placeholder="Z"
           />
         </div>
 
         <div style={rowStyles}>
-          <label style={labelStyles}>Direction:</label>
-          <select
-            style={selectStyles}
-            value={data.direction}
-            onChange={(e) => handleChange('direction', e.target.value as Direction)}
-          >
-            <option value="x">X Axis</option>
-            <option value="y">Y Axis</option>
-            <option value="z">Z Axis</option>
-          </select>
+          <label style={labelStyles}>Rotation:</label>
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.rotation.x}
+            onChange={(e) => handleRotationChange('x', e.target.value)}
+            placeholder="X"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.rotation.y}
+            onChange={(e) => handleRotationChange('y', e.target.value)}
+            placeholder="Y"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.rotation.z}
+            onChange={(e) => handleRotationChange('z', e.target.value)}
+            placeholder="Z"
+          />
         </div>
 
-        <div style={{ marginTop: '12px' }}>
-          <div style={rowStyles}>
-            <label style={labelStyles}>Position:</label>
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.position.x}
-              onChange={(e) => handlePositionChange('x', e.target.value)}
-              placeholder="X"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.position.y}
-              onChange={(e) => handlePositionChange('y', e.target.value)}
-              placeholder="Y"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.position.z}
-              onChange={(e) => handlePositionChange('z', e.target.value)}
-              placeholder="Z"
-            />
-          </div>
-
-          <div style={rowStyles}>
-            <label style={labelStyles}>Rotation:</label>
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.rotation.x}
-              onChange={(e) => handleRotationChange('x', e.target.value)}
-              placeholder="X"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.rotation.y}
-              onChange={(e) => handleRotationChange('y', e.target.value)}
-              placeholder="Y"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.rotation.z}
-              onChange={(e) => handleRotationChange('z', e.target.value)}
-              placeholder="Z"
-            />
-          </div>
-
-          <div style={rowStyles}>
-            <label style={labelStyles}>Scale:</label>
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.scale.x}
-              onChange={(e) => handleScaleChange('x', e.target.value)}
-              placeholder="X"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.scale.y}
-              onChange={(e) => handleScaleChange('y', e.target.value)}
-              placeholder="Y"
-            />
-            <input
-              type="number"
-              style={inputStyles}
-              value={data.scale.z}
-              onChange={(e) => handleScaleChange('z', e.target.value)}
-              placeholder="Z"
-            />
-          </div>
+        <div style={rowStyles}>
+          <label style={labelStyles}>Scale:</label>
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.scale.x}
+            onChange={(e) => handleScaleChange('x', e.target.value)}
+            placeholder="X"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.scale.y}
+            onChange={(e) => handleScaleChange('y', e.target.value)}
+            placeholder="Y"
+          />
+          <input
+            type="number"
+            style={inputStyles}
+            value={data.scale.z}
+            onChange={(e) => handleScaleChange('z', e.target.value)}
+            placeholder="Z"
+          />
         </div>
       </div>
 
