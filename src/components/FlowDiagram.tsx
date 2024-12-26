@@ -305,7 +305,7 @@ const customStyles = `
 
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
-  const { currentGraph, saveGraph, loadGraph, deleteGraph, getGraphList } = useGraphManager();
+  const { currentGraph, saveGraph, loadGraph, deleteGraph, getGraphList, isLoading, error } = useGraphManager();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [graphName, setGraphName] = useState('');
@@ -621,12 +621,26 @@ const FlowDiagramInner = () => {
         }}>
           <h3 style={{ marginTop: 0, marginBottom: '16px' }}>Zarządzaj Grafami</h3>
           
+          {error && (
+            <div style={{
+              padding: '8px',
+              marginBottom: '16px',
+              background: '#fee2e2',
+              border: '1px solid #ef4444',
+              borderRadius: '4px',
+              color: '#b91c1c'
+            }}>
+              {error}
+            </div>
+          )}
+          
           <div style={{ marginBottom: '16px' }}>
             <input
               type="text"
               value={graphName}
               onChange={(e) => setGraphName(e.target.value)}
               placeholder="Nazwa nowego grafu"
+              disabled={isLoading}
               style={{
                 width: '100%',
                 padding: '8px',
@@ -637,17 +651,22 @@ const FlowDiagramInner = () => {
             />
             <button
               onClick={handleSaveGraph}
-              disabled={!graphName.trim()}
+              disabled={!graphName.trim() || isLoading}
               style={{
                 width: '100%',
                 padding: '8px',
-                background: graphName.trim() ? '#3b82f6' : '#9ca3af',
+                background: graphName.trim() && !isLoading ? '#3b82f6' : '#9ca3af',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: graphName.trim() ? 'pointer' : 'not-allowed'
+                cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
+              {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
               Zapisz jako nowy graf
             </button>
           </div>
@@ -675,14 +694,15 @@ const FlowDiagramInner = () => {
                   <div>
                     <button
                       onClick={() => handleLoadGraph(name)}
+                      disabled={isLoading}
                       style={{
                         padding: '4px 8px',
-                        background: '#3b82f6',
+                        background: !isLoading ? '#3b82f6' : '#9ca3af',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
                         marginRight: '4px',
-                        cursor: 'pointer'
+                        cursor: !isLoading ? 'pointer' : 'not-allowed'
                       }}
                     >
                       Wczytaj
@@ -690,13 +710,14 @@ const FlowDiagramInner = () => {
                     {name !== 'default' && (
                       <button
                         onClick={() => deleteGraph(name)}
+                        disabled={isLoading}
                         style={{
                           padding: '4px 8px',
-                          background: '#ef4444',
+                          background: !isLoading ? '#ef4444' : '#9ca3af',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
-                          cursor: 'pointer'
+                          cursor: !isLoading ? 'pointer' : 'not-allowed'
                         }}
                       >
                         Usuń
@@ -710,14 +731,15 @@ const FlowDiagramInner = () => {
 
           <button
             onClick={() => setIsGraphModalOpen(false)}
+            disabled={isLoading}
             style={{
               width: '100%',
               padding: '8px',
-              background: '#6b7280',
+              background: !isLoading ? '#6b7280' : '#9ca3af',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: !isLoading ? 'pointer' : 'not-allowed'
             }}
           >
             Zamknij

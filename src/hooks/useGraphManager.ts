@@ -7,28 +7,58 @@ export const useGraphManager = () => {
     default: defaultGraph
   });
   const [currentGraph, setCurrentGraph] = useState('default');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Wczytaj grafy z localStorage przy starcie
+  // Wczytaj grafy przy starcie
   useEffect(() => {
-    const savedGraphs = localStorage.getItem('savedGraphs');
-    if (savedGraphs) {
+    const fetchGraphs = async () => {
       try {
-        const parsedGraphs = JSON.parse(savedGraphs);
-        setGraphs(prev => ({ ...prev, ...parsedGraphs }));
-      } catch (e) {
-        console.error('Error loading saved graphs:', e);
+        setIsLoading(true);
+        const response = await fetch('/api/graphs');
+        if (!response.ok) throw new Error('Failed to fetch graphs');
+        const data = await response.json();
+        setGraphs(prev => ({ ...prev, ...data }));
+      } catch (err) {
+        setError(err.message);
+        console.error('Error loading graphs:', err);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    fetchGraphs();
   }, []);
 
   // Zapisz graf
-  const saveGraph = (name: string, nodes: Node[], edges: Edge[]) => {
-    const newGraphs = {
-      ...graphs,
-      [name]: { nodes, edges }
-    };
-    setGraphs(newGraphs);
-    localStorage.setItem('savedGraphs', JSON.stringify(newGraphs));
+  const saveGraph = async (name: string, nodes: Node[], edges: Edge[]) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/graphs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          data: { nodes, edges }
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to save graph');
+
+      setGraphs(prev => ({
+        ...prev,
+        [name]: { nodes, edges }
+      }));
+      
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error saving graph:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Wczytaj graf
@@ -41,14 +71,31 @@ export const useGraphManager = () => {
   };
 
   // Usuń graf
-  const deleteGraph = (name: string) => {
-    if (name === 'default') return; // Nie pozwól usunąć domyślnego grafu
-    const newGraphs = { ...graphs };
-    delete newGraphs[name];
-    setGraphs(newGraphs);
-    localStorage.setItem('savedGraphs', JSON.stringify(newGraphs));
-    if (currentGraph === name) {
-      setCurrentGraph('default');
+  const deleteGraph = async (name: string) => {
+    if (name === 'default') return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/graphs?name=${name}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) throw new Error('Failed to delete graph');
+
+      const newGraphs = { ...graphs };
+      delete newGraphs[name];
+      setGraphs(newGraphs);
+
+      if (currentGraph === name) {
+        setCurrentGraph('default');
+      }
+      
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error deleting graph:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,6 +107,8 @@ export const useGraphManager = () => {
     saveGraph,
     loadGraph,
     deleteGraph,
-    getGraphList
+    getGraphList,
+    isLoading,
+    error
   };
 };
