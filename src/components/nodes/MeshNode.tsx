@@ -8,6 +8,8 @@ interface MeshNodeProps {
     position: { x: number; y: number; z: number };
     rotation: { x: number; y: number; z: number };
     scale: { x: number; y: number; z: number };
+    geometry?: any;
+    material?: any;
     onUpdate: (id: string, data: any) => void;
     onDelete?: () => void;
     toggleInputSelection?: (nodeId: string, field: string, type: string) => void;
@@ -16,7 +18,7 @@ interface MeshNodeProps {
 }
 
 const MeshNode: React.FC<MeshNodeProps> = ({ id, data }) => {
-  const { position, rotation, scale, onUpdate, onDelete, toggleInputSelection, selectedInputs = [] } = data;
+  const { position, rotation, scale, geometry, material, onUpdate, onDelete, toggleInputSelection, selectedInputs = [] } = data;
   const [expandedSection, setExpandedSection] = useState<'position' | 'rotation' | 'scale' | null>(null);
 
   const handleChange = (category: string, axis: string, value: number) => {
@@ -112,7 +114,24 @@ const MeshNode: React.FC<MeshNodeProps> = ({ id, data }) => {
       padding: '10px',
       minWidth: '300px',
     }}>
-      <Handle type="target" position={Position.Left} />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="geometry"
+        style={{ top: '30%' }}
+        onConnect={(params) => {
+          onUpdate(id, { geometry: params });
+        }}
+      />
+      <Handle 
+        type="target" 
+        position={Position.Left}
+        id="material"
+        style={{ top: '70%' }}
+        onConnect={(params) => {
+          onUpdate(id, { material: params });
+        }}
+      />
       <Handle type="source" position={Position.Right} />
 
       <div style={{ marginBottom: '8px' }}>
@@ -123,6 +142,19 @@ const MeshNode: React.FC<MeshNodeProps> = ({ id, data }) => {
           marginBottom: '8px'
         }}>
           <strong style={{ color: '#1e293b' }}>Mesh</strong>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            fontSize: '12px',
+            color: '#6b7280'
+          }}>
+            <span>
+              {geometry ? '✓' : '○'} Geometry
+            </span>
+            <span>
+              {material ? '✓' : '○'} Material
+            </span>
+          </div>
           {onDelete && (
             <button
               onClick={onDelete}
