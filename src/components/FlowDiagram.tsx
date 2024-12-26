@@ -384,9 +384,13 @@ const FlowDiagramInner = () => {
                sourceNode?.type === 'loop';
       }
 
-      // Loop może przyjmować połączenia tylko od Mesh i Group
+      // Loop może przyjmować połączenia od Mesh, Group i operacji CSG
       if (targetNode?.type === 'loop') {
-        return sourceNode?.type === 'mesh' || sourceNode?.type === 'group';
+        return sourceNode?.type === 'mesh' || 
+               sourceNode?.type === 'group' ||
+               sourceNode?.type === 'subtract' || 
+               sourceNode?.type === 'intersect' ||
+               sourceNode?.type === 'union';
       }
 
       // Mesh może przyjmować połączenia od Geometry i Material

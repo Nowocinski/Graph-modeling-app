@@ -1109,12 +1109,17 @@ export default function ThreeScene() {
     scene: THREE.Scene,
     objects: { [key: string]: THREE.Object3D }
   ) => {
-    // Znajdź input node (Mesh lub Group)
+    // Znajdź input node (Mesh, Group lub CSG)
     const inputEdge = edges.find(edge => edge.target === loopNode.id);
     if (!inputEdge) return;
 
     const inputNode = nodes.find(node => node.id === inputEdge.source);
     if (!inputNode) return;
+
+    // Jeśli input to operacja CSG, poczekaj na jej zakończenie
+    if (inputNode.type === 'subtract' || inputNode.type === 'intersect' || inputNode.type === 'union') {
+      if (!objects[inputNode.id]) return;
+    }
 
     const inputObject = objects[inputNode.id];
     if (!inputObject) return;
@@ -1161,6 +1166,13 @@ export default function ThreeScene() {
         clone.position.y = offset;
       } else {
         clone.position.z = offset;
+      }
+
+      // Jeśli to operacja CSG, upewnij się że materiały są skopiowane poprawnie
+      if (inputNode.type === 'subtract' || inputNode.type === 'intersect' || inputNode.type === 'union') {
+        if (clone instanceof THREE.Mesh) {
+          clone.material = (inputObject as THREE.Mesh).material.clone();
+        }
       }
 
       loopGroup.add(clone);
