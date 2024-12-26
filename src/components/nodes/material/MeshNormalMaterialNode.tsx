@@ -68,8 +68,8 @@ const MeshNormalMaterialNode = ({ data, id }: NodeProps<MeshNormalMaterialData>)
 
   return (
     <div className="node-box" style={{
-      background: '#fff',
-      border: '1px solid #777',
+      background: '#ddd6fe',
+      border: '1px solid #a78bfa',
       borderRadius: '8px',
       padding: '10px',
       minWidth: '200px',
