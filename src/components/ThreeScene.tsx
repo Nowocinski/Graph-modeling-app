@@ -608,7 +608,7 @@ export default function ThreeScene() {
       }
 
       // Standardowa obsługa zwykłych meshy
-      handleMeshNode(meshNode, edges, scene, objectsRef.current);
+      processMeshNode(meshNode, scene);
     });
   }, [nodes, edges]);
 
@@ -1191,86 +1191,84 @@ export default function ThreeScene() {
     }
   };
 
-  // Funkcja obsługująca zwykłe meshe
-  const handleMeshNode = (
-    meshNode: any, 
-    edges: any[], 
-    scene: THREE.Scene,
-    objectsRef: { [key: string]: THREE.Object3D }
-  ) => {
-    const geometryEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'geometry');
-    const materialEdge = edges.find(edge => edge.target === meshNode.id && edge.targetHandle === 'material');
+  const processMeshNode = (meshNode: any, scene: THREE.Scene) => {
+    let mesh = objectsRef.current[meshNode.id] as THREE.Mesh;
 
+    // Znajdź geometrię
+    const geometryEdge = edges.find(edge => 
+      edge.target === meshNode.id && edge.targetHandle === 'geometry'
+    );
     const geometryNode = nodes.find(node => node.id === geometryEdge?.source);
+
+    // Znajdź materiał
+    const materialEdge = edges.find(edge => 
+      edge.target === meshNode.id && edge.targetHandle === 'material'
+    );
     const materialNode = nodes.find(node => node.id === materialEdge?.source);
 
-    if (!geometryNode || !materialNode) return;
+    // Jeśli brak geometrii lub materiału, usuń mesh ze sceny
+    if (!geometryNode || !materialNode) {
+      if (mesh) {
+        mesh.removeFromParent();
+      }
+      return;
+    }
 
-    let mesh = objectsRef[meshNode.id] as THREE.Mesh;
-
-    // Sprawdź czy mesh istnieje
+    // Stwórz nowy mesh jeśli nie istnieje
     if (!mesh) {
       const geometry = createGeometry(geometryNode);
       const material = createMaterial(materialNode);
       mesh = new THREE.Mesh(geometry, material);
-      objectsRef[meshNode.id] = mesh;
+      objectsRef.current[meshNode.id] = mesh;
     } else {
-      // Aktualizuj geometrię i materiał
+      // Aktualizuj geometrię
       const newGeometry = createGeometry(geometryNode);
-      const newMaterial = createMaterial(materialNode);
-
-      // Usuń starą geometrię i materiał
       mesh.geometry.dispose();
-      if (mesh.material instanceof THREE.Material) {
+      mesh.geometry = newGeometry;
+
+      // Aktualizuj materiał
+      const newMaterial = createMaterial(materialNode);
+      if (mesh.material) {
         mesh.material.dispose();
       }
-
-      // Przypisz nową geometrię i materiał
-      mesh.geometry = newGeometry;
       mesh.material = newMaterial;
     }
+
+    // Aktualizuj transformacje
+    const updateMeshTransform = (mesh: THREE.Mesh, meshNode: any) => {
+      const position = meshNode.data.connections?.position ?? meshNode.data.position;
+      const rotation = meshNode.data.connections?.rotation ?? meshNode.data.rotation;
+      const scale = meshNode.data.connections?.scale ?? meshNode.data.scale;
+
+      mesh.position.set(position.x, position.y, position.z);
+      mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+      mesh.scale.set(scale.x, scale.y, scale.z);
+    };
+    updateMeshTransform(mesh, meshNode);
 
     // Znajdź rodzica (scenę lub grupę)
     const parentEdge = edges.find(edge => edge.source === meshNode.id);
     const parentNode = nodes.find(node => node.id === parentEdge?.target);
     
-    if (parentNode?.type === 'group') {
-      const parentGroup = objectsRef[parentNode.id] as THREE.Group;
-      if (parentGroup && mesh.parent !== parentGroup) {
-        if (mesh.parent) {
-          mesh.parent.remove(mesh);
+    if (parentNode) {
+      if (parentNode.type === 'scene') {
+        if (mesh.parent !== scene) {
+          scene.add(mesh);
         }
-        parentGroup.add(mesh);
+      } else if (parentNode.type === 'group') {
+        const parentGroup = objectsRef.current[parentNode.id] as THREE.Group;
+        if (parentGroup && mesh.parent !== parentGroup) {
+          if (mesh.parent) {
+            mesh.parent.remove(mesh);
+          }
+          parentGroup.add(mesh);
+        }
       }
     } else {
       if (mesh.parent !== scene) {
-        if (mesh.parent) {
-          mesh.parent.remove(mesh);
-        }
         scene.add(mesh);
       }
     }
-
-    // Update position
-    mesh.position.set(
-      meshNode.data.position.x,
-      meshNode.data.position.y,
-      meshNode.data.position.z
-    );
-
-    // Update rotation
-    mesh.rotation.set(
-      meshNode.data.rotation.x,
-      meshNode.data.rotation.y,
-      meshNode.data.rotation.z
-    );
-
-    // Update scale
-    mesh.scale.set(
-      meshNode.data.scale.x,
-      meshNode.data.scale.y,
-      meshNode.data.scale.z
-    );
   };
 
   // Animation
