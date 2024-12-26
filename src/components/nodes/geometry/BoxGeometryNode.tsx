@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+import NumberInput from '../../inputs/NumberInput';
 
 interface BoxGeometryData {
   width: number;
@@ -9,6 +10,13 @@ interface BoxGeometryData {
   depth: number;
   onUpdate?: (id: string, data: Partial<BoxGeometryData>) => void;
   onDelete?: (id: string) => void;
+  toggleInputSelection?: (nodeId: string, field: string, type: string) => void;
+  selectedInputs?: { nodeId: string; field: string; type: string; }[];
+}
+
+interface BoxGeometryNodeProps {
+  id: string;
+  data: BoxGeometryData;
 }
 
 const inputStyles = {
@@ -40,18 +48,24 @@ const deleteButtonStyles = {
   }
 };
 
-const BoxGeometryNode = ({ data, id }: NodeProps<BoxGeometryData>) => {
+const BoxGeometryNode: React.FC<BoxGeometryNodeProps> = ({ id, data }) => {
+  const { width, height, depth, onUpdate, onDelete, toggleInputSelection, selectedInputs = [] } = data;
+
   const handleChange = (field: keyof BoxGeometryData, value: string) => {
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && data.onUpdate) {
-      data.onUpdate(id, { [field]: numValue });
+    if (!isNaN(numValue) && onUpdate) {
+      onUpdate(id, { [field]: numValue });
     }
   };
 
   const handleDelete = () => {
-    if (data.onDelete) {
-      data.onDelete(id);
+    if (onDelete) {
+      onDelete(id);
     }
+  };
+
+  const isInputSelected = (field: string) => {
+    return selectedInputs.some(input => input.nodeId === id && input.field === field);
   };
 
   return (
@@ -85,36 +99,33 @@ const BoxGeometryNode = ({ data, id }: NodeProps<BoxGeometryData>) => {
         </button>
 
         <div style={{ fontSize: '12px' }}>
-          <div style={{ marginBottom: '4px' }}>
-            <label>Width:</label>
-            <input
-              type="number"
-              value={data.width}
-              style={inputStyles}
-              step="0.1"
-              onChange={(e) => handleChange('width', e.target.value)}
-            />
-          </div>
-          <div style={{ marginBottom: '4px' }}>
-            <label>Height:</label>
-            <input
-              type="number"
-              value={data.height}
-              style={inputStyles}
-              step="0.1"
-              onChange={(e) => handleChange('height', e.target.value)}
-            />
-          </div>
-          <div style={{ marginBottom: '4px' }}>
-            <label>Depth:</label>
-            <input
-              type="number"
-              value={data.depth}
-              style={inputStyles}
-              step="0.1"
-              onChange={(e) => handleChange('depth', e.target.value)}
-            />
-          </div>
+          <NumberInput
+            label="Width"
+            value={width}
+            onChange={(value) => handleChange('width', value.toString())}
+            nodeId={id}
+            field="width"
+            onSelect={toggleInputSelection}
+            isSelected={isInputSelected('width')}
+          />
+          <NumberInput
+            label="Height"
+            value={height}
+            onChange={(value) => handleChange('height', value.toString())}
+            nodeId={id}
+            field="height"
+            onSelect={toggleInputSelection}
+            isSelected={isInputSelected('height')}
+          />
+          <NumberInput
+            label="Depth"
+            value={depth}
+            onChange={(value) => handleChange('depth', value.toString())}
+            nodeId={id}
+            field="depth"
+            onSelect={toggleInputSelection}
+            isSelected={isInputSelected('depth')}
+          />
         </div>
       </div>
 
