@@ -147,6 +147,9 @@ const nodes = {
     { type: 'mesh', label: 'Mesh', icon: '▣' },
     { type: 'group', label: 'Group', icon: '▢' },
   ],
+  Utilities: [
+    { type: 'loop', label: 'Loop', icon: '↻' },
+  ],
   'CSG Operations': [
     { type: 'subtract', label: 'Subtract Operation', icon: '⊖' },
     { type: 'intersect', label: 'Intersect Operation', icon: '⊗' },

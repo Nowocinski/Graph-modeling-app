@@ -45,6 +45,7 @@ import GroupNode from './nodes/GroupNode';
 import SubtractNode from './nodes/operation/SubtractNode';
 import IntersectNode from './nodes/operation/IntersectNode';
 import UnionNode from './nodes/operation/UnionNode';
+import LoopNode from './nodes/utility/LoopNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 
@@ -75,7 +76,8 @@ const nodeTypes: NodeTypes = {
   group: GroupNode,
   subtract: SubtractNode,
   intersect: IntersectNode,
-  union: UnionNode
+  union: UnionNode,
+  loop: LoopNode
 };
 
 // Domyślne wartości dla nowych node'ów
@@ -226,7 +228,15 @@ const defaultNodeData = {
   },
   subtract: {},
   intersect: {},
-  union: {}
+  union: {},
+  loop: {
+    iterations: 1,
+    spacing: 1,
+    direction: 'x',
+    position: { x: 0, y: 0, z: 0 },
+    rotation: { x: 0, y: 0, z: 0 },
+    scale: { x: 1, y: 1, z: 1 }
+  }
 };
 
 const defaultSceneNode: Node = {
