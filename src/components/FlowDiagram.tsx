@@ -583,10 +583,55 @@ const FlowDiagramInner = () => {
     if (selectedGraphToImport) {
       const graphToImport = loadGraph(selectedGraphToImport);
       if (graphToImport) {
-        // Adjust positions of imported nodes to avoid overlap
+        // Calculate boundaries of existing nodes
+        const existingBounds = nodes.reduce((bounds, node) => {
+          bounds.minX = Math.min(bounds.minX, node.position.x);
+          bounds.maxX = Math.max(bounds.maxX, node.position.x);
+          bounds.minY = Math.min(bounds.minY, node.position.y);
+          bounds.maxY = Math.max(bounds.maxY, node.position.y);
+          return bounds;
+        }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+        // If there are no existing nodes, use default position
+        if (existingBounds.minX === Infinity) {
+          existingBounds.minX = 0;
+          existingBounds.maxX = 0;
+          existingBounds.minY = 0;
+          existingBounds.maxY = 0;
+        }
+
+        // Calculate boundaries of imported nodes (excluding scene nodes)
+        const importBounds = graphToImport.nodes
+          .filter(node => node.type !== 'scene')
+          .reduce((bounds, node) => {
+            bounds.minX = Math.min(bounds.minX, node.position.x);
+            bounds.maxX = Math.max(bounds.maxX, node.position.x);
+            bounds.minY = Math.min(bounds.minY, node.position.y);
+            bounds.maxY = Math.max(bounds.maxY, node.position.y);
+            return bounds;
+          }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+        // Calculate offset to place imported nodes next to existing ones
+        // Add padding between existing and imported nodes
+        const PADDING = 300;
         const viewport = getViewport();
-        const offsetX = 100;
-        const offsetY = 100;
+        
+        // Determine if there's more space on the right or bottom
+        const rightSpace = viewport.width - (existingBounds.maxX - existingBounds.minX);
+        const bottomSpace = viewport.height - (existingBounds.maxY - existingBounds.minY);
+        
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (rightSpace > bottomSpace) {
+          // Place nodes to the right
+          offsetX = existingBounds.maxX + PADDING - importBounds.minX;
+          offsetY = existingBounds.minY - importBounds.minY;
+        } else {
+          // Place nodes below
+          offsetX = existingBounds.minX - importBounds.minX;
+          offsetY = existingBounds.maxY + PADDING - importBounds.minY;
+        }
 
         // Filter out scene nodes and get their IDs
         const sceneNodeIds = new Set(
