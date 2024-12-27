@@ -870,7 +870,7 @@ const FlowDiagramInner = () => {
                 type="text"
                 value={graphName}
                 onChange={(e) => setGraphName(e.target.value)}
-                placeholder="Nazwa grafu..."
+                placeholder="The name of the graph..."
                 style={{
                   width: '100%',
                   padding: '10px',
