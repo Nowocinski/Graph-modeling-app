@@ -306,7 +306,7 @@ const FlowDiagramInner = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [importSearchFilter, setImportSearchFilter] = useState('');
 
-  // Wczytaj domyślny graf przy starcie
+  // Load domyślny graf przy starcie
   useEffect(() => {
     const defaultGraph = loadGraph('default');
     if (defaultGraph) {
@@ -1032,7 +1032,7 @@ const FlowDiagramInner = () => {
                           fontWeight: 500
                         }}
                       >
-                        Wczytaj
+                        Load
                       </button>
                       {name !== 'default' && (
                         <button
@@ -1049,7 +1049,7 @@ const FlowDiagramInner = () => {
                             fontWeight: 500
                           }}
                         >
-                          Usuń
+                          Delete
                         </button>
                       )}
                     </div>
