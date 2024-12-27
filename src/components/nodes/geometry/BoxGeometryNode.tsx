@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position } from 'reactflow';
 import NumberInput from '../../inputs/NumberInput';
 
 interface BoxGeometryData {
@@ -18,15 +18,6 @@ interface BoxGeometryNodeProps {
   id: string;
   data: BoxGeometryData;
 }
-
-const inputStyles = {
-  width: '60px',
-  padding: '2px 4px',
-  fontSize: '12px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-  marginLeft: '8px'
-};
 
 const deleteButtonStyles = {
   position: 'absolute' as const,
