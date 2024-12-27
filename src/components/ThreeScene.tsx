@@ -366,7 +366,8 @@ const createMaterial = (materialNode: any): THREE.Material => {
 };
 
 export default function ThreeScene() {
-  const mountRef = useRef<HTMLDivElement>(null);
+  const { nodes, edges } = useScene();
+  const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -375,8 +376,14 @@ export default function ThreeScene() {
   const axesHelperRef = useRef<THREE.AxesHelper | null>(null);
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  
-  const { nodes, edges } = useScene();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Make scene accessible globally
+  useEffect(() => {
+    if (sceneRef.current) {
+      (window as any).__threeScene = sceneRef.current;
+    }
+  }, [sceneRef.current]);
 
   // Update dimensions
   useEffect(() => {
@@ -394,7 +401,7 @@ export default function ThreeScene() {
 
   // Initialize scene
   useEffect(() => {
-    if (!mountRef.current) return;
+    if (!containerRef.current || isInitialized) return;
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -417,11 +424,13 @@ export default function ThreeScene() {
     camera.position.set(5, 5, 5);
     camera.lookAt(0, 0, 0);
 
-    mountRef.current.appendChild(renderer.domElement);
+    containerRef.current.appendChild(renderer.domElement);
+
+    setIsInitialized(true);
 
     return () => {
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (containerRef.current && renderer.domElement) {
+        containerRef.current.removeChild(renderer.domElement);
       }
     };
   }, []);
@@ -1317,5 +1326,5 @@ export default function ThreeScene() {
     animate();
   }, []);
 
-  return <div ref={mountRef} style={sceneStyles} />;
+  return <div ref={containerRef} style={sceneStyles} />;
 }

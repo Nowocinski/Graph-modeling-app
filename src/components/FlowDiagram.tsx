@@ -48,6 +48,9 @@ import BulkEditNode from './nodes/utility/BulkEditNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 import { useGraphManager } from '../hooks/useGraphManager';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
+import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter';
+import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
@@ -305,6 +308,7 @@ const FlowDiagramInner = () => {
   const [selectedGraphToImport, setSelectedGraphToImport] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
   const [importSearchFilter, setImportSearchFilter] = useState('');
+  const [exportFormat, setExportFormat] = useState('gltf');
 
   // Load domyślny graf przy starcie
   useEffect(() => {
@@ -488,26 +492,60 @@ const FlowDiagramInner = () => {
   }, []);
 
   const handleExportGraph = useCallback(() => {
-    const graphData = {
-      nodes: nodes.map(({ id, type, position, data }) => ({
-        id,
-        type,
-        position,
-        data
-      })),
-      edges
-    };
+    const scene = (window as any).__threeScene;
+    if (!scene) {
+      console.error('Three.js scene is not available');
+      return;
+    }
 
-    const dataStr = JSON.stringify(graphData, null, 2);
-    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+    let exporter;
+    let extension;
     
-    const exportFileDefaultName = 'flow-export.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  }, [nodes, edges]);
+    switch (exportFormat) {
+      case 'gltf':
+        exporter = new GLTFExporter();
+        extension = 'gltf';
+        break;
+      case 'obj':
+        exporter = new OBJExporter();
+        extension = 'obj';
+        break;
+      case 'stl':
+        exporter = new STLExporter();
+        extension = 'stl';
+        break;
+      default:
+        return;
+    }
+
+    if (exportFormat === 'gltf') {
+      exporter.parse(
+        scene,
+        (result) => {
+          const output = JSON.stringify(result);
+          const blob = new Blob([output], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `scene.${extension}`;
+          link.click();
+          URL.revokeObjectURL(url);
+        },
+        (error) => {
+          console.error('An error occurred while exporting:', error);
+        }
+      );
+    } else {
+      const result = exporter.parse(scene);
+      const blob = new Blob([result], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `scene.${extension}`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  }, [exportFormat]);
 
   const handleResetScene = useCallback(() => {
     setNodes(initialNodes);
@@ -551,13 +589,18 @@ const FlowDiagramInner = () => {
 
   const createBulkEditNode = () => {
     const { x: viewX, y: viewY } = getViewport();
+    
+    // Pobierz środek widoku
+    const centerX = window.innerWidth / 4;
+    const centerY = window.innerHeight / 2;
+    
+    // Przekonwertuj pozycję ekranu na pozycję flow
+    const position = project({ x: centerX, y: centerY });
+
     const newNode: Node = {
       id: `bulkEdit_${Date.now()}`,
       type: 'bulkEdit',
-      position: { 
-        x: -viewX + window.innerWidth/2 - 100,
-        y: -viewY + window.innerHeight/2 - 100
-      },
+      position: position,
       data: {
         onUpdate: handleNodeUpdate,
         onIdChange: handleNodeIdChange,
@@ -1319,6 +1362,53 @@ const FlowDiagramInner = () => {
           </button>
         </div>
       )}
+
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        background: '#1e293b',
+        padding: '12px',
+        borderRadius: '8px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        zIndex: 1000,
+        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      }}>
+        <select 
+          value={exportFormat}
+          onChange={(e) => setExportFormat(e.target.value)}
+          style={{
+            background: '#334155',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            border: '1px solid #475569',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="gltf">GLTF</option>
+          <option value="obj">OBJ</option>
+          <option value="stl">STL</option>
+        </select>
+        <button
+          onClick={handleExportGraph}
+          style={{
+            background: '#3b82f6',
+            color: 'white',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+        >
+          Export Scene
+        </button>
+      </div>
 
       <ReactFlow
         nodes={nodes.map(node => ({
