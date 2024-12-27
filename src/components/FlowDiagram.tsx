@@ -789,8 +789,8 @@ const FlowDiagramInner = () => {
 
       <div style={{
         position: 'absolute',
-        left: '10px',
-        top: '10px',
+        left: '15px',
+        top: '60px',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -800,9 +800,7 @@ const FlowDiagramInner = () => {
         {/* Nazwa aktualnego grafu */}
         <div style={{
           padding: '8px',
-          background: '#1e293b',
           color: '#e2e8f0',
-          borderRadius: '4px',
           fontSize: '14px',
           fontWeight: 500
         }}>
