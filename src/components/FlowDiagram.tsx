@@ -318,6 +318,7 @@ const FlowDiagramInner = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedGraphToImport, setSelectedGraphToImport] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
+  const [importSearchFilter, setImportSearchFilter] = useState('');
 
   // Wczytaj domyślny graf przy starcie
   useEffect(() => {
@@ -1140,6 +1141,26 @@ const FlowDiagramInner = () => {
               }}>
                 Wybierz graf do zaimportowania:
               </h4>
+              <div style={{
+                marginBottom: '12px'
+              }}>
+                <input
+                  type="text"
+                  value={importSearchFilter}
+                  onChange={(e) => setImportSearchFilter(e.target.value)}
+                  placeholder="Szukaj grafu..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: '#334155',
+                    border: '1px solid #475569',
+                    borderRadius: '6px',
+                    color: '#e2e8f0',
+                    fontSize: '0.875rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
               <div style={{ 
                 border: '1px solid #475569',
                 borderRadius: '8px',
@@ -1148,6 +1169,7 @@ const FlowDiagramInner = () => {
               }}>
                 {getGraphList()
                   .filter(name => name !== currentGraph)
+                  .filter(name => name.toLowerCase().includes(importSearchFilter.toLowerCase()))
                   .map((name, index, filteredList) => (
                     <div
                       key={name}
