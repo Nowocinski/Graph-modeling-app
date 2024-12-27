@@ -51,6 +51,7 @@ import { useGraphManager } from '../hooks/useGraphManager';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import * as THREE from 'three';
 
 // Definicja typów node'ów
 const nodeTypes: NodeTypes = {
@@ -498,6 +499,22 @@ const FlowDiagramInner = () => {
       return;
     }
 
+    // Create a clone of the scene for export
+    const exportScene = scene.clone();
+    
+    // Replace MeshNormalMaterial with MeshStandardMaterial
+    exportScene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        if (object.material instanceof THREE.MeshNormalMaterial) {
+          object.material = new THREE.MeshStandardMaterial({
+            color: 0x808080,  // szary kolor
+            roughness: 0.5,
+            metalness: 0.5
+          });
+        }
+      }
+    });
+
     let exporter;
     let extension;
     
@@ -520,7 +537,7 @@ const FlowDiagramInner = () => {
 
     if (exportFormat === 'gltf') {
       exporter.parse(
-        scene,
+        exportScene,
         (result) => {
           const output = JSON.stringify(result);
           const blob = new Blob([output], { type: 'text/plain' });
@@ -536,7 +553,7 @@ const FlowDiagramInner = () => {
         }
       );
     } else {
-      const result = exporter.parse(scene);
+      const result = exporter.parse(exportScene);
       const blob = new Blob([result], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -545,6 +562,18 @@ const FlowDiagramInner = () => {
       link.click();
       URL.revokeObjectURL(url);
     }
+
+    // Clean up
+    exportScene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        if (object.material) {
+          object.material.dispose();
+        }
+        if (object.geometry) {
+          object.geometry.dispose();
+        }
+      }
+    });
   }, [exportFormat]);
 
   const handleResetScene = useCallback(() => {
