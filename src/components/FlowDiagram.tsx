@@ -1365,7 +1365,7 @@ const FlowDiagramInner = () => {
           gap: '8px'
         }}>
           <span style={{ fontSize: '1.25rem' }}>⚠️</span>
-          Niezapisane zmiany
+          Unsaved changes
         </div>
       )}
     </div>
