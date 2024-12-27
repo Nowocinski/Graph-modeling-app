@@ -827,110 +827,64 @@ const FlowDiagramInner = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          background: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          zIndex: 1000,
+          zIndex: 1000
         }}>
           <div style={{
             background: '#1e293b',
             padding: '24px',
             borderRadius: '12px',
-            width: '400px',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            overflow: 'auto',
-            position: 'relative',
-            border: '1px solid #334155'
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px'
-            }}>
+            <div style={{ marginBottom: '24px' }}>
               <h3 style={{ 
-                margin: 0,
+                margin: '0 0 16px',
                 color: '#e2e8f0',
                 fontSize: '1.25rem',
                 fontWeight: 600
               }}>
                 Zarządzaj Grafami
               </h3>
-              <button
-                onClick={() => {
-                  setIsGraphModalOpen(false);
-                  setShowOverwriteConfirm(false);
-                }}
-                disabled={isLoading}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: !isLoading ? 'pointer' : 'not-allowed',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s'
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            
-            {error && !error.includes('już istnieje') && (
-              <div style={{
-                padding: '12px',
-                marginBottom: '16px',
-                background: '#7f1d1d',
-                border: '1px solid #991b1b',
-                borderRadius: '8px',
-                color: '#fecaca',
-                fontSize: '0.875rem'
-              }}>
-                {error}
-              </div>
-            )}
-            
-            <div style={{ marginBottom: '20px' }}>
               <input
                 type="text"
                 value={graphName}
-                onChange={(e) => {
-                  setGraphName(e.target.value);
-                  setShowOverwriteConfirm(false);
-                }}
-                placeholder="Nazwa nowego grafu"
-                disabled={isLoading}
+                onChange={(e) => setGraphName(e.target.value)}
+                placeholder="Nazwa grafu..."
                 style={{
                   width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid #475569',
+                  padding: '10px',
                   background: '#334155',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
                   color: '#e2e8f0',
-                  fontSize: '0.875rem',
-                  marginBottom: '12px',
-                  outline: 'none',
-                  transition: 'all 0.2s'
+                  fontSize: '0.875rem'
                 }}
               />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
               {showOverwriteConfirm ? (
                 <div style={{
                   padding: '12px',
-                  marginBottom: '12px',
                   background: '#854d0e',
-                  border: '1px solid #a16207',
                   borderRadius: '8px',
-                  color: '#fef3c7'
+                  marginBottom: '12px'
                 }}>
-                  <div style={{ marginBottom: '8px', fontSize: '0.875rem' }}>
+                  <p style={{ 
+                    margin: '0 0 12px',
+                    color: '#fef3c7',
+                    fontSize: '0.875rem'
+                  }}>
                     Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  </p>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <button
                       onClick={() => handleSaveGraph(true)}
                       disabled={isLoading}
@@ -992,7 +946,7 @@ const FlowDiagramInner = () => {
               )}
             </div>
 
-            <div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <h4 style={{ 
                 margin: '0 0 12px',
                 color: '#e2e8f0',
@@ -1004,7 +958,8 @@ const FlowDiagramInner = () => {
               <div style={{ 
                 border: '1px solid #475569',
                 borderRadius: '8px',
-                overflow: 'hidden'
+                overflow: 'auto',
+                maxHeight: '300px'
               }}>
                 {getGraphList().map((name, index) => (
                   <div
@@ -1033,19 +988,15 @@ const FlowDiagramInner = () => {
                         style={{
                           padding: '6px 12px',
                           background: !isLoading ? '#3b82f6' : '#475569',
-                          color: '#e2e8f0',
+                          color: 'white',
                           border: 'none',
                           borderRadius: '6px',
                           cursor: !isLoading ? 'pointer' : 'not-allowed',
                           fontSize: '0.75rem',
-                          fontWeight: 500,
-                          transition: 'all 0.2s',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px'
+                          fontWeight: 500
                         }}
                       >
-                        <span>📂</span> Wczytaj
+                        Wczytaj
                       </button>
                       {name !== 'default' && (
                         <button
@@ -1053,20 +1004,16 @@ const FlowDiagramInner = () => {
                           disabled={isLoading}
                           style={{
                             padding: '6px 12px',
-                            background: !isLoading ? '#dc2626' : '#475569',
-                            color: '#e2e8f0',
+                            background: !isLoading ? '#ef4444' : '#475569',
+                            color: 'white',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: !isLoading ? 'pointer' : 'not-allowed',
                             fontSize: '0.75rem',
-                            fontWeight: 500,
-                            transition: 'all 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px'
+                            fontWeight: 500
                           }}
                         >
-                          <span>🗑️</span> Usuń
+                          Usuń
                         </button>
                       )}
                     </div>
