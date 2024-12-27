@@ -843,15 +843,41 @@ const FlowDiagramInner = () => {
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ 
-                margin: '0 0 16px',
+                margin: '0',
                 color: '#e2e8f0',
                 fontSize: '1.25rem',
                 fontWeight: 600
               }}>
                 Zarządzaj Grafami
               </h3>
+              <button
+                onClick={() => {
+                  setIsGraphModalOpen(false);
+                  setShowOverwriteConfirm(false);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  fontSize: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'color 0.2s',
+                  ':hover': {
+                    color: '#e2e8f0'
+                  }
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
               <input
                 type="text"
                 value={graphName}
