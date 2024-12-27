@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import NumberInput from '../inputs/NumberInput';
 
 interface SceneData {
   backgroundColor: string;
