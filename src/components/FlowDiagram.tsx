@@ -1125,7 +1125,7 @@ const FlowDiagramInner = () => {
                 fontSize: '1rem',
                 fontWeight: 500
               }}>
-                Wybierz graf do zaimportowania:
+                Select a graph to import:
               </h4>
               <div style={{
                 marginBottom: '12px'
