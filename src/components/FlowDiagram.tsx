@@ -802,7 +802,6 @@ const FlowDiagramInner = () => {
             background: '#1e293b',
             padding: '24px',
             borderRadius: '12px',
-            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
             width: '400px',
             maxWidth: '90vw',
             maxHeight: '90vh',
@@ -1059,21 +1058,36 @@ const FlowDiagramInner = () => {
         }}>
           <div style={{
             background: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '400px'
+            padding: '24px',
+            borderRadius: '12px',
+            width: '450px',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
           }}>
-            <h3 style={{ marginTop: 0 }}>Importuj Graf</h3>
-            <p>Wybierz graf do zaimportowania do obecnego grafu:</p>
+            <h3 style={{ 
+              marginTop: 0, 
+              fontSize: '24px', 
+              color: '#1e293b',
+              marginBottom: '16px'
+            }}>Importuj Graf</h3>
+            <p style={{
+              color: '#475569',
+              marginBottom: '12px',
+              fontSize: '16px'
+            }}>Wybierz graf do zaimportowania do obecnego grafu:</p>
             <select
               value={selectedGraphToImport}
               onChange={(e) => setSelectedGraphToImport(e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px',
-                marginBottom: '16px',
-                borderRadius: '4px',
-                border: '1px solid #e2e8f0'
+                padding: '10px 12px',
+                marginBottom: '20px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                fontSize: '16px',
+                color: '#334155',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                cursor: 'pointer'
               }}
             >
               <option value="">Wybierz graf...</option>
@@ -1081,18 +1095,25 @@ const FlowDiagramInner = () => {
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button
                 onClick={() => {
                   setIsImportModalOpen(false);
                   setSelectedGraphToImport('');
                 }}
                 style={{
-                  padding: '8px 16px',
-                  background: '#e2e8f0',
+                  padding: '10px 20px',
+                  background: '#f1f5f9',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  color: '#475569',
+                  fontWeight: '500',
+                  transition: 'background 0.2s',
+                  ':hover': {
+                    background: '#e2e8f0'
+                  }
                 }}
               >
                 Anuluj
@@ -1101,12 +1122,18 @@ const FlowDiagramInner = () => {
                 onClick={handleImportGraph}
                 disabled={!selectedGraphToImport}
                 style={{
-                  padding: '8px 16px',
-                  background: selectedGraphToImport ? '#10b981' : '#e2e8f0',
-                  color: selectedGraphToImport ? 'white' : '#666',
+                  padding: '10px 20px',
+                  background: selectedGraphToImport ? '#0ea5e9' : '#e2e8f0',
+                  color: selectedGraphToImport ? 'white' : '#94a3b8',
                   border: 'none',
-                  borderRadius: '4px',
-                  cursor: selectedGraphToImport ? 'pointer' : 'not-allowed'
+                  borderRadius: '6px',
+                  cursor: selectedGraphToImport ? 'pointer' : 'not-allowed',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  transition: 'background 0.2s',
+                  ':hover': {
+                    background: selectedGraphToImport ? '#0284c7' : '#e2e8f0'
+                  }
                 }}
               >
                 Importuj
