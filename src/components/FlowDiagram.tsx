@@ -896,7 +896,7 @@ const FlowDiagramInner = () => {
                     color: '#fef3c7',
                     fontSize: '0.875rem'
                   }}>
-                    Graf o tej nazwie już istnieje. Czy chcesz go nadpisać?
+                    A graph with this name already exists. Do you want to overwrite it?
                   </p>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <button
@@ -913,7 +913,7 @@ const FlowDiagramInner = () => {
                         fontWeight: 500
                       }}
                     >
-                      Nadpisz
+                      Overwrite
                     </button>
                     <button
                       onClick={() => setShowOverwriteConfirm(false)}
