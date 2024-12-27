@@ -838,7 +838,7 @@ const FlowDiagramInner = () => {
                 fontSize: '1.25rem',
                 fontWeight: 600
               }}>
-                Zarządzaj Grafami
+                Manage Graphs
               </h3>
               <button
                 onClick={() => {
