@@ -967,7 +967,7 @@ const FlowDiagramInner = () => {
                 fontSize: '1rem',
                 fontWeight: 500
               }}>
-                Zapisane grafy:
+                Saved Graphs:
               </h4>
               <div style={{
                 marginBottom: '12px'
@@ -976,7 +976,7 @@ const FlowDiagramInner = () => {
                   type="text"
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
-                  placeholder="Szukaj grafu..."
+                  placeholder="Look for a graph..."
                   style={{
                     width: '100%',
                     padding: '8px 12px',
