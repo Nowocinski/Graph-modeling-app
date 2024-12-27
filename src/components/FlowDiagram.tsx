@@ -677,6 +677,8 @@ const FlowDiagramInner = () => {
             padding: '10px',
             pointerEvents: 'none' as const, // Make the border non-interactive
             zIndex: -1, // Place behind other nodes
+            color: '#fff',
+            fontSize: '30px'
           },
           data: {
             label: `Imported from: ${selectedGraphToImport}`,
