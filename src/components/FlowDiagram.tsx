@@ -1134,7 +1134,7 @@ const FlowDiagramInner = () => {
                   type="text"
                   value={importSearchFilter}
                   onChange={(e) => setImportSearchFilter(e.target.value)}
-                  placeholder="Szukaj grafu..."
+                  placeholder="Search graph..."
                   style={{
                     width: '100%',
                     padding: '8px 12px',
