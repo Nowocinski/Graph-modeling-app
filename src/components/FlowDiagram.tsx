@@ -1216,7 +1216,7 @@ const FlowDiagramInner = () => {
                   fontWeight: 500
                 }}
               >
-                Importuj
+                Import
               </button>
             </div>
           </div>
