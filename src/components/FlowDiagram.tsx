@@ -1091,7 +1091,7 @@ const FlowDiagramInner = () => {
                 fontSize: '1.25rem',
                 fontWeight: 600
               }}>
-                Importuj Graf
+                Import Graph
               </h3>
               <button
                 onClick={() => {
