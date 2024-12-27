@@ -754,7 +754,7 @@ export default function ThreeScene() {
 
       // Update parent
       if (parentNode?.type === 'group') {
-        const parentGroup = objectsRef[meshNode.id] as THREE.Group;
+        const parentGroup = objectsRef[parentEdge.target] as THREE.Group;
         if (parentGroup && resultMesh.parent !== parentGroup) {
           if (resultMesh.parent) {
             resultMesh.parent.remove(resultMesh);
@@ -922,7 +922,7 @@ export default function ThreeScene() {
 
       // Update parent
       if (parentNode?.type === 'group') {
-        const parentGroup = objectsRef[parentNode.id] as THREE.Group;
+        const parentGroup = objectsRef[parentEdge.target] as THREE.Group;
         if (parentGroup && resultMesh.parent !== parentGroup) {
           if (resultMesh.parent) {
             resultMesh.parent.remove(resultMesh);
@@ -1083,7 +1083,7 @@ export default function ThreeScene() {
 
       // Update parent
       if (parentNode?.type === 'group') {
-        const parentGroup = objectsRef[parentNode.id] as THREE.Group;
+        const parentGroup = objectsRef[parentEdge.target] as THREE.Group;
         if (parentGroup && resultMesh.parent !== parentGroup) {
           if (resultMesh.parent) {
             resultMesh.parent.remove(resultMesh);
