@@ -955,7 +955,7 @@ const FlowDiagramInner = () => {
                   }}
                 >
                   {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
-                  Zapisz jako nowy graf
+                  Save as a new graph
                 </button>
               )}
             </div>
