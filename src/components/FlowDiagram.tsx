@@ -1084,10 +1084,11 @@ const FlowDiagramInner = () => {
                 borderRadius: '6px',
                 border: '1px solid #cbd5e1',
                 fontSize: '16px',
-                color: '#334155',
+                color: '#ffffff',
                 outline: 'none',
-                transition: 'border-color 0.2s',
-                cursor: 'pointer'
+                transition: 'all 0.2s',
+                cursor: 'pointer',
+                appearance: 'auto'
               }}
             >
               <option value="">Wybierz graf...</option>
