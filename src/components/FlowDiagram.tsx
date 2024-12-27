@@ -536,21 +536,38 @@ const FlowDiagramInner = () => {
     }
 
     if (exportFormat === 'gltf') {
+      const options = {
+        binary: true, // eksportuj jako GLB (bardziej skompresowany format binarny)
+        embedImages: true, // osadź tekstury w pliku
+        precision: 3, // zmniejsz precyzję liczb zmiennoprzecinkowych
+        onlyVisible: true, // eksportuj tylko widoczne obiekty
+        trs: false, // nie używaj osobnych transformacji (translation, rotation, scale)
+        forceIndices: true, // wymuś indeksowanie geometrii
+        truncateDrawRange: true, // przytnij zakres rysowania do faktycznie używanych wierzchołków
+        includeCustomExtensions: false, // nie dołączaj niestandardowych rozszerzeń
+      };
+
       exporter.parse(
         exportScene,
         (result) => {
-          const output = JSON.stringify(result);
-          const blob = new Blob([output], { type: 'text/plain' });
+          let blob;
+          if (options.binary) {
+            blob = new Blob([result], { type: 'application/octet-stream' });
+          } else {
+            const output = JSON.stringify(result);
+            blob = new Blob([output], { type: 'text/plain' });
+          }
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `scene.${extension}`;
+          link.download = `scene.${options.binary ? 'glb' : 'gltf'}`;
           link.click();
           URL.revokeObjectURL(url);
         },
         (error) => {
           console.error('An error occurred while exporting:', error);
-        }
+        },
+        options
       );
     } else {
       const result = exporter.parse(exportScene);
