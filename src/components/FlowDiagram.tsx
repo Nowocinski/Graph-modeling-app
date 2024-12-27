@@ -749,7 +749,7 @@ const FlowDiagramInner = () => {
             gap: '6px'
           }}
         >
-          <span>📦</span> Importuj
+          <span>📦</span> Import
         </button>
         <button
           onClick={handleExportGraph}
