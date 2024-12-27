@@ -732,7 +732,7 @@ const FlowDiagramInner = () => {
             gap: '6px'
           }}
         >
-          <span>💾</span> Zapisz/Wczytaj
+          <span>💾</span> Save/Load
         </button>
         <button
           onClick={() => setIsImportModalOpen(true)}
