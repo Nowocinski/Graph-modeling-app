@@ -372,6 +372,8 @@ export default function ThreeScene() {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const objectsRef = useRef<{ [key: string]: THREE.Object3D }>({});
+  const axesHelperRef = useRef<THREE.AxesHelper | null>(null);
+  const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   
   const { nodes, edges } = useScene();
@@ -610,6 +612,29 @@ export default function ThreeScene() {
       // Standardowa obsługa zwykłych meshy
       processMeshNode(meshNode, scene);
     });
+
+    // Obsługa AxesHelper i GridHelper
+    if (sceneNode) {
+      // AxesHelper
+      if (sceneNode.data.showAxesHelper && !axesHelperRef.current) {
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
+        axesHelperRef.current = axesHelper;
+      } else if (!sceneNode.data.showAxesHelper && axesHelperRef.current) {
+        scene.remove(axesHelperRef.current);
+        axesHelperRef.current = null;
+      }
+
+      // GridHelper
+      if (sceneNode.data.showGridHelper && !gridHelperRef.current) {
+        const gridHelper = new THREE.GridHelper(10, 10);
+        scene.add(gridHelper);
+        gridHelperRef.current = gridHelper;
+      } else if (!sceneNode.data.showGridHelper && gridHelperRef.current) {
+        scene.remove(gridHelperRef.current);
+        gridHelperRef.current = null;
+      }
+    }
   }, [nodes, edges]);
 
   // Funkcja obsługująca operację subtract
@@ -729,7 +754,7 @@ export default function ThreeScene() {
 
       // Update parent
       if (parentNode?.type === 'group') {
-        const parentGroup = objectsRef[parentNode.id] as THREE.Group;
+        const parentGroup = objectsRef[meshNode.id] as THREE.Group;
         if (parentGroup && resultMesh.parent !== parentGroup) {
           if (resultMesh.parent) {
             resultMesh.parent.remove(resultMesh);

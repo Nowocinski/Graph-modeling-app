@@ -90,6 +90,14 @@ const defaultNodeData = {
     height: 1,
     depth: 1
   },
+  scene: {
+    backgroundColor: '#ffffff',
+    ambientLightIntensity: 0.5,
+    pointLightIntensity: 1,
+    pointLightPosition: { x: 0, y: 0, z: 0 },
+    showAxesHelper: false,
+    showGridHelper: false
+  },
   sphereGeometry: {
     radius: 1,
     widthSegments: 32,
@@ -216,12 +224,6 @@ const defaultNodeData = {
     position: { x: 0, y: 0, z: 0 },
     rotation: { x: 0, y: 0, z: 0 },
     scale: { x: 1, y: 1, z: 1 }
-  },
-  scene: {
-    backgroundColor: '#e0e0e0',
-    ambientLightIntensity: 0.5,
-    pointLightIntensity: 1.0,
-    pointLightPosition: { x: 5, y: 5, z: 5 }
   },
   group: {
     name: 'Group',
