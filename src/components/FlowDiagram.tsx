@@ -938,6 +938,441 @@ const FlowDiagramInner = () => {
 
       <div style={{
         position: 'absolute',
+        left: '15px',
+        top: '60px',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      }}>
+        {/* Nazwa aktualnego grafu */}
+        <div style={{
+          padding: '8px',
+          color: '#e2e8f0',
+          fontSize: '14px',
+          fontWeight: 500
+        }}>
+          Graf: {currentGraph || 'default'}
+        </div>
+      </div>
+
+      {isGraphModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#1e293b',
+            padding: '24px',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ 
+                margin: '0',
+                color: '#e2e8f0',
+                fontSize: '1.25rem',
+                fontWeight: 600
+              }}>
+                Manage Graphs
+              </h3>
+              <button
+                onClick={() => {
+                  setIsGraphModalOpen(false);
+                  setShowOverwriteConfirm(false);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  fontSize: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'color 0.2s',
+                  ':hover': {
+                    color: '#e2e8f0'
+                  }
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <input
+                type="text"
+                value={graphName}
+                onChange={(e) => setGraphName(e.target.value)}
+                placeholder="The name of the graph..."
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  background: '#334155',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#e2e8f0',
+                  fontSize: '0.875rem'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              {showOverwriteConfirm ? (
+                <div style={{
+                  padding: '12px',
+                  background: '#854d0e',
+                  borderRadius: '8px',
+                  marginBottom: '12px'
+                }}>
+                  <p style={{ 
+                    margin: '0 0 12px',
+                    color: '#fef3c7',
+                    fontSize: '0.875rem'
+                  }}>
+                    A graph with this name already exists. Do you want to overwrite it?
+                  </p>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => handleSaveGraph(true)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: !isLoading ? '#b45309' : '#475569',
+                        color: '#fef3c7',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Overwrite
+                    </button>
+                    <button
+                      onClick={() => setShowOverwriteConfirm(false)}
+                      disabled={isLoading}
+                      style={{
+                        padding: '6px 12px',
+                        background: 'transparent',
+                        color: '#fef3c7',
+                        border: '1px solid #fef3c7',
+                        borderRadius: '6px',
+                        cursor: !isLoading ? 'pointer' : 'not-allowed',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleSaveGraph(false)}
+                  disabled={!graphName.trim() || isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: graphName.trim() && !isLoading ? '#3b82f6' : '#475569',
+                    color: '#e2e8f0',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: graphName.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {isLoading && <span style={{ width: '16px', height: '16px' }} className="spinner" />}
+                  Save as a new graph
+                </button>
+              )}
+            </div>
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <h4 style={{ 
+                margin: '0 0 12px',
+                color: '#e2e8f0',
+                fontSize: '1rem',
+                fontWeight: 500
+              }}>
+                Saved Graphs:
+              </h4>
+              <div style={{
+                marginBottom: '12px'
+              }}>
+                <input
+                  type="text"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  placeholder="Look for a graph..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: '#334155',
+                    border: '1px solid #475569',
+                    borderRadius: '6px',
+                    color: '#e2e8f0',
+                    fontSize: '0.875rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              <div style={{ 
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                overflow: 'auto',
+                maxHeight: '300px'
+              }}>
+                {getGraphList()
+                  .filter(name => name.toLowerCase().includes(searchFilter.toLowerCase()))
+                  .map((name, index, filteredList) => (
+                  <div
+                    key={name}
+                    style={{
+                      padding: '12px',
+                      borderBottom: index < filteredList.length - 1 ? '1px solid #475569' : 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: '#334155',
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}>
+                      {name}
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => handleLoadGraph(name)}
+                        disabled={isLoading}
+                        style={{
+                          padding: '6px 12px',
+                          background: !isLoading ? '#3b82f6' : '#475569',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: !isLoading ? 'pointer' : 'not-allowed',
+                          fontSize: '0.75rem',
+                          fontWeight: 500
+                        }}
+                      >
+                        Load
+                      </button>
+                      {name !== 'default' && (
+                        <button
+                          onClick={() => deleteGraph(name)}
+                          disabled={isLoading}
+                          style={{
+                            padding: '6px 12px',
+                            background: !isLoading ? '#ef4444' : '#475569',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: !isLoading ? 'pointer' : 'not-allowed',
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImportModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#1e293b',
+            padding: '24px',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ 
+                margin: '0',
+                color: '#e2e8f0',
+                fontSize: '1.25rem',
+                fontWeight: 600
+              }}>
+                Import Graph
+              </h3>
+              <button
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setSelectedGraphToImport('');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  fontSize: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'color 0.2s',
+                  ':hover': {
+                    color: '#e2e8f0'
+                  }
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <h4 style={{ 
+                margin: '0 0 12px',
+                color: '#e2e8f0',
+                fontSize: '1rem',
+                fontWeight: 500
+              }}>
+                Select a graph to import:
+              </h4>
+              <div style={{
+                marginBottom: '12px'
+              }}>
+                <input
+                  type="text"
+                  value={importSearchFilter}
+                  onChange={(e) => setImportSearchFilter(e.target.value)}
+                  placeholder="Search graph..."
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: '#334155',
+                    border: '1px solid #475569',
+                    borderRadius: '6px',
+                    color: '#e2e8f0',
+                    fontSize: '0.875rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              <div style={{ 
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                overflow: 'auto',
+                maxHeight: '300px'
+              }}>
+                {getGraphList()
+                  .filter(name => name !== currentGraph)
+                  .filter(name => name.toLowerCase().includes(importSearchFilter.toLowerCase()))
+                  .map((name, index, filteredList) => (
+                    <div
+                      key={name}
+                      onClick={() => setSelectedGraphToImport(name)}
+                      style={{
+                        padding: '12px',
+                        borderBottom: index < filteredList.length - 1 ? '1px solid #475569' : 'none',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: selectedGraphToImport === name ? '#475569' : '#334155',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                    >
+                      <span style={{ 
+                        color: '#e2e8f0',
+                        fontSize: '0.875rem',
+                        fontWeight: 500
+                      }}>
+                        {name}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setSelectedGraphToImport('');
+                }}
+                style={{
+                  padding: '10px 20px',
+                  background: '#475569',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: '#e2e8f0',
+                  fontWeight: 500
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleImportGraph}
+                disabled={!selectedGraphToImport}
+                style={{
+                  padding: '10px 20px',
+                  background: selectedGraphToImport ? '#3b82f6' : '#475569',
+                  color: selectedGraphToImport ? '#ffffff' : '#94a3b8',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: selectedGraphToImport ? 'pointer' : 'not-allowed',
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}
+              >
+                Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{
+        position: 'absolute',
         top: '20px',
         right: '20px',
         zIndex: 4,
