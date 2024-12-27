@@ -48,9 +48,9 @@ import BulkEditNode from './nodes/utility/BulkEditNode';
 import NodeSelector from './NodeSelector';
 import { useScene } from '../context/SceneContext';
 import { useGraphManager } from '../hooks/useGraphManager';
-import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
-import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter';
-import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import * as THREE from 'three';
 
 // Definicja typów node'ów
