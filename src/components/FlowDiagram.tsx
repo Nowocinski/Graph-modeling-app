@@ -1352,6 +1352,8 @@ const FlowDiagramInner = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onEdgeClick={onEdgeClick}
+        minZoom={0.1}
+        maxZoom={4}
         fitView
       >
         <Background />
