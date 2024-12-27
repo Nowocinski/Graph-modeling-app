@@ -430,20 +430,32 @@ const FlowDiagramInner = () => {
     const targetNode = nodes.find(node => node.id === params.target);
 
     if (sourceNode && targetNode) {
-      // Aktualizuj target node z danymi ze source node
-      const sourceData = sourceNode.data;
-      const targetData = { ...targetNode.data };
-
+      // Najpierw usuń istniejące połączenia dla danego handleType
       if (params.targetHandle === 'geometry' && sourceNode.type.includes('Geometry')) {
-        targetData.geometry = sourceData;
+        // Usuń istniejące połączenie geometry
+        setEdges(eds => eds.filter(edge => 
+          !(edge.target === params.target && edge.targetHandle === 'geometry')
+        ));
+        
+        // Aktualizuj target node
+        const targetData = { ...targetNode.data };
+        targetData.geometry = sourceNode.data;
+        handleNodeUpdate(targetNode.id, targetData);
       } else if (params.targetHandle === 'material' && sourceNode.type.includes('Material')) {
-        targetData.material = sourceData;
+        // Usuń istniejące połączenie material
+        setEdges(eds => eds.filter(edge => 
+          !(edge.target === params.target && edge.targetHandle === 'material')
+        ));
+        
+        // Aktualizuj target node
+        const targetData = { ...targetNode.data };
+        targetData.material = sourceNode.data;
+        handleNodeUpdate(targetNode.id, targetData);
       }
 
-      handleNodeUpdate(targetNode.id, targetData);
+      // Dodaj nowe połączenie
+      setEdges((eds) => addEdge(params, eds));
     }
-
-    setEdges((eds) => addEdge(params, eds));
   }, [nodes, handleNodeUpdate]);
 
   const onNodesChange = useCallback(
