@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ReactFlow, { 
   Node, 
   Edge, 
@@ -11,11 +11,9 @@ import ReactFlow, {
   NodeChange,
   addEdge,
   Connection,
-  Edge as FlowEdge,
   applyEdgeChanges,
   EdgeChange,
   ReactFlowProvider,
-  ReactFlowInstance,
   useReactFlow
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -292,18 +290,6 @@ const initialEdges: Edge[] = [
   { id: 'e2-3', source: 'meshNormalMaterial_1', target: 'mesh_1', targetHandle: 'material' },
   { id: 'e3-4', source: 'mesh_1', target: 'scene' }
 ];
-
-const flowStyles = {
-  width: '100%',
-  height: '100vh'
-};
-
-// Style do ukrycia linku reactflow.dev
-const customStyles = `
-  .react-flow__node {
-    width: fit-content;
-  }
-`;
 
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
