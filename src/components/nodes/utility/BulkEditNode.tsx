@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Handle, Position } from 'reactflow';
 import NumberInput from '../../inputs/NumberInput';
 
 interface BulkEditNodeProps {
