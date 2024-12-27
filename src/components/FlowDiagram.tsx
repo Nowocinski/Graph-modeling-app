@@ -787,6 +787,29 @@ const FlowDiagramInner = () => {
         </button>
       </div>
 
+      <div style={{
+        position: 'absolute',
+        left: '10px',
+        top: '10px',
+        zIndex: 1000,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      }}>
+
+        {/* Nazwa aktualnego grafu */}
+        <div style={{
+          padding: '8px',
+          background: '#1e293b',
+          color: '#e2e8f0',
+          borderRadius: '4px',
+          fontSize: '14px',
+          fontWeight: 500
+        }}>
+          Graf: {currentGraph || 'default'}
+        </div>
+      </div>
+
       {isGraphModalOpen && (
         <div style={{
           position: 'fixed',
