@@ -929,7 +929,7 @@ const FlowDiagramInner = () => {
                         fontWeight: 500
                       }}
                     >
-                      Anuluj
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -1200,7 +1200,7 @@ const FlowDiagramInner = () => {
                   fontWeight: 500
                 }}
               >
-                Anuluj
+                Cancel
               </button>
               <button
                 onClick={handleImportGraph}
@@ -1299,7 +1299,7 @@ const FlowDiagramInner = () => {
                   fontSize: '14px'
                 }}
               >
-                Anuluj
+                Cancel
               </button>
             </>
           )}
