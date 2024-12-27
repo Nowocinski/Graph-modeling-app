@@ -13,6 +13,8 @@ interface SceneData {
     y: number;
     z: number;
   };
+  showAxesHelper: boolean;
+  showGridHelper: boolean;
   onUpdate?: (id: string, data: Partial<SceneData>) => void;
 }
 
@@ -20,7 +22,9 @@ const defaultValues = {
   backgroundColor: '#ffffff',
   ambientLightIntensity: 0.5,
   pointLightIntensity: 1,
-  pointLightPosition: { x: 0, y: 0, z: 0 }
+  pointLightPosition: { x: 0, y: 0, z: 0 },
+  showAxesHelper: false,
+  showGridHelper: false
 };
 
 const inputStyles = {
@@ -93,6 +97,8 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
     ambientLightIntensity = defaultValues.ambientLightIntensity,
     pointLightIntensity = defaultValues.pointLightIntensity,
     pointLightPosition = defaultValues.pointLightPosition,
+    showAxesHelper = defaultValues.showAxesHelper,
+    showGridHelper = defaultValues.showGridHelper,
     onUpdate
   } = data;
 
@@ -163,6 +169,28 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
           values={pointLightPosition}
           onChange={(axis, value) => handleChange('pointLightPosition', { [axis]: value })}
         />
+
+        <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            id="axesHelper"
+            checked={showAxesHelper}
+            onChange={(e) => handleChange('showAxesHelper', e.target.checked)}
+            style={{ marginRight: '8px' }}
+          />
+          <label htmlFor="axesHelper" style={{ cursor: 'pointer' }}>Show Axes Helper</label>
+        </div>
+
+        <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            id="gridHelper"
+            checked={showGridHelper}
+            onChange={(e) => handleChange('showGridHelper', e.target.checked)}
+            style={{ marginRight: '8px' }}
+          />
+          <label htmlFor="gridHelper" style={{ cursor: 'pointer' }}>Show Grid Helper</label>
+        </div>
       </div>
     </div>
   );
