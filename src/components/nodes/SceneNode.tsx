@@ -6,7 +6,6 @@ import { Handle, Position, NodeProps } from 'reactflow';
 interface SceneData {
   backgroundColor: string;
   ambientLightIntensity: number;
-  pointLightIntensity: number;
   showAxesHelper: boolean;
   showGridHelper: boolean;
   onUpdate?: (id: string, data: Partial<SceneData>) => void;
@@ -15,7 +14,6 @@ interface SceneData {
 const defaultValues = {
   backgroundColor: '#ffffff',
   ambientLightIntensity: 0.5,
-  pointLightIntensity: 1,
   showAxesHelper: false,
   showGridHelper: false
 };
@@ -42,7 +40,6 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
   const {
     backgroundColor = defaultValues.backgroundColor,
     ambientLightIntensity = defaultValues.ambientLightIntensity,
-    pointLightIntensity = defaultValues.pointLightIntensity,
     showAxesHelper = defaultValues.showAxesHelper,
     showGridHelper = defaultValues.showGridHelper,
     onUpdate
@@ -86,18 +83,6 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
             min="0"
             max="1"
             onChange={(e) => handleChange('ambientLightIntensity', parseFloat(e.target.value))}
-          />
-        </div>
-
-        <div style={{ marginBottom: '8px' }}>
-          <label>Point Light Intensity:</label>
-          <input
-            type="number"
-            value={pointLightIntensity}
-            style={inputStyles}
-            step="0.1"
-            min="0"
-            onChange={(e) => handleChange('pointLightIntensity', parseFloat(e.target.value))}
           />
         </div>
 

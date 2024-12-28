@@ -96,7 +96,6 @@ const defaultNodeData = {
   },
   scene: {
     backgroundColor: '#ffffff',
-    ambientLightIntensity: 0.5,
     showAxesHelper: false,
     showGridHelper: false
   },
@@ -266,7 +265,6 @@ const defaultSceneNode: Node = {
   position: { x: 900, y: 200 },
   data: {
     backgroundColor: '#f0f0f0',
-    ambientLightIntensity: 0.5,
     showAxesHelper: false,
     showGridHelper: false
   }
