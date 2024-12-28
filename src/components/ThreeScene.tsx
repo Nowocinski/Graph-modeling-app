@@ -57,9 +57,9 @@ const buttonStyle = {
 const getButtonStyle = (view: 'top' | 'bottom' | 'left' | 'right' | 'center', activeView: 'top' | 'bottom' | 'left' | 'right' | 'center') => ({
   ...buttonStyle,
   gridArea: view,
-  backgroundColor: activeView === view ? '#000080' : '#ffffff', // granatowy gdy aktywny
+  backgroundColor: activeView === view ? '#ff377e' : '#ffffff', // różowy gdy aktywny
   color: activeView === view ? '#ffffff' : '#333333', // biały tekst gdy aktywny
-  borderColor: activeView === view ? '#000080' : '#cccccc'
+  borderColor: activeView === view ? '#ee266d' : '#cccccc'
 });
 
 const topButtonStyle = { ...buttonStyle, gridArea: 'top' };
