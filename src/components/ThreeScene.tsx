@@ -573,18 +573,13 @@ export default function ThreeScene() {
     if (sceneNode) {
       scene.background = new THREE.Color(sceneNode.data.backgroundColor);
       
-      // Update lights
+      // Update ambient light
       scene.children
-        .filter(child => child.type.includes('Light'))
-        .forEach(child => scene.remove(child));
+        .filter(child => child instanceof THREE.AmbientLight)
+        .forEach(light => scene.remove(light));
 
       const ambientLight = new THREE.AmbientLight(0xffffff, sceneNode.data.ambientLightIntensity);
       scene.add(ambientLight);
-
-      const pointLight = new THREE.PointLight(0xffffff, sceneNode.data.pointLightIntensity);
-      const { x, y, z } = sceneNode.data.pointLightPosition;
-      pointLight.position.set(x, y, z);
-      scene.add(pointLight);
     }
 
     // Clean up removed or disconnected objects

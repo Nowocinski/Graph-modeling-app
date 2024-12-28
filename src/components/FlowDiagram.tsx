@@ -97,8 +97,6 @@ const defaultNodeData = {
   scene: {
     backgroundColor: '#ffffff',
     ambientLightIntensity: 0.5,
-    pointLightIntensity: 1,
-    pointLightPosition: { x: 0, y: 0, z: 0 },
     showAxesHelper: false,
     showGridHelper: false
   },
@@ -269,8 +267,8 @@ const defaultSceneNode: Node = {
   data: {
     backgroundColor: '#f0f0f0',
     ambientLightIntensity: 0.5,
-    pointLightIntensity: 0.8,
-    pointLightPosition: { x: 10, y: 10, z: 10 }
+    showAxesHelper: false,
+    showGridHelper: false
   }
 };
 

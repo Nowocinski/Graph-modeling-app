@@ -7,11 +7,6 @@ interface SceneData {
   backgroundColor: string;
   ambientLightIntensity: number;
   pointLightIntensity: number;
-  pointLightPosition: {
-    x: number;
-    y: number;
-    z: number;
-  };
   showAxesHelper: boolean;
   showGridHelper: boolean;
   onUpdate?: (id: string, data: Partial<SceneData>) => void;
@@ -21,7 +16,6 @@ const defaultValues = {
   backgroundColor: '#ffffff',
   ambientLightIntensity: 0.5,
   pointLightIntensity: 1,
-  pointLightPosition: { x: 0, y: 0, z: 0 },
   showAxesHelper: false,
   showGridHelper: false
 };
@@ -44,58 +38,11 @@ const colorInputStyles = {
   marginLeft: '8px'
 };
 
-const Vector3Input = ({ 
-  label, 
-  values, 
-  onChange 
-}: { 
-  label: string; 
-  values: { x: number; y: number; z: number }; 
-  onChange: (axis: 'x' | 'y' | 'z', value: number) => void;
-}) => (
-  <div style={{ marginBottom: '8px' }}>
-    <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{label}:</div>
-    <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
-      <div>
-        <label style={{ fontSize: '11px' }}>X:</label>
-        <input
-          type="number"
-          value={values.x}
-          style={inputStyles}
-          step="0.1"
-          onChange={(e) => onChange('x', parseFloat(e.target.value) || 0)}
-        />
-      </div>
-      <div>
-        <label style={{ fontSize: '11px' }}>Y:</label>
-        <input
-          type="number"
-          value={values.y}
-          style={inputStyles}
-          step="0.1"
-          onChange={(e) => onChange('y', parseFloat(e.target.value) || 0)}
-        />
-      </div>
-      <div>
-        <label style={{ fontSize: '11px' }}>Z:</label>
-        <input
-          type="number"
-          value={values.z}
-          style={inputStyles}
-          step="0.1"
-          onChange={(e) => onChange('z', parseFloat(e.target.value) || 0)}
-        />
-      </div>
-    </div>
-  </div>
-);
-
 const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
   const {
     backgroundColor = defaultValues.backgroundColor,
     ambientLightIntensity = defaultValues.ambientLightIntensity,
     pointLightIntensity = defaultValues.pointLightIntensity,
-    pointLightPosition = defaultValues.pointLightPosition,
     showAxesHelper = defaultValues.showAxesHelper,
     showGridHelper = defaultValues.showGridHelper,
     onUpdate
@@ -103,16 +50,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
 
   const handleChange = (field: string, value: any) => {
     if (onUpdate) {
-      if (field === 'pointLightPosition') {
-        onUpdate(id, {
-          pointLightPosition: {
-            ...data.pointLightPosition,
-            ...value
-          }
-        });
-      } else {
-        onUpdate(id, { [field]: value });
-      }
+      onUpdate(id, { [field]: value });
     }
   };
 
@@ -162,12 +100,6 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
             onChange={(e) => handleChange('pointLightIntensity', parseFloat(e.target.value))}
           />
         </div>
-
-        <Vector3Input
-          label="Point Light Position"
-          values={pointLightPosition}
-          onChange={(axis, value) => handleChange('pointLightPosition', { [axis]: value })}
-        />
 
         <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
           <input
