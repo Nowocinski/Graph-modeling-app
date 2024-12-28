@@ -54,6 +54,14 @@ const buttonStyle = {
   }
 };
 
+const getButtonStyle = (view: 'top' | 'bottom' | 'left' | 'right' | 'center', activeView: 'top' | 'bottom' | 'left' | 'right' | 'center') => ({
+  ...buttonStyle,
+  gridArea: view,
+  backgroundColor: activeView === view ? '#000080' : '#ffffff', // granatowy gdy aktywny
+  color: activeView === view ? '#ffffff' : '#333333', // biały tekst gdy aktywny
+  borderColor: activeView === view ? '#000080' : '#cccccc'
+});
+
 const topButtonStyle = { ...buttonStyle, gridArea: 'top' };
 const bottomButtonStyle = { ...buttonStyle, gridArea: 'bottom' };
 const leftButtonStyle = { ...buttonStyle, gridArea: 'left' };
@@ -421,6 +429,7 @@ export default function ThreeScene() {
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
+  const [activeView, setActiveView] = useState<'top' | 'bottom' | 'left' | 'right' | 'center'>('center');
 
   // Make scene accessible globally
   useEffect(() => {
@@ -1373,6 +1382,8 @@ export default function ThreeScene() {
   const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right' | 'center') => {
     if (!perspectiveCameraRef.current || !orthographicCameraRef.current || !controlsRef.current) return;
 
+    setActiveView(view); // Aktualizacja aktywnego widoku
+
     const distance = 10;
     let camera: THREE.Camera;
     const controls = controlsRef.current;
@@ -1457,31 +1468,31 @@ export default function ThreeScene() {
       <div style={viewButtonsContainerStyles}>
         <button 
           onClick={() => handleViewChange('top')}
-          style={topButtonStyle}
+          style={getButtonStyle('top', activeView)}
         >
           T
         </button>
         <button 
           onClick={() => handleViewChange('left')}
-          style={leftButtonStyle}
+          style={getButtonStyle('left', activeView)}
         >
           L
         </button>
         <button 
           onClick={() => handleViewChange('center')}
-          style={centerButtonStyle}
+          style={getButtonStyle('center', activeView)}
         >
           C
         </button>
         <button 
           onClick={() => handleViewChange('right')}
-          style={rightButtonStyle}
+          style={getButtonStyle('right', activeView)}
         >
           R
         </button>
         <button 
           onClick={() => handleViewChange('bottom')}
-          style={bottomButtonStyle}
+          style={getButtonStyle('bottom', activeView)}
         >
           B
         </button>
