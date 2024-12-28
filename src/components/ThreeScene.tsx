@@ -1399,25 +1399,25 @@ export default function ThreeScene() {
           onClick={() => handleViewChange('top')}
           style={topButtonStyle}
         >
-          Top
+          T
         </button>
         <button 
           onClick={() => handleViewChange('left')}
           style={leftButtonStyle}
         >
-          Left
+          L
         </button>
         <button 
           onClick={() => handleViewChange('right')}
           style={rightButtonStyle}
         >
-          Right
+          R
         </button>
         <button 
           onClick={() => handleViewChange('bottom')}
           style={bottomButtonStyle}
         >
-          Bottom
+          B
         </button>
       </div>
     </div>
