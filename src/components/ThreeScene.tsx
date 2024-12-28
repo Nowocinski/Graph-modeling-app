@@ -8,14 +8,41 @@ import { CSG } from 'three-csg-ts';
 
 const sceneStyles = {
   width: '100%',
-  height: '100%',
+  height: '100vh',
   margin: 0,
   padding: 0,
   overflow: 'hidden',
   position: 'relative' as const,
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  backgroundColor: '#f0f0f0'
+};
+
+const viewButtonsStyles = {
+  position: 'absolute' as const,
+  top: '20px',
+  right: '20px',
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: '5px',
+  zIndex: 1000
+};
+
+const buttonStyle = {
+  padding: '8px 16px',
+  backgroundColor: '#ffffff',
+  border: '1px solid #cccccc',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '14px',
+  fontWeight: 'bold' as const,
+  color: '#333333',
+  transition: 'all 0.2s ease',
+  ':hover': {
+    backgroundColor: '#f0f0f0',
+    borderColor: '#999999'
+  }
 };
 
 const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
@@ -1305,6 +1332,35 @@ export default function ThreeScene() {
     }
   };
 
+  const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right') => {
+    if (!cameraRef.current) return;
+
+    const camera = cameraRef.current;
+    const distance = 5; // odległość kamery od środka sceny
+
+    switch (view) {
+      case 'top':
+        camera.position.set(0, distance, 0);
+        camera.up.set(0, 0, -1); // ustaw właściwą orientację "góry" dla widoku z góry
+        break;
+      case 'bottom':
+        camera.position.set(0, -distance, 0);
+        camera.up.set(0, 0, 1);
+        break;
+      case 'left':
+        camera.position.set(-distance, 0, 0);
+        camera.up.set(0, 1, 0);
+        break;
+      case 'right':
+        camera.position.set(distance, 0, 0);
+        camera.up.set(0, 1, 0);
+        break;
+    }
+
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+  };
+
   // Animation
   useEffect(() => {
     const animate = () => {
@@ -1326,5 +1382,34 @@ export default function ThreeScene() {
     animate();
   }, []);
 
-  return <div ref={containerRef} style={sceneStyles} />;
+  return (
+    <div ref={containerRef} style={sceneStyles}>
+      <div style={viewButtonsStyles}>
+        <button 
+          onClick={() => handleViewChange('top')}
+          style={buttonStyle}
+        >
+          Top
+        </button>
+        <button 
+          onClick={() => handleViewChange('bottom')}
+          style={buttonStyle}
+        >
+          Bottom
+        </button>
+        <button 
+          onClick={() => handleViewChange('left')}
+          style={buttonStyle}
+        >
+          Left
+        </button>
+        <button 
+          onClick={() => handleViewChange('right')}
+          style={buttonStyle}
+        >
+          Right
+        </button>
+      </div>
+    </div>
+  );
 }
