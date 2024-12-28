@@ -19,12 +19,17 @@ const sceneStyles = {
   backgroundColor: '#f0f0f0'
 };
 
-const viewButtonsStyles = {
+const viewButtonsContainerStyles = {
   position: 'absolute' as const,
-  top: '20px',
+  top: '50%',
   right: '20px',
+  transform: 'translateY(-50%)',
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
+  gridTemplateAreas: `
+    ". top ."
+    "left . right"
+    ". bottom ."
+  `,
   gap: '5px',
   zIndex: 1000
 };
@@ -44,6 +49,11 @@ const buttonStyle = {
     borderColor: '#999999'
   }
 };
+
+const topButtonStyle = { ...buttonStyle, gridArea: 'top' };
+const bottomButtonStyle = { ...buttonStyle, gridArea: 'bottom' };
+const leftButtonStyle = { ...buttonStyle, gridArea: 'left' };
+const rightButtonStyle = { ...buttonStyle, gridArea: 'right' };
 
 const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
   const nodeType = geometryNode.type;
@@ -1384,30 +1394,30 @@ export default function ThreeScene() {
 
   return (
     <div ref={containerRef} style={sceneStyles}>
-      <div style={viewButtonsStyles}>
+      <div style={viewButtonsContainerStyles}>
         <button 
           onClick={() => handleViewChange('top')}
-          style={buttonStyle}
+          style={topButtonStyle}
         >
           Top
         </button>
         <button 
-          onClick={() => handleViewChange('bottom')}
-          style={buttonStyle}
-        >
-          Bottom
-        </button>
-        <button 
           onClick={() => handleViewChange('left')}
-          style={buttonStyle}
+          style={leftButtonStyle}
         >
           Left
         </button>
         <button 
           onClick={() => handleViewChange('right')}
-          style={buttonStyle}
+          style={rightButtonStyle}
         >
           Right
+        </button>
+        <button 
+          onClick={() => handleViewChange('bottom')}
+          style={bottomButtonStyle}
+        >
+          Bottom
         </button>
       </div>
     </div>
