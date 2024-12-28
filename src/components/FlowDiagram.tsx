@@ -37,6 +37,7 @@ import TubeGeometryNode from './nodes/geometry/TubeGeometryNode';
 import MeshNormalMaterialNode from './nodes/material/MeshNormalMaterialNode';
 import MeshBasicMaterialNode from './nodes/material/MeshBasicMaterialNode';
 import MeshPhongMaterialNode from './nodes/material/MeshPhongMaterialNode';
+import MeshStandardMaterialNode from './nodes/material/MeshStandardMaterialNode';
 import MeshNode from './nodes/MeshNode';
 import SceneNode from './nodes/SceneNode';
 import GroupNode from './nodes/GroupNode';
@@ -75,6 +76,7 @@ const nodeTypes: NodeTypes = {
   meshNormalMaterial: MeshNormalMaterialNode,
   meshBasicMaterial: MeshBasicMaterialNode,
   meshPhongMaterial: MeshPhongMaterialNode,
+  meshStandardMaterial: MeshStandardMaterialNode,
   mesh: MeshNode,
   scene: SceneNode,
   group: GroupNode,
@@ -220,6 +222,16 @@ const defaultNodeData = {
     visible: true,
     side: 'front',
     flatShading: false
+  },
+  meshStandardMaterial: {
+    color: '#ffffff',
+    roughness: 0.5,
+    metalness: 0.5,
+    wireframe: false,
+    transparent: false,
+    opacity: 1,
+    visible: true,
+    side: 'front'
   },
   mesh: {
     name: 'Mesh',
