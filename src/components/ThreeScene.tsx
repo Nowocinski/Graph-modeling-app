@@ -26,7 +26,7 @@ const viewButtonsContainerStyles = {
   display: 'grid',
   gridTemplateAreas: `
     ". top ."
-    "left . right"
+    "left center right"
     ". bottom ."
   `,
   gap: '5px',
@@ -58,6 +58,7 @@ const topButtonStyle = { ...buttonStyle, gridArea: 'top' };
 const bottomButtonStyle = { ...buttonStyle, gridArea: 'bottom' };
 const leftButtonStyle = { ...buttonStyle, gridArea: 'left' };
 const rightButtonStyle = { ...buttonStyle, gridArea: 'right' };
+const centerButtonStyle = { ...buttonStyle, gridArea: 'center' };
 
 const createGeometry = (geometryNode: any): THREE.BufferGeometry => {
   const nodeType = geometryNode.type;
@@ -836,13 +837,6 @@ export default function ThreeScene() {
       resultMesh.material.needsUpdate = true;
       resultMesh.geometry.attributes.position.needsUpdate = true;
 
-      console.log('Final result mesh state:', {
-        position: resultMesh.position,
-        visible: resultMesh.visible,
-        materialVisible: resultMesh.material.visible,
-        geometryVertices: resultMesh.geometry.attributes.position.count
-      });
-
       // Clean up
       geometryA.dispose();
       geometryB.dispose();
@@ -1346,7 +1340,7 @@ export default function ThreeScene() {
     }
   };
 
-  const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right') => {
+  const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right' | 'center') => {
     if (!cameraRef.current) return;
 
     const camera = cameraRef.current;
@@ -1367,6 +1361,10 @@ export default function ThreeScene() {
         break;
       case 'right':
         camera.position.set(distance, 0, 0);
+        camera.up.set(0, 1, 0);
+        break;
+      case 'center':
+        camera.position.set(5, 5, 5);
         camera.up.set(0, 1, 0);
         break;
     }
@@ -1410,6 +1408,12 @@ export default function ThreeScene() {
           style={leftButtonStyle}
         >
           L
+        </button>
+        <button 
+          onClick={() => handleViewChange('center')}
+          style={centerButtonStyle}
+        >
+          C
         </button>
         <button 
           onClick={() => handleViewChange('right')}
