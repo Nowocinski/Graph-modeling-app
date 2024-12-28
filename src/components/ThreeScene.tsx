@@ -707,7 +707,7 @@ export default function ThreeScene() {
     if (sceneNode) {
       // AxesHelper
       if (sceneNode.data.showAxesHelper && !axesHelperRef.current) {
-        const axesHelper = new THREE.AxesHelper(5);
+        const axesHelper = new THREE.AxesHelper(100);
         scene.add(axesHelper);
         axesHelperRef.current = axesHelper;
       } else if (!sceneNode.data.showAxesHelper && axesHelperRef.current) {
@@ -717,7 +717,7 @@ export default function ThreeScene() {
 
       // GridHelper
       if (sceneNode.data.showGridHelper && !gridHelperRef.current) {
-        const gridHelper = new THREE.GridHelper(10, 10);
+        const gridHelper = new THREE.GridHelper(100, 100);
         scene.add(gridHelper);
         gridHelperRef.current = gridHelper;
       } else if (!sceneNode.data.showGridHelper && gridHelperRef.current) {
