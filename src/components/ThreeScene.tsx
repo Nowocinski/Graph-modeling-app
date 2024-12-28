@@ -1371,18 +1371,32 @@ export default function ThreeScene() {
   };
 
   const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right' | 'center') => {
-    if (!perspectiveCameraRef.current || !orthographicCameraRef.current) return;
+    if (!perspectiveCameraRef.current || !orthographicCameraRef.current || !controlsRef.current) return;
 
     const distance = 10;
     let camera: THREE.Camera;
+    const controls = controlsRef.current;
 
     // Choose camera type based on view
     if (view === 'center') {
       camera = perspectiveCameraRef.current;
       camera.position.set(5, 5, 5);
       camera.up.set(0, 1, 0);
+      
+      // Enable full orbital controls for center view
+      controls.enableRotate = true;
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.minPolarAngle = 0;
+      controls.maxPolarAngle = Math.PI;
     } else {
       camera = orthographicCameraRef.current;
+      
+      // Disable rotation and limit panning for orthographic views
+      controls.enableRotate = false;
+      controls.enablePan = true;
+      controls.enableZoom = true;
+
       switch (view) {
         case 'top':
           camera.position.set(0, distance, 0);
@@ -1406,10 +1420,15 @@ export default function ThreeScene() {
     // Update camera and controls
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
+    controls.object = camera;
     
     if (controlsRef.current) {
-      controlsRef.current.object = camera;
+      controlsRef.current.update();
     }
+
+    // Reset controls target and update
+    controls.target.set(0, 0, 0);
+    controls.update();
   };
 
   // Animation
