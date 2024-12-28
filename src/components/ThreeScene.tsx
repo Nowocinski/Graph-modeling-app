@@ -412,7 +412,9 @@ export default function ThreeScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const perspectiveCameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const orthographicCameraRef = useRef<THREE.OrthographicCamera | null>(null);
+  const cameraRef = useRef<THREE.Camera | null>(null);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const objectsRef = useRef<{ [key: string]: THREE.Object3D }>({});
   const axesHelperRef = useRef<THREE.AxesHelper | null>(null);
@@ -448,8 +450,29 @@ export default function ThreeScene() {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
-    cameraRef.current = camera;
+    // Perspective camera
+    const perspectiveCamera = new THREE.PerspectiveCamera(75, dimensions.width / dimensions.height, 0.1, 1000);
+    perspectiveCamera.position.set(5, 5, 5);
+    perspectiveCamera.lookAt(0, 0, 0);
+    perspectiveCameraRef.current = perspectiveCamera;
+
+    // Orthographic camera
+    const frustumSize = 10;
+    const aspect = dimensions.width / dimensions.height;
+    const orthographicCamera = new THREE.OrthographicCamera(
+      frustumSize * aspect / -2,
+      frustumSize * aspect / 2,
+      frustumSize / 2,
+      frustumSize / -2,
+      0.1,
+      1000
+    );
+    orthographicCamera.position.set(5, 5, 5);
+    orthographicCamera.lookAt(0, 0, 0);
+    orthographicCameraRef.current = orthographicCamera;
+
+    // Set initial camera
+    cameraRef.current = perspectiveCamera;
 
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true,
@@ -457,14 +480,11 @@ export default function ThreeScene() {
     });
     rendererRef.current = renderer;
     
-    const controls = new OrbitControlsImpl(camera, renderer.domElement);
+    const controls = new OrbitControlsImpl(cameraRef.current, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
     controlsRef.current = controls;
-
-    camera.position.set(5, 5, 5);
-    camera.lookAt(0, 0, 0);
 
     containerRef.current.appendChild(renderer.domElement);
 
@@ -481,14 +501,24 @@ export default function ThreeScene() {
   useEffect(() => {
     if (!rendererRef.current || !cameraRef.current) return;
 
-    const camera = cameraRef.current;
-    const renderer = rendererRef.current;
+    const aspect = dimensions.width / dimensions.height;
+    
+    // Update perspective camera
+    const perspectiveCamera = perspectiveCameraRef.current;
+    perspectiveCamera.aspect = aspect;
+    perspectiveCamera.updateProjectionMatrix();
 
-    camera.aspect = dimensions.width / dimensions.height;
-    camera.updateProjectionMatrix();
+    // Update orthographic camera
+    const orthographicCamera = orthographicCameraRef.current;
+    const frustumSize = 10;
+    orthographicCamera.left = frustumSize * aspect / -2;
+    orthographicCamera.right = frustumSize * aspect / 2;
+    orthographicCamera.top = frustumSize / 2;
+    orthographicCamera.bottom = frustumSize / -2;
+    orthographicCamera.updateProjectionMatrix();
 
-    renderer.setSize(dimensions.width, dimensions.height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Update renderer
+    rendererRef.current.setSize(dimensions.width, dimensions.height);
   }, [dimensions]);
 
   // Update scene based on nodes
@@ -1341,36 +1371,45 @@ export default function ThreeScene() {
   };
 
   const handleViewChange = (view: 'top' | 'bottom' | 'left' | 'right' | 'center') => {
-    if (!cameraRef.current) return;
+    if (!perspectiveCameraRef.current || !orthographicCameraRef.current) return;
 
-    const camera = cameraRef.current;
-    const distance = 5; // odległość kamery od środka sceny
+    const distance = 10;
+    let camera: THREE.Camera;
 
-    switch (view) {
-      case 'top':
-        camera.position.set(0, distance, 0);
-        camera.up.set(0, 0, -1); // ustaw właściwą orientację "góry" dla widoku z góry
-        break;
-      case 'bottom':
-        camera.position.set(0, -distance, 0);
-        camera.up.set(0, 0, 1);
-        break;
-      case 'left':
-        camera.position.set(-distance, 0, 0);
-        camera.up.set(0, 1, 0);
-        break;
-      case 'right':
-        camera.position.set(distance, 0, 0);
-        camera.up.set(0, 1, 0);
-        break;
-      case 'center':
-        camera.position.set(5, 5, 5);
-        camera.up.set(0, 1, 0);
-        break;
+    // Choose camera type based on view
+    if (view === 'center') {
+      camera = perspectiveCameraRef.current;
+      camera.position.set(5, 5, 5);
+      camera.up.set(0, 1, 0);
+    } else {
+      camera = orthographicCameraRef.current;
+      switch (view) {
+        case 'top':
+          camera.position.set(0, distance, 0);
+          camera.up.set(0, 0, -1);
+          break;
+        case 'bottom':
+          camera.position.set(0, -distance, 0);
+          camera.up.set(0, 0, 1);
+          break;
+        case 'left':
+          camera.position.set(-distance, 0, 0);
+          camera.up.set(0, 1, 0);
+          break;
+        case 'right':
+          camera.position.set(distance, 0, 0);
+          camera.up.set(0, 1, 0);
+          break;
+      }
     }
 
+    // Update camera and controls
     camera.lookAt(0, 0, 0);
-    camera.updateProjectionMatrix();
+    cameraRef.current = camera;
+    
+    if (controlsRef.current) {
+      controlsRef.current.object = camera;
+    }
   };
 
   // Animation
