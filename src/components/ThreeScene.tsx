@@ -409,6 +409,17 @@ const createMaterial = (materialNode: any): THREE.Material => {
         side: getSide(materialNode.data.side),
         flatShading: materialNode.data.flatShading
       });
+    case 'meshStandardMaterial':
+      return new THREE.MeshStandardMaterial({
+        color: materialNode.data.color,
+        roughness: materialNode.data.roughness,
+        metalness: materialNode.data.metalness,
+        wireframe: materialNode.data.wireframe,
+        transparent: materialNode.data.transparent,
+        opacity: materialNode.data.opacity,
+        visible: materialNode.data.visible,
+        side: getSide(materialNode.data.side)
+      });
     default:
       console.warn('Unknown material type:', materialNode.type);
       return new THREE.MeshNormalMaterial();

@@ -103,7 +103,8 @@ const nodes = {
   Material: [
     { type: 'meshNormalMaterial', label: 'Normal', icon: '◇' },
     { type: 'meshBasicMaterial', label: 'Basic', icon: '◈' },
-    { type: 'meshPhongMaterial', label: 'Phong', icon: '◆' }
+    { type: 'meshPhongMaterial', label: 'Phong', icon: '◆' },
+    { type: 'meshStandardMaterial', label: 'Standard', icon: '◊' }
   ],
   Objects: [
     { type: 'mesh', label: 'Mesh', icon: '▣' },
