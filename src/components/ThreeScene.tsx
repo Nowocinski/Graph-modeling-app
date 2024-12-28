@@ -21,9 +21,8 @@ const sceneStyles = {
 
 const viewButtonsContainerStyles = {
   position: 'absolute' as const,
-  top: '50%',
+  top: '20px',
   right: '20px',
-  transform: 'translateY(-50%)',
   display: 'grid',
   gridTemplateAreas: `
     ". top ."
@@ -35,7 +34,9 @@ const viewButtonsContainerStyles = {
 };
 
 const buttonStyle = {
-  padding: '8px 16px',
+  padding: '6px',
+  width: '30px',
+  height: '30px',
   backgroundColor: '#ffffff',
   border: '1px solid #cccccc',
   borderRadius: '4px',
@@ -44,6 +45,9 @@ const buttonStyle = {
   fontWeight: 'bold' as const,
   color: '#333333',
   transition: 'all 0.2s ease',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   ':hover': {
     backgroundColor: '#f0f0f0',
     borderColor: '#999999'
