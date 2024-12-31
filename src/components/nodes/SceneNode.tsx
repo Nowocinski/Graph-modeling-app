@@ -8,6 +8,8 @@ interface SceneData {
   ambientLightIntensity: number;
   showAxesHelper: boolean;
   showGridHelper: boolean;
+  showDirectionalLight: boolean;
+  directionalLightIntensity: number;
   onUpdate?: (id: string, data: Partial<SceneData>) => void;
 }
 
@@ -15,7 +17,9 @@ const defaultValues = {
   backgroundColor: '#ffffff',
   ambientLightIntensity: 0.5,
   showAxesHelper: false,
-  showGridHelper: false
+  showGridHelper: false,
+  showDirectionalLight: false,
+  directionalLightIntensity: 0.5
 };
 
 const inputStyles = {
@@ -42,6 +46,8 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
     ambientLightIntensity = defaultValues.ambientLightIntensity,
     showAxesHelper = defaultValues.showAxesHelper,
     showGridHelper = defaultValues.showGridHelper,
+    showDirectionalLight = defaultValues.showDirectionalLight,
+    directionalLightIntensity = defaultValues.directionalLightIntensity,
     onUpdate
   } = data;
 
@@ -107,6 +113,38 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
           />
           <label htmlFor="gridHelper" style={{ cursor: 'pointer' }}>Show Grid Helper</label>
         </div>
+
+        <div className="mt-2">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={showDirectionalLight}
+              onChange={(e) => handleChange('showDirectionalLight', e.target.checked)}
+            />
+            <span>Directional Light</span>
+          </label>
+        </div>
+        {showDirectionalLight && (
+          <div className="mt-2">
+            <label className="flex flex-col">
+              <span>Light Intensity (0-1)</span>
+              <input
+                type="number"
+                min="0"
+                max="1"
+                step="0.1"
+                value={directionalLightIntensity}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (value >= 0 && value <= 1) {
+                    handleChange('directionalLightIntensity', value);
+                  }
+                }}
+                className="bg-white text-black border border-gray-300 rounded px-2 py-1 w-20"
+              />
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );

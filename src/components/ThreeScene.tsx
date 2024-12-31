@@ -436,8 +436,9 @@ export default function ThreeScene() {
   const cameraRef = useRef<THREE.Camera | null>(null);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const objectsRef = useRef<{ [key: string]: THREE.Object3D }>({});
-  const axesHelperRef = useRef<THREE.AxesHelper | null>(null);
+  const axesHelperRef = useRef<THREE.Group | null>(null);
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
+  const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
   const [activeView, setActiveView] = useState<'top' | 'bottom' | 'left' | 'right' | 'center'>('center');
@@ -580,6 +581,20 @@ export default function ThreeScene() {
 
       const ambientLight = new THREE.AmbientLight(0xffffff, sceneNode.data.ambientLightIntensity);
       scene.add(ambientLight);
+
+      // Obsługa DirectionalLight
+      if (sceneNode.data.showDirectionalLight && !directionalLightRef.current) {
+        const light = new THREE.DirectionalLight(0xffffff, sceneNode.data.directionalLightIntensity || 0.5);
+        light.position.set(5, 5, 5);
+        light.name = 'helper_directional_light';
+        scene.add(light);
+        directionalLightRef.current = light;
+      } else if (!sceneNode.data.showDirectionalLight && directionalLightRef.current) {
+        scene.remove(directionalLightRef.current);
+        directionalLightRef.current = null;
+      } else if (directionalLightRef.current) {
+        directionalLightRef.current.intensity = sceneNode.data.directionalLightIntensity || 0.5;
+      }
     }
 
     // Clean up removed or disconnected objects
