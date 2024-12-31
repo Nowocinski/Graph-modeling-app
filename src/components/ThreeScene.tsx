@@ -439,6 +439,7 @@ export default function ThreeScene() {
   const axesHelperRef = useRef<THREE.Group | null>(null);
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const lightHelperRef = useRef<THREE.DirectionalLightHelper | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isInitialized, setIsInitialized] = useState(false);
   const [activeView, setActiveView] = useState<'top' | 'bottom' | 'left' | 'right' | 'center'>('center');
@@ -585,12 +586,24 @@ export default function ThreeScene() {
       // Obsługa DirectionalLight
       if (sceneNode.data.showDirectionalLight && !directionalLightRef.current) {
         const light = new THREE.DirectionalLight(0xffffff, sceneNode.data.directionalLightIntensity || 0.5);
-        light.position.set(5, 5, 5);
         light.name = 'helper_directional_light';
+        
+        // Dodaj helper do wizualizacji światła
+        const helper = new THREE.DirectionalLightHelper(light, 2);
+        helper.name = 'helper_directional_light_helper';
+        scene.add(helper);
+        lightHelperRef.current = helper;
+        
         scene.add(light);
+        scene.add(light.target);
         directionalLightRef.current = light;
       } else if (!sceneNode.data.showDirectionalLight && directionalLightRef.current) {
         scene.remove(directionalLightRef.current);
+        scene.remove(directionalLightRef.current.target);
+        if (lightHelperRef.current) {
+          scene.remove(lightHelperRef.current);
+          lightHelperRef.current = null;
+        }
         directionalLightRef.current = null;
       } else if (directionalLightRef.current) {
         directionalLightRef.current.intensity = sceneNode.data.directionalLightIntensity || 0.5;
@@ -1470,6 +1483,27 @@ export default function ThreeScene() {
 
       if (controlsRef.current) {
         controlsRef.current.update();
+      }
+
+      // Aktualizuj pozycję światła
+      if (directionalLightRef.current && cameraRef.current) {
+        const cameraPosition = new THREE.Vector3();
+        const cameraDirection = new THREE.Vector3();
+        
+        cameraRef.current.getWorldPosition(cameraPosition);
+        cameraRef.current.getWorldDirection(cameraDirection);
+        
+        // Ustaw światło w pozycji kamery
+        directionalLightRef.current.position.copy(cameraPosition);
+        
+        // Ustaw target 10 jednostek przed kamerą
+        const targetPosition = cameraPosition.clone().add(cameraDirection.multiplyScalar(10));
+        directionalLightRef.current.target.position.copy(targetPosition);
+        
+        // Aktualizuj helper
+        if (lightHelperRef.current) {
+          lightHelperRef.current.update();
+        }
       }
 
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
