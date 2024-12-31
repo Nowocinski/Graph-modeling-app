@@ -1,0 +1,389 @@
+{
+  "nodes": [
+    {
+      "id": "scene",
+      "type": "scene",
+      "position": {
+        "x": 1551.762860744635,
+        "y": 630.1140360907739
+      },
+      "data": {
+        "backgroundColor": "#B1EBE4",
+        "ambientLightIntensity": 0.5,
+        "pointLightIntensity": 1,
+        "pointLightPosition": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "width": 300,
+      "height": 194,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1551.762860744635,
+        "y": 630.1140360907739
+      },
+      "dragging": false
+    },
+    {
+      "id": "boxGeometry_1",
+      "type": "boxGeometry",
+      "position": {
+        "x": 101.3402934522291,
+        "y": 202.90571250364616
+      },
+      "data": {
+        "width": 1,
+        "height": 0.1,
+        "depth": 1
+      },
+      "width": 210,
+      "height": 170,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": 101.3402934522291,
+        "y": 202.90571250364616
+      }
+    },
+    {
+      "id": "meshNormalMaterial_1",
+      "type": "meshNormalMaterial",
+      "position": {
+        "x": -147.56899629831557,
+        "y": 601.8372300278807
+      },
+      "data": {},
+      "width": 200,
+      "height": 159,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -147.56899629831557,
+        "y": 601.8372300278807
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_1",
+      "type": "mesh",
+      "position": {
+        "x": 478.0841332801614,
+        "y": 508.0139145477756
+      },
+      "data": {
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 478.0841332801614,
+        "y": 508.0139145477756
+      },
+      "dragging": false
+    },
+    {
+      "id": "cylinderGeometry_1735644115623",
+      "type": "cylinderGeometry",
+      "position": {
+        "x": 78.92974072856063,
+        "y": 919.2909919260707
+      },
+      "data": {
+        "radiusTop": 0.05,
+        "radiusBottom": 0.05,
+        "height": 1,
+        "radialSegments": 32,
+        "heightSegments": 1,
+        "openEnded": false
+      },
+      "width": 200,
+      "height": 203,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 78.92974072856063,
+        "y": 919.2909919260707
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_1735644140189",
+      "type": "mesh",
+      "position": {
+        "x": 446.06200811290535,
+        "y": 901.4248201442899
+      },
+      "data": {
+        "name": "Mesh",
+        "position": {
+          "x": 0,
+          "y": -0.5,
+          "z": -0.4
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "geometry": {
+          "radiusTop": 1,
+          "radiusBottom": 1,
+          "height": 1,
+          "radialSegments": 32,
+          "heightSegments": 1,
+          "openEnded": false
+        },
+        "material": {},
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": true,
+      "positionAbsolute": {
+        "x": 446.06200811290535,
+        "y": 901.4248201442899
+      },
+      "dragging": false
+    },
+    {
+      "id": "loop_1735644163898",
+      "type": "loop",
+      "position": {
+        "x": 870.7650955838228,
+        "y": 849.0069459753473
+      },
+      "data": {
+        "iterations": 2,
+        "spacing": 0.8,
+        "direction": "x",
+        "position": {
+          "x": -0.4,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      },
+      "width": 380,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 870.7650955838228,
+        "y": 849.0069459753473
+      },
+      "dragging": false
+    },
+    {
+      "id": "cylinderGeometry_1735644402720",
+      "type": "cylinderGeometry",
+      "position": {
+        "x": 69.5245155035748,
+        "y": 1305.8406915206958
+      },
+      "data": {
+        "radiusTop": 0.05,
+        "radiusBottom": 0.05,
+        "height": 1,
+        "radialSegments": 32,
+        "heightSegments": 1,
+        "openEnded": false
+      },
+      "width": 200,
+      "height": 203,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 69.5245155035748,
+        "y": 1305.8406915206958
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_1735644412835",
+      "type": "mesh",
+      "position": {
+        "x": 437.71466033058044,
+        "y": 1313.1916363907683
+      },
+      "data": {
+        "name": "Mesh",
+        "position": {
+          "x": 0,
+          "y": -0.5,
+          "z": -0.4
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "material": {
+          "source": "meshNormalMaterial_1",
+          "sourceHandle": null,
+          "target": "mesh_1735644412835",
+          "targetHandle": "material"
+        },
+        "geometry": {
+          "radiusTop": 1,
+          "radiusBottom": 1,
+          "height": 1,
+          "radialSegments": 32,
+          "heightSegments": 1,
+          "openEnded": false
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 437.71466033058044,
+        "y": 1313.1916363907683
+      },
+      "dragging": false
+    },
+    {
+      "id": "loop_1735644452058",
+      "type": "loop",
+      "position": {
+        "x": 865.2317847678013,
+        "y": 1290.6194328331635
+      },
+      "data": {
+        "iterations": 2,
+        "spacing": 0.8,
+        "direction": "x",
+        "position": {
+          "x": -0.4,
+          "y": 0,
+          "z": 0.8
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      },
+      "width": 380,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 865.2317847678013,
+        "y": 1290.6194328331635
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-3",
+      "source": "boxGeometry_1",
+      "target": "mesh_1",
+      "targetHandle": "geometry"
+    },
+    {
+      "id": "e2-3",
+      "source": "meshNormalMaterial_1",
+      "target": "mesh_1",
+      "targetHandle": "material"
+    },
+    {
+      "id": "e3-4",
+      "source": "mesh_1",
+      "target": "scene"
+    },
+    {
+      "source": "cylinderGeometry_1735644115623",
+      "sourceHandle": null,
+      "target": "mesh_1735644140189",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-cylinderGeometry_1735644115623-mesh_1735644140189geometry"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_1735644140189",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial_1-mesh_1735644140189material"
+    },
+    {
+      "source": "mesh_1735644140189",
+      "sourceHandle": null,
+      "target": "loop_1735644163898",
+      "targetHandle": "input",
+      "id": "reactflow__edge-mesh_1735644140189-loop_1735644163898input"
+    },
+    {
+      "source": "loop_1735644163898",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-loop_1735644163898-scene"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_1735644412835",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial_1-mesh_1735644412835material"
+    },
+    {
+      "source": "cylinderGeometry_1735644402720",
+      "sourceHandle": null,
+      "target": "mesh_1735644412835",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-cylinderGeometry_1735644402720-mesh_1735644412835geometry"
+    },
+    {
+      "source": "mesh_1735644412835",
+      "sourceHandle": null,
+      "target": "loop_1735644452058",
+      "targetHandle": "input",
+      "id": "reactflow__edge-mesh_1735644412835-loop_1735644452058input"
+    },
+    {
+      "source": "loop_1735644452058",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-loop_1735644452058-scene"
+    }
+  ]
+}

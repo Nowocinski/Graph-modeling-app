@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "scene",
+      "type": "scene",
+      "position": {
+        "x": 900,
+        "y": 400
+      },
+      "data": {
+        "backgroundColor": "#B1EBE4",
+        "ambientLightIntensity": 0.5,
+        "pointLightIntensity": 1,
+        "pointLightPosition": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "width": 300,
+      "height": 194
+    },
+    {
+      "id": "meshNormalMaterial_1",
+      "type": "meshNormalMaterial",
+      "position": {
+        "x": 100,
+        "y": 600
+      },
+      "data": {},
+      "width": 200,
+      "height": 159
+    },
+    {
+      "id": "mesh_1",
+      "type": "mesh",
+      "position": {
+        "x": 500,
+        "y": 400
+      },
+      "data": {
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "geometry": {
+          "depth": 1,
+          "bevelEnabled": true,
+          "bevelThickness": 0.2,
+          "bevelSize": 0.1,
+          "bevelSegments": 3,
+          "steps": 1
+        }
+      },
+      "width": 300,
+      "height": 183
+    },
+    {
+      "id": "extrudeGeometry_1735644001971",
+      "type": "extrudeGeometry",
+      "position": {
+        "x": 116.49095456020163,
+        "y": 288.4814825531303
+      },
+      "data": {
+        "depth": 1,
+        "bevelEnabled": true,
+        "bevelThickness": 0.2,
+        "bevelSize": 0.1,
+        "bevelSegments": 3,
+        "steps": 1
+      },
+      "width": 200,
+      "height": 203,
+      "selected": true,
+      "positionAbsolute": {
+        "x": 116.49095456020163,
+        "y": 288.4814825531303
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e2-3",
+      "source": "meshNormalMaterial_1",
+      "target": "mesh_1",
+      "targetHandle": "material"
+    },
+    {
+      "id": "e3-4",
+      "source": "mesh_1",
+      "target": "scene"
+    },
+    {
+      "source": "extrudeGeometry_1735644001971",
+      "sourceHandle": null,
+      "target": "mesh_1",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-extrudeGeometry_1735644001971-mesh_1geometry"
+    }
+  ]
+}
