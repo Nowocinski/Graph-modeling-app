@@ -1,0 +1,269 @@
+{
+  "nodes": [
+    {
+      "id": "scene",
+      "type": "scene",
+      "position": {
+        "x": 2396.744224480018,
+        "y": 755.396643414874
+      },
+      "data": {
+        "backgroundColor": "#B1EBE4",
+        "ambientLightIntensity": 0.5,
+        "pointLightIntensity": 1,
+        "pointLightPosition": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "width": 300,
+      "height": 194,
+      "selected": true,
+      "positionAbsolute": {
+        "x": 2396.744224480018,
+        "y": 755.396643414874
+      },
+      "dragging": false
+    },
+    {
+      "id": "import_border_1735647076751",
+      "type": "default",
+      "position": {
+        "x": 850,
+        "y": 650
+      },
+      "style": {
+        "width": 1307.2039899891743,
+        "height": 996.5714955445164,
+        "backgroundColor": "transparent",
+        "border": "2px dashed #666",
+        "borderRadius": "8px",
+        "padding": "10px",
+        "pointerEvents": "none",
+        "zIndex": -1,
+        "color": "#fff",
+        "fontSize": "30px"
+      },
+      "data": {
+        "label": "Imported from: framuga-okna",
+        "importedAt": "12/31/2024, 1:11:16 PM"
+      },
+      "width": 1307,
+      "height": 997
+    },
+    {
+      "id": "boxGeometry_1_imported_1735647076751_yl13jx6ce",
+      "type": "boxGeometry",
+      "position": {
+        "x": 932.0105820105821,
+        "y": 700
+      },
+      "data": {
+        "width": 0.1,
+        "height": 1,
+        "depth": 1
+      },
+      "width": 210,
+      "height": 170,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 104.80158730158729,
+        "y": 206.4021164021164
+      },
+      "dragging": false
+    },
+    {
+      "id": "meshNormalMaterial_1_imported_1735647076751_13pl9fipm",
+      "type": "meshNormalMaterial",
+      "position": {
+        "x": 900,
+        "y": 1015.1719576719577
+      },
+      "data": {},
+      "width": 200,
+      "height": 159,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 72.79100529100529,
+        "y": 521.5740740740741
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_1_imported_1735647076751_ldl3id5fz",
+      "type": "mesh",
+      "position": {
+        "x": 1327.2089947089949,
+        "y": 893.5978835978835
+      },
+      "data": {
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      },
+      "width": 300,
+      "height": 183
+    },
+    {
+      "id": "mesh_1735646812833_imported_1735647076751_8c2hw4diq",
+      "type": "mesh",
+      "position": {
+        "x": 1323.5582010582011,
+        "y": 1232.8654689839727
+      },
+      "data": {
+        "name": "Mesh",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 0.8,
+          "z": 0.8
+        },
+        "geometry": {
+          "width": 1,
+          "height": 1,
+          "depth": 1
+        },
+        "material": {
+          "wireframe": true,
+          "transparent": false,
+          "opacity": 1,
+          "side": "front"
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 496.3492063492064,
+        "y": 739.2675853860892
+      },
+      "dragging": false
+    },
+    {
+      "id": "subtract_1735646822767_imported_1735647076751_qzsjsbhlv",
+      "type": "subtract",
+      "position": {
+        "x": 1757.2039899891743,
+        "y": 1103.837680835216
+      },
+      "data": {},
+      "width": 200,
+      "height": 112,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 929.9949952801796,
+        "y": 610.2397972373323
+      },
+      "dragging": false
+    },
+    {
+      "id": "boxGeometry_1735646830182_imported_1735647076751_nbkcui9qz",
+      "type": "boxGeometry",
+      "position": {
+        "x": 955.436507936508,
+        "y": 1253.6723472908511
+      },
+      "data": {
+        "width": 0.2,
+        "height": 1,
+        "depth": 1
+      },
+      "width": 210,
+      "height": 170,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 128.22751322751324,
+        "y": 760.0744636929675
+      },
+      "dragging": false
+    },
+    {
+      "id": "meshNormalMaterial_1735646874607_imported_1735647076751_2vxwwh7xm",
+      "type": "meshNormalMaterial",
+      "position": {
+        "x": 973.4884131813626,
+        "y": 1496.5714955445164
+      },
+      "data": {
+        "wireframe": true,
+        "transparent": false,
+        "opacity": 1,
+        "side": "front"
+      },
+      "width": 200,
+      "height": 159,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 146.2794184723678,
+        "y": 1002.9736119466328
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-3_imported_1735647076752_gow5b5w06",
+      "source": "boxGeometry_1_imported_1735647076751_yl13jx6ce",
+      "target": "mesh_1_imported_1735647076751_ldl3id5fz",
+      "targetHandle": "geometry"
+    },
+    {
+      "id": "e2-3_imported_1735647076752_h35k3eg14",
+      "source": "meshNormalMaterial_1_imported_1735647076751_13pl9fipm",
+      "target": "mesh_1_imported_1735647076751_ldl3id5fz",
+      "targetHandle": "material"
+    },
+    {
+      "source": "boxGeometry_1735646830182_imported_1735647076751_nbkcui9qz",
+      "sourceHandle": null,
+      "target": "mesh_1735646812833_imported_1735647076751_8c2hw4diq",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-boxGeometry_1735646830182-mesh_1735646812833geometry_imported_1735647076752_39bm6v0hr"
+    },
+    {
+      "source": "meshNormalMaterial_1735646874607_imported_1735647076751_2vxwwh7xm",
+      "sourceHandle": null,
+      "target": "mesh_1735646812833_imported_1735647076751_8c2hw4diq",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial_1735646874607-mesh_1735646812833material_imported_1735647076752_0oz3l5yb9"
+    },
+    {
+      "source": "mesh_1_imported_1735647076751_ldl3id5fz",
+      "sourceHandle": null,
+      "target": "subtract_1735646822767_imported_1735647076751_qzsjsbhlv",
+      "targetHandle": "meshA",
+      "id": "reactflow__edge-mesh_1-subtract_1735646822767meshA_imported_1735647076752_gf7k3f8e3"
+    },
+    {
+      "source": "mesh_1735646812833_imported_1735647076751_8c2hw4diq",
+      "sourceHandle": null,
+      "target": "subtract_1735646822767_imported_1735647076751_qzsjsbhlv",
+      "targetHandle": "meshB",
+      "id": "reactflow__edge-mesh_1735646812833-subtract_1735646822767meshB_imported_1735647076752_0w18gn9s4"
+    }
+  ]
+}
