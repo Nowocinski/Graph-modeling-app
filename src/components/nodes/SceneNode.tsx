@@ -19,7 +19,7 @@ const defaultValues = {
   showAxesHelper: false,
   showGridHelper: false,
   showDirectionalLight: false,
-  directionalLightIntensity: 0.5
+  directionalLightIntensity: 1
 };
 
 const inputStyles = {
@@ -127,7 +127,7 @@ const SceneNode = ({ data, id }: NodeProps<SceneData>) => {
         {showDirectionalLight && (
           <div className="mt-2">
             <label className="flex flex-col">
-              <span>Light Intensity (0-1)</span>
+              <span>Light Intensity</span>
               <input
                 type="number"
                 min="0"
