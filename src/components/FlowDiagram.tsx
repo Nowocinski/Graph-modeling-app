@@ -869,6 +869,14 @@ const FlowDiagramInner = () => {
                 .map((node: Node) => node.id)
             );
 
+            // Find nodes that are connected to scene nodes
+            const nodesConnectedToScene = new Set<string>();
+            jsonContent.edges.forEach((edge: Edge) => {
+              if (sceneNodeIds.has(edge.target)) {
+                nodesConnectedToScene.add(edge.source);
+              }
+            });
+
             // Generate new IDs for imported nodes and edges to avoid conflicts
             const oldToNewIds = new Map<string, string>();
             const newNodes = jsonContent.nodes
@@ -885,6 +893,47 @@ const FlowDiagramInner = () => {
                   }
                 };
               });
+
+            // If there are multiple nodes connected to scene, create a group node
+            let groupNode: Node | null = null;
+            let groupNodeId: string | null = null;
+            if (nodesConnectedToScene.size > 1) {
+              groupNodeId = `group_imported_${Date.now()}`;
+              const groupBounds = {
+                minX: Infinity,
+                maxX: -Infinity,
+                minY: Infinity,
+                maxY: -Infinity
+              };
+
+              // Calculate group node position based on connected nodes
+              nodesConnectedToScene.forEach(nodeId => {
+                const node = jsonContent.nodes.find((n: Node) => n.id === nodeId);
+                if (node) {
+                  groupBounds.minX = Math.min(groupBounds.minX, node.position.x);
+                  groupBounds.maxX = Math.max(groupBounds.maxX, node.position.x);
+                  groupBounds.minY = Math.min(groupBounds.minY, node.position.y);
+                  groupBounds.maxY = Math.max(groupBounds.maxY, node.position.y);
+                }
+              });
+
+              groupNode = {
+                id: groupNodeId,
+                type: 'group',
+                position: {
+                  x: groupBounds.minX + offsetX,
+                  y: groupBounds.minY + offsetY - 100 // Position slightly above the nodes
+                },
+                data: {
+                  label: `Imported Group (${file.name})`,
+                  onUpdate: handleNodeUpdate,
+                  onIdChange: handleNodeIdChange,
+                  position: { x: 0, y: 0, z: 0 },
+                  rotation: { x: 0, y: 0, z: 0 },
+                  scale: { x: 1, y: 1, z: 1 }
+                }
+              };
+            }
 
             // Create a border node to visually group imported nodes
             const BORDER_PADDING = 50;
@@ -915,17 +964,56 @@ const FlowDiagramInner = () => {
             };
 
             // Update edge references to use new node IDs
-            const newEdges = jsonContent.edges
+            let newEdges = jsonContent.edges
               .filter((edge: Edge) => !sceneNodeIds.has(edge.source) && !sceneNodeIds.has(edge.target))
-              .map((edge: Edge) => ({
-                ...edge,
-                id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                source: oldToNewIds.get(edge.source) || edge.source,
-                target: oldToNewIds.get(edge.target) || edge.target
-              }));
+              .map((edge: Edge) => {
+                const newSourceId = oldToNewIds.get(edge.source) || edge.source;
+                const newTargetId = oldToNewIds.get(edge.target) || edge.target;
+                return {
+                  ...edge,
+                  id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  source: newSourceId,
+                  target: newTargetId
+                };
+              });
 
-            // Add imported nodes, border and edges to current graph
-            setNodes(currentNodes => [...currentNodes, borderNode, ...newNodes]);
+            // If we have a group node, add edges from nodes to group and from group to scene
+            if (groupNode && groupNodeId) {
+              // Remove any existing edges to scene from the nodes that will be connected to group
+              newEdges = newEdges.filter((edge: Edge) => {
+                const oldSourceId = Object.keys(oldToNewIds).find(key => oldToNewIds.get(key) === edge.source);
+                return !(edge.target === 'scene' && oldSourceId && nodesConnectedToScene.has(oldSourceId));
+              });
+
+              // Add edges from nodes to group
+              nodesConnectedToScene.forEach(nodeId => {
+                const newNodeId = oldToNewIds.get(nodeId);
+                if (newNodeId) {
+                  newEdges.push({
+                    id: `edge_to_group_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    source: newNodeId,
+                    target: groupNodeId,
+                    targetHandle: 'input'
+                  });
+                }
+              });
+
+              // Add edge from group to scene
+              newEdges.push({
+                id: `edge_group_to_scene_${Date.now()}`,
+                source: groupNodeId,
+                target: 'scene',
+                targetHandle: 'input'
+              });
+            }
+
+            // Add imported nodes, border, group (if exists) and edges to current graph
+            setNodes(currentNodes => [
+              ...currentNodes,
+              borderNode,
+              ...(groupNode ? [groupNode] : []),
+              ...newNodes
+            ]);
             setEdges(currentEdges => [...currentEdges, ...newEdges]);
             setIsImportModalOpen(false);
           } else {
@@ -937,7 +1025,7 @@ const FlowDiagramInner = () => {
       };
       reader.readAsText(file);
     }
-  }, [nodes, getViewport]);
+  }, [nodes, getViewport, handleNodeUpdate, handleNodeIdChange]);
 
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
