@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "scene",
+      "type": "scene",
+      "position": { "x": 900, "y": 400 },
+      "data": {
+        "backgroundColor": "#B1EBE4",
+        "ambientLightIntensity": 0.5,
+        "pointLightIntensity": 1,
+        "pointLightPosition": { "x": 0, "y": 0, "z": 0 }
+      }
+    },
+    {
+      "id": "boxGeometry_1",
+      "type": "boxGeometry",
+      "position": { "x": 100, "y": 200 },
+      "data": {
+        "width": 1,
+        "height": 1,
+        "depth": 1
+      }
+    },
+    {
+      "id": "meshNormalMaterial_1",
+      "type": "meshNormalMaterial",
+      "position": { "x": 100, "y": 600 },
+      "data": {}
+    },
+    {
+      "id": "mesh_1",
+      "type": "mesh",
+      "position": { "x": 500, "y": 400 },
+      "data": {
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "rotation": { "x": 0, "y": 0, "z": 0 },
+        "scale": { "x": 1, "y": 1, "z": 1 }
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e1-3", "source": "boxGeometry_1", "target": "mesh_1", "targetHandle": "geometry" },
+    { "id": "e2-3", "source": "meshNormalMaterial_1", "target": "mesh_1", "targetHandle": "material" },
+    { "id": "e3-4", "source": "mesh_1", "target": "scene" }
+  ]
+}

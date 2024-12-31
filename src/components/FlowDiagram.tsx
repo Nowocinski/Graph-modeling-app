@@ -306,15 +306,16 @@ const initialEdges: Edge[] = [
 const FlowDiagramInner = () => {
   const { updateNodes, updateEdges, updateSceneState } = useScene();
   const { currentGraph, saveGraph, loadGraph, deleteGraph, getGraphList, isLoading, error } = useGraphManager();
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [graphs, setGraphs] = useState<{ [key: string]: { nodes: Node[]; edges: Edge[]; } }>({});
   const [graphName, setGraphName] = useState('');
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [originalGraph, setOriginalGraph] = useState<{ nodes: Node[]; edges: Edge[] } | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedGraphToImport, setSelectedGraphToImport] = useState('');
+  const [originalGraph, setOriginalGraph] = useState<{ nodes: Node[]; edges: Edge[]; } | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [importSearchFilter, setImportSearchFilter] = useState('');
   const [exportFormat, setExportFormat] = useState('gltf');
@@ -349,20 +350,68 @@ const FlowDiagramInner = () => {
     }
   }, [isGraphModalOpen, currentGraph]);
 
+  const loadGraphs = async () => {
+    try {
+      const response = await fetch('/api/graphs');
+      if (!response.ok) {
+        throw new Error('Failed to load graphs');
+      }
+      const data = await response.json();
+      setGraphs(data);
+    } catch (error) {
+      console.error('Error loading graphs:', error);
+      alert('Failed to load graphs. Please try again.');
+    }
+  };
+
+  // Load graphs when component mounts
+  useEffect(() => {
+    loadGraphs();
+  }, []);
+
   const handleSaveGraph = async (overwrite = false) => {
-    if (graphName.trim()) {
-      if (!overwrite && getGraphList().includes(graphName.trim())) {
-        setShowOverwriteConfirm(true);
-        return;
+    if (!graphName.trim()) {
+      alert('Please enter a graph name');
+      return;
+    }
+
+    if (!overwrite && getGraphList().includes(graphName.trim())) {
+      setShowOverwriteConfirm(true);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/graphs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: graphName.trim(),
+          data: {
+            nodes: nodes,
+            edges: edges,
+          },
+          overwrite,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save graph');
       }
+
+      setGraphName('');
+      setShowOverwriteConfirm(false);
+      setIsGraphModalOpen(false);
+      setOriginalGraph({ nodes, edges });
       
-      const success = await saveGraph(graphName.trim(), nodes, edges, overwrite);
-      if (success) {
-        setGraphName('');
-        setShowOverwriteConfirm(false);
-        setIsGraphModalOpen(false);
-        setOriginalGraph({ nodes, edges });
-      }
+      // Refresh graph list
+      loadGraphs();
+    } catch (error) {
+      console.error('Error saving graph:', error);
+      alert(error instanceof Error ? error.message : 'Failed to save graph. Please try again.');
     }
   };
 
