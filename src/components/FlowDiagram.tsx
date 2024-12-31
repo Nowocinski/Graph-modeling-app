@@ -804,6 +804,141 @@ const FlowDiagramInner = () => {
     }
   };
 
+  const handleFileImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonContent = JSON.parse(e.target?.result as string);
+          if (jsonContent.nodes && jsonContent.edges) {
+            // Calculate boundaries of existing nodes
+            const existingBounds = nodes.reduce((bounds, node) => {
+              bounds.minX = Math.min(bounds.minX, node.position.x);
+              bounds.maxX = Math.max(bounds.maxX, node.position.x);
+              bounds.minY = Math.min(bounds.minY, node.position.y);
+              bounds.maxY = Math.max(bounds.maxY, node.position.y);
+              return bounds;
+            }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+            // If there are no existing nodes, use default position
+            if (existingBounds.minX === Infinity) {
+              existingBounds.minX = 0;
+              existingBounds.maxX = 0;
+              existingBounds.minY = 0;
+              existingBounds.maxY = 0;
+            }
+
+            // Calculate boundaries of imported nodes (excluding scene nodes)
+            const NODE_WIDTH = 250; // Approximate width of nodes
+            const importBounds = jsonContent.nodes
+              .filter((node: Node) => node.type !== 'scene')
+              .reduce((bounds: any, node: Node) => {
+                bounds.minX = Math.min(bounds.minX, node.position.x);
+                bounds.maxX = Math.max(bounds.maxX, node.position.x + NODE_WIDTH);
+                bounds.minY = Math.min(bounds.minY, node.position.y);
+                bounds.maxY = Math.max(bounds.maxY, node.position.y + 100);
+                return bounds;
+              }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
+
+            // Calculate offset to place imported nodes next to existing ones
+            const PADDING = 300;
+            const viewport = getViewport();
+            
+            // Determine if there's more space on the right or bottom
+            const rightSpace = viewport.width - (existingBounds.maxX - existingBounds.minX);
+            const bottomSpace = viewport.height - (existingBounds.maxY - existingBounds.minY);
+            
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (rightSpace > bottomSpace) {
+              // Place nodes to the right
+              offsetX = existingBounds.maxX + PADDING - importBounds.minX;
+              offsetY = existingBounds.minY - importBounds.minY;
+            } else {
+              // Place nodes below
+              offsetX = existingBounds.minX - importBounds.minX;
+              offsetY = existingBounds.maxY + PADDING - importBounds.minY;
+            }
+
+            // Filter out scene nodes and get their IDs
+            const sceneNodeIds = new Set(
+              jsonContent.nodes
+                .filter((node: Node) => node.type === 'scene')
+                .map((node: Node) => node.id)
+            );
+
+            // Generate new IDs for imported nodes and edges to avoid conflicts
+            const oldToNewIds = new Map<string, string>();
+            const newNodes = jsonContent.nodes
+              .filter((node: Node) => node.type !== 'scene')
+              .map((node: Node) => {
+                const newId = `${node.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                oldToNewIds.set(node.id, newId);
+                return {
+                  ...node,
+                  id: newId,
+                  position: {
+                    x: node.position.x + offsetX,
+                    y: node.position.y + offsetY
+                  }
+                };
+              });
+
+            // Create a border node to visually group imported nodes
+            const BORDER_PADDING = 50;
+            const EXTRA_RIGHT_PADDING = 100;
+            const borderNode = {
+              id: `import_border_${Date.now()}`,
+              type: 'default',
+              position: {
+                x: importBounds.minX + offsetX - BORDER_PADDING,
+                y: importBounds.minY + offsetY - BORDER_PADDING
+              },
+              style: {
+                width: importBounds.maxX - importBounds.minX + (BORDER_PADDING * 2) + EXTRA_RIGHT_PADDING,
+                height: importBounds.maxY - importBounds.minY + (BORDER_PADDING * 2),
+                backgroundColor: 'transparent',
+                border: '2px dashed #666',
+                borderRadius: '8px',
+                padding: '10px',
+                pointerEvents: 'none' as const,
+                zIndex: -1,
+                color: '#fff',
+                fontSize: '30px'
+              },
+              data: {
+                label: `Imported from: ${file.name}`,
+                importedAt: new Date().toLocaleString()
+              }
+            };
+
+            // Update edge references to use new node IDs
+            const newEdges = jsonContent.edges
+              .filter((edge: Edge) => !sceneNodeIds.has(edge.source) && !sceneNodeIds.has(edge.target))
+              .map((edge: Edge) => ({
+                ...edge,
+                id: `${edge.id}_imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                source: oldToNewIds.get(edge.source) || edge.source,
+                target: oldToNewIds.get(edge.target) || edge.target
+              }));
+
+            // Add imported nodes, border and edges to current graph
+            setNodes(currentNodes => [...currentNodes, borderNode, ...newNodes]);
+            setEdges(currentEdges => [...currentEdges, ...newEdges]);
+            setIsImportModalOpen(false);
+          } else {
+            alert('Invalid graph file format. The file must contain nodes and edges arrays.');
+          }
+        } catch (error) {
+          alert('Error parsing JSON file. Please make sure the file is valid JSON.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  }, [nodes, getViewport]);
+
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
       {/* Dialog eksportu */}
@@ -1281,8 +1416,54 @@ const FlowDiagramInner = () => {
                 fontSize: '1rem',
                 fontWeight: 500
               }}>
-                Select a graph to import:
+                Import options:
               </h4>
+              
+              {/* File import section */}
+              <div style={{ marginBottom: '24px' }}>
+                <h5 style={{ 
+                  margin: '0 0 8px',
+                  color: '#e2e8f0',
+                  fontSize: '0.875rem',
+                  fontWeight: 500
+                }}>
+                  Import from JSON file:
+                </h5>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileImport}
+                  style={{ display: 'none' }}
+                  id="json-file-input"
+                />
+                <label
+                  htmlFor="json-file-input"
+                  style={{
+                    display: 'inline-block',
+                    padding: '8px 16px',
+                    background: '#3b82f6',
+                    color: 'white',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    textAlign: 'center',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  Choose JSON File
+                </label>
+              </div>
+
+              <h5 style={{ 
+                margin: '0 0 8px',
+                color: '#e2e8f0',
+                fontSize: '0.875rem',
+                fontWeight: 500
+              }}>
+                Import from saved graphs:
+              </h5>
               <div style={{
                 marginBottom: '12px'
               }}>
@@ -1313,29 +1494,29 @@ const FlowDiagramInner = () => {
                   .filter(name => name !== currentGraph)
                   .filter(name => name.toLowerCase().includes(importSearchFilter.toLowerCase()))
                   .map((name, index, filteredList) => (
-                    <div
-                      key={name}
-                      onClick={() => setSelectedGraphToImport(name)}
-                      style={{
-                        padding: '12px',
-                        borderBottom: index < filteredList.length - 1 ? '1px solid #475569' : 'none',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        background: selectedGraphToImport === name ? '#475569' : '#334155',
-                        cursor: 'pointer',
-                        transition: 'background-color 0.2s'
-                      }}
-                    >
-                      <span style={{ 
-                        color: '#e2e8f0',
-                        fontSize: '0.875rem',
-                        fontWeight: 500
-                      }}>
-                        {name}
-                      </span>
-                    </div>
-                  ))}
+                  <div
+                    key={name}
+                    onClick={() => setSelectedGraphToImport(name)}
+                    style={{
+                      padding: '12px',
+                      borderBottom: index < filteredList.length - 1 ? '1px solid #475569' : 'none',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: selectedGraphToImport === name ? '#475569' : '#334155',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                  >
+                    <span style={{ 
+                      color: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}>
+                      {name}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
