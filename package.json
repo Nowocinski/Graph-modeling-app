@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build-force": "CI=false NEXT_TELEMETRY_DISABLED=1 next build",
     "start": "next start",
     "lint": "next lint"
   },
