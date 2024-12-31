@@ -164,7 +164,7 @@
       },
       "width": 202,
       "height": 109,
-      "selected": true,
+      "selected": false,
       "positionAbsolute": {
         "x": 111.52906015660048,
         "y": 1282.7177644176725
@@ -418,7 +418,7 @@
       "id": "torusKnotGeometry_1735644838627",
       "type": "torusKnotGeometry",
       "position": {
-        "x": 85.42732436465329,
+        "x": 105.3716139430889,
         "y": 3940.4715705192943
       },
       "data": {
@@ -431,9 +431,9 @@
       },
       "width": 201,
       "height": 209,
-      "selected": false,
+      "selected": true,
       "positionAbsolute": {
-        "x": 85.42732436465329,
+        "x": 105.3716139430889,
         "y": 3940.4715705192943
       },
       "dragging": false
@@ -598,11 +598,147 @@
         "selectedInputs": {}
       },
       "width": 300,
-      "height": 311,
+      "height": 183,
       "selected": false,
       "positionAbsolute": {
         "x": 499.112693589967,
         "y": 1382.7833164892397
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_octahedron",
+      "type": "mesh",
+      "position": {
+        "x": 589.1779701470555,
+        "y": 1584.2221086668906
+      },
+      "data": {
+        "position": {
+          "x": -0.2,
+          "y": 4.5,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 0.8,
+          "y": 0.8,
+          "z": 0.8
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 589.1779701470555,
+        "y": 1584.2221086668906
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_ring",
+      "type": "mesh",
+      "position": {
+        "x": 569.1829046505194,
+        "y": 1830.6338451567515
+      },
+      "data": {
+        "position": {
+          "x": 4.5,
+          "y": 2,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 0.7,
+          "y": 0.7,
+          "z": 0.7
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 569.1829046505194,
+        "y": 1830.6338451567515
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_torus",
+      "type": "mesh",
+      "position": {
+        "x": 589.9920454527636,
+        "y": 2035.577670623548
+      },
+      "data": {
+        "position": {
+          "x": 2.4,
+          "y": 2,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 0.6,
+          "y": 0.6,
+          "z": 0.6
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 589.9920454527636,
+        "y": 2035.577670623548
+      },
+      "dragging": false
+    },
+    {
+      "id": "mesh_torusKnot",
+      "type": "mesh",
+      "position": {
+        "x": 583.7127925424189,
+        "y": 2287.829483052389
+      },
+      "data": {
+        "position": {
+          "x": 4.6,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 0.6,
+          "y": 0.6,
+          "z": 0.6
+        },
+        "selectedInputs": {}
+      },
+      "width": 300,
+      "height": 183,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 583.7127925424189,
+        "y": 2287.829483052389
       },
       "dragging": false
     }
@@ -708,6 +844,90 @@
       "target": "scene",
       "targetHandle": null,
       "id": "reactflow__edge-mesh_1735645114457-scene"
+    },
+    {
+      "source": "octahedronGeometry_1735644775170",
+      "sourceHandle": null,
+      "target": "mesh_octahedron",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-octahedronGeometry-mesh_octahedron"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_octahedron",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial-mesh_octahedron"
+    },
+    {
+      "source": "mesh_octahedron",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-mesh_octahedron-scene"
+    },
+    {
+      "source": "ringGeometry_1735644779880",
+      "sourceHandle": null,
+      "target": "mesh_ring",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-ringGeometry-mesh_ring"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_ring",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial-mesh_ring"
+    },
+    {
+      "source": "mesh_ring",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-mesh_ring-scene"
+    },
+    {
+      "source": "torusGeometry_1735644786656",
+      "sourceHandle": null,
+      "target": "mesh_torus",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-torusGeometry-mesh_torus"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_torus",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial-mesh_torus"
+    },
+    {
+      "source": "mesh_torus",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-mesh_torus-scene"
+    },
+    {
+      "source": "torusKnotGeometry_1735644838627",
+      "sourceHandle": null,
+      "target": "mesh_torusKnot",
+      "targetHandle": "geometry",
+      "id": "reactflow__edge-torusKnotGeometry-mesh_torusKnot"
+    },
+    {
+      "source": "meshNormalMaterial_1",
+      "sourceHandle": null,
+      "target": "mesh_torusKnot",
+      "targetHandle": "material",
+      "id": "reactflow__edge-meshNormalMaterial-mesh_torusKnot"
+    },
+    {
+      "source": "mesh_torusKnot",
+      "sourceHandle": null,
+      "target": "scene",
+      "targetHandle": null,
+      "id": "reactflow__edge-mesh_torusKnot-scene"
     }
   ]
 }
