@@ -5,7 +5,7 @@
       "type": "scene",
       "position": { "x": 900, "y": 400 },
       "data": {
-        "backgroundColor": "#323232",
+        "backgroundColor": "#B1EBE4",
         "ambientLightIntensity": 0.5,
         "pointLightIntensity": 1,
         "pointLightPosition": { "x": 0, "y": 0, "z": 0 }
